@@ -1,0 +1,26 @@
+{
+  "name": "antds",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview",
+    "d": "deno run -A dev/ant-icons.ts",
+    "i1": "pnpm -F @ant-design/icons-svg generate && pnpm -F @ant-design/icons-svg build && pnpm -F @ant-design/icons generate",
+    "i2": "pnpm -F @ant-design/icons compile",
+    "ii": "yarn i1 && yarn i2"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.8.2",
+    "vite": "^3.0.9",
+    "vite-plugin-solid": "^2.3.0"
+  },
+  "dependencies": {
+    "@ant-design/icons": "workspace:4.7.0",
+    "@ant-design/icons-svg": "workspace:4.2.1",
+    "solid-js": "^1.5.1"
+  }
+}
