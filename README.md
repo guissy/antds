@@ -3,7 +3,7 @@
 
 just some tools for convert antd-react to antd-solid
 
-## roadmap
+## todo
 - [X] Icon
 - [ ] Button
 - [ ] Typography
@@ -71,15 +71,15 @@ just some tools for convert antd-react to antd-solid
 
 ## start
 ```bash
+yarn d
 pnpm i
-yarn ii
 yarn start
 ```
 
 ## dev
 ```bash
+yarn d
 pnpm add -w @ant-design/icons-svg
-pnpm add -w @ant-design/icons-react
-yarn ii
+pnpm add -w @ant-design/icons
 yarn start
 ```
