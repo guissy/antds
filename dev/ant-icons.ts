@@ -15,7 +15,7 @@ await $`cp -rf ant-design-icons/packages/icons-svg antd-solid-icons`;
 await $`cp -rf ant-design-icons/packages/icons-react antd-solid-icons`;
 
 // package.json
-const p1 = await $`cat ant-design-icons/packages/icons-react/package.json`.stdout("pipe");
+const p1 = await $`cat ant-design-icons/packages/icons-react/package.json`.stdout("inherit");
 const pkg1 = p1.stdoutJson;
 delete pkg1.unpkg;
 delete pkg1.main;
@@ -41,7 +41,7 @@ for await (const file of $.fs.expandGlob(`antd-solid-icons/icons-react/src/**/*.
     if (count == n) {
         break;
     }
-    let s1 = await $`cat ${file.path}`.stdout("pipe");
+    let s1 = await $`cat ${file.path}`.stdout("inherit");
     let s2 = reactToSolid(s1.stdout);
     await Deno.writeFile(file.path, new TextEncoder().encode(s2));
     count += 1;
@@ -53,7 +53,7 @@ for await (const file of $.fs.expandGlob(`antd-solid-icons/icons-react/src/**/*.
         break;
     }
     // console.log(file.path);
-    let s1 = await $`cat ${file.path}`.stdout("pipe");
+    let s1 = await $`cat ${file.path}`.stdout("inherit");
     let s2 = s1.stdout.replaceAll(' as IconBaseComponent<IconComponentProps>;', '')
     .replace(/import (\w+) from '@ant\-design\/icons\-svg\/lib/, `import $1 from '@ant-design/icons-svg/es`)
     .replace(/but got \${icon}/, `but got \${JSON.stringify(icon)}`);

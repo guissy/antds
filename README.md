@@ -1,7 +1,18 @@
-# antd for solid-js
-=========
+<p align="center">
+  <a href="https://ant.design">
+    <img width="200" src="https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg">
+  </a>
+</p>
 
-just some tools for convert antd-react to antd-solid
+<h1 align="center">Ant Design</h1>
+
+<div align="center">
+
+Antd for Solid-js
+</div>
+
+
+**Just a tool for convert antd-react to antd-solid**
 
 ## todo
 - [X] Icon
