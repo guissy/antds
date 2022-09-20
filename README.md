@@ -1,10 +1,13 @@
 <p align="center">
   <a href="https://ant.design">
-    <img width="200" src="https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg">
+    <img width="100" src="https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg">
+  </a>
+  <a href="https://www.solidjs.com/">
+    <img width="100" src="https://www.solidjs.com/assets/logo.123b04bc.svg">
   </a>
 </p>
 
-<h1 align="center">Ant Design</h1>
+<h1 align="center">Ant Design + SolidJS</h1>
 
 <div align="center">
 
