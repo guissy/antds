@@ -31,7 +31,8 @@ module.exports = {
     "solid-js/web": `${solidjsPath}/web/dist/web.cjs`,
     "solid-js/store": `${solidjsPath}/store/dist/store.cjs`,
     "solid-js": `${solidjsPath}/dist/solid.cjs`,
-    // "@ant-design/icons": `${pkgRootPath}/packages/antd-solid-icons/icons-react/src/index.ts`
+    "@ant-design/icons-solid": `${pkgRootPath}/packages/antd-solid-icons/icons-react/src/index.ts`,
+    "@ant-design/icons-svg/es/asn": `${pkgRootPath}/packages/antd-solid-icons/icons-svg/lib/asn/AccountBookFilled.js`
   },
 
   verbose: true,

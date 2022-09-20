@@ -423,7 +423,7 @@ import {
   ZhihuOutlined,
   ZoomInOutlined,
   ZoomOutOutlined
-} from "@ant-design/icons";
+} from "@ant-design/icons-solid";
 
 export default {
   title: "General/Icon",

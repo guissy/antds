@@ -1,9 +1,7 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "./test-utils";
-// import { AccountBookOutlined as Icon } from "@ant-design/icons";
-import Icon from "../packages/antd-solid-icons/icons-react/src/icons/AccountBookOutlined";
-// import { iconStyles } from "./icon.styles";
+import { renderWithAntdProvider } from "./test-utils";
+import { AccountBookOutlined as Icon } from "@ant-design/icons-solid";
 
 describe("Icon", () => {
   afterEach(() => {
@@ -13,7 +11,7 @@ describe("Icon", () => {
 
   it("should render", () => {
     // act
-    renderWithHopeProvider(() => <Icon data-testid="icon" />);
+    renderWithAntdProvider(() => <Icon data-testid="icon" />);
     const icon = screen.getByTestId("icon");
 
     // assert
@@ -21,7 +19,7 @@ describe("Icon", () => {
   });
 
   it("should render <svg> tag with children", () => {
-    renderWithHopeProvider(() => (
+    renderWithAntdProvider(() => (
       <Icon data-testid="icon">
       </Icon>
     ));
@@ -33,18 +31,10 @@ describe("Icon", () => {
     expect(icon.querySelector("path")).toBeTruthy();
   });
 
-  // it("should render svg component provided with the as prop", () => {
-  //   // act
-  //   renderWithHopeProvider(() => <Icon data-testid="icon" as={IconCheckCircle} />);
-  //   const icon = screen.getByTestId("icon");
-
-  //   // assert
-  //   expect(icon).toBe(<IconCheckCircle />);
-  // });
 
   it("should have semantic anticon class", () => {
     // act
-    renderWithHopeProvider(() => <Icon data-testid="icon" />);
+    renderWithAntdProvider(() => <Icon data-testid="icon" />);
     const icon = screen.getByTestId("icon");
 
     // assert
@@ -57,7 +47,7 @@ describe("Icon", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => (
+    renderWithAntdProvider(() => (
       <Icon class={stubClass} data-testid="icon" />
     ));
     const icon = screen.getByTestId("icon");
@@ -71,7 +61,7 @@ describe("Icon", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => (
+    renderWithAntdProvider(() => (
       // eslint-disable-next-line solid/no-react-specific-props
       <Icon className={stubClass} data-testid="icon" />
     ));
@@ -87,7 +77,7 @@ describe("Icon", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => (
+    renderWithAntdProvider(() => (
       <Icon classList={{ [stubClass]: true }} data-testid="icon" />
     ));
     const icon = screen.getByTestId("icon");

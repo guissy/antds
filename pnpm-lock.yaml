@@ -93,7 +93,7 @@ importers:
   packages/antd-solid-icons/icons-react:
     specifiers:
       '@ant-design/colors': ^6.0.0
-      '@ant-design/icons-svg': ^4.2.1
+      '@ant-design/icons-svg': workspace:^4.2.1
       '@babel/runtime': ^7.11.2
       '@types/classnames': ^2.2.9
       '@types/enzyme': ^3.10.3
