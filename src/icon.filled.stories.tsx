@@ -220,7 +220,7 @@ import {
   YuqueFilled,
   ZhihuCircleFilled,
   ZhihuSquareFilled
-} from "@ant-design/icons";
+} from "@ant-design/icons-solid";
 
 export default {
   title: "General/Icon",

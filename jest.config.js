@@ -32,8 +32,8 @@ module.exports = {
     "solid-js/store": `${solidjsPath}/store/dist/store.cjs`,
     "solid-js": `${solidjsPath}/dist/solid.cjs`,
     "@ant-design/icons-solid": `${pkgRootPath}/packages/antd-solid-icons/icons-react/src/index.ts`,
-    "@ant-design/icons-svg/es/asn": `${pkgRootPath}/packages/antd-solid-icons/icons-svg/lib/asn/AccountBookFilled.js`
-  },
+    "@ant-design/icons-svg/es/asn": `${pkgRootPath}/packages/antd-solid-icons/icons-react/node_modules/@ant-design/icons-svg/lib/asn/AccountBookFilled.js`
+  },//Users/zhonglvgui/Documents/h5/antds/node_modules/.pnpm/registry.npmmirror.com+@ant-design+icons-svg@4.2.1/node_modules/@ant-design/icons-svg/es/asn/AccountBookFilled.js
 
   verbose: true,
   testTimeout: 30000

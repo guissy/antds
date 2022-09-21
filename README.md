@@ -93,7 +93,6 @@ yarn start
 ## dev
 ```bash
 yarn d
-pnpm add -w @ant-design/icons-svg
-pnpm add -w @ant-design/icons
+pnpm add -w @ant-design/icons-solid
 yarn start
 ```

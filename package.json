@@ -7,10 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "d": "deno run -A dev/ant-icons.ts",
-    "i1": "pnpm -F @ant-design/icons-svg generate && pnpm -F @ant-design/icons-svg build && pnpm -F @ant-design/icons generate",
-    "i2": "pnpm -F @ant-design/icons compile",
-    "ii": "yarn i1 && yarn i2",
+    "d": "ts-node --esm dev/ant-icons.ts",
     "storybook": "start-storybook -p 6006",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -18,6 +15,7 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@babel/preset-env": "^7.19.1",
     "@storybook/addon-a11y": "6.5.12",
     "@storybook/addon-actions": "6.5.12",
     "@storybook/addon-essentials": "6.5.12",
@@ -43,9 +41,12 @@
     "solid-testing-library": "^0.3.0",
     "storybook-dark-mode": "1.0.9",
     "ts-jest": "^29.0.1",
+    "ts-node": "^10.9.1",
+    "ts-node-esm": "^0.0.6",
     "typescript": "^4.8.2",
     "vite": "^3.0.9",
-    "vite-plugin-solid": "^2.3.0"
+    "vite-plugin-solid": "^2.3.0",
+    "zx": "^7.0.8"
   },
   "dependencies": {
     "@ant-design/icons-solid": "workspace:4.7.0",
