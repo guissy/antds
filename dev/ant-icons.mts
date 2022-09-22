@@ -51,8 +51,6 @@ const resolvePkg = async () => {
   }
   Object.assign(pkg.devDependencies, {
     "@babel/preset-env": "^7.19.1",
-    "@storybook/builder-webpack5": "6.5.12",
-    "@storybook/theming": "6.5.12",
     "@testing-library/jest-dom": "^5.16.5",
     "@types/jest": "^29.0.3",
     "@types/testing-library__jest-dom": "^5.14.5",
@@ -60,14 +58,13 @@ const resolvePkg = async () => {
     jest: "^29.0.3",
     "jest-environment-jsdom": "^29.0.3",
     "solid-testing-library": "^0.3.0",
-    "storybook-dark-mode": "1.0.9",
     "ts-jest": "^29.0.1",
     "ts-node": "^10.9.1",
     vite: "^3.0.9",
     "vite-plugin-solid": "^2.3.0",
   });
   // sort object by key
-  // pkg.devDependencies = JSON.parse(JSON.stringify(pkg.devDependencies))
+  pkg.devDependencies = Object.fromEntries(Object.entries(pkg.devDependencies).sort((a, b) => a[0] < b[0] ? -1 : 1))
   pkg.peerDependencies = {
     solid: ">=1.5.0",
   };
@@ -78,6 +75,14 @@ const resolvePkg = async () => {
   try {
     cd(`${cwd}/packages/antd-icons-solid`);
     await $`yarn`;
+    await $`cp -f ${cwd}/dev/generate.ts ./scripts/generate.ts`;
+    await $`cp -f ${cwd}/dev/main.tsx ./src/main.tsx`;
+    await $`cp -f ${cwd}/dev/App.tsx ./src/App.tsx`;
+    await $`cp -f ${cwd}/dev/utils.ts ./src/utils.ts`;
+    await $`cp -f ${cwd}/dev/index.html ./index.html`;
+    await $`cp -f ${cwd}/dev/vite.config.ts ./vite.config.ts`;
+    await $`cp -f ${cwd}/dev/jest.config.js ./jest.config.js`;
+
     await $`yarn generate`;
   } catch (e) {
     console.log(e);
@@ -88,12 +93,18 @@ const resolvePkg = async () => {
 const react2Solid = async () => {
   cd(`${cwd}/packages/antd-icons-solid`);
   for await (const file of await glob(`src/**/*.{ts,tsx}`)) {
+    if (file.includes("/src/icons/")) {
+      break;
+    }
     let s1 = await $`cat ${file}`;
     let s2 = reactToSolid(s1.stdout);
     await nodeFs.writeFile(file, s2);
   }
 
   for await (const file of await glob(`src/**/*.{ts,tsx}`)) {
+    if (file.includes("/src/icons/")) {
+      break;
+    }
     // console.log(file);
     let s1 = await $`cat ${file}`;
     let s2 = s1.stdout
@@ -107,14 +118,8 @@ const react2Solid = async () => {
   }
 };
 
-await getRepo()
-await resolvePkg()
+// await getRepo()
+// await resolvePkg()
 await react2Solid()
-
-cd(cwd);
-await $`cp -f ./dev/main.tsx ./packages/antd-icons-solid/src/main.tsx`;
-await $`cp -f ./dev/App.tsx ./packages/antd-icons-solid/src/App.tsx`;
-await $`cp -f ./dev/index.html ./packages/antd-icons-solid/index.html`;
-await $`cp -f ./dev/vite.config.ts ./packages/antd-icons-solid/vite.config.ts`;
 
 // await $`rm -rf packages/ant-design-icons`;
