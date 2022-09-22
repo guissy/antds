@@ -61,20 +61,30 @@ const resolvePkg = async () => {
     "ts-jest": "^29.0.1",
     "ts-node": "^10.9.1",
     vite: "^3.0.9",
-    "vite-plugin-solid": "^2.3.0",
+    "vite-plugin-solid": "^2.3.0"
   });
   // sort object by key
   pkg.devDependencies = Object.fromEntries(Object.entries(pkg.devDependencies).sort((a, b) => a[0] < b[0] ? -1 : 1))
   pkg.peerDependencies = {
-    solid: ">=1.5.0",
+    "solid-js": ">=1.5.0",
   };
   await nodeFs.writeFile(
     "antd-icons-solid/package.json",
     JSON.stringify(pkg, null, "  ")
   );
+
+  // typescript
+  const p2 = await $`cat antd-icons-solid/tsconfig.json`;
+  const tsconfig = JSON.parse(p2.stdout);
+  tsconfig.compilerOptions.jsx = "preserve";
+  tsconfig.compilerOptions.jsxImportSource = "solid-js";
+  await nodeFs.writeFile(
+    "antd-icons-solid/tsconfig.json",
+    JSON.stringify(tsconfig, null, "  ")
+  );
   try {
     cd(`${cwd}/packages/antd-icons-solid`);
-    await $`yarn`;
+    await $`npm i`;
     await $`cp -f ${cwd}/dev/generate.ts ./scripts/generate.ts`;
     await $`cp -f ${cwd}/dev/main.tsx ./src/main.tsx`;
     await $`cp -f ${cwd}/dev/App.tsx ./src/App.tsx`;
@@ -82,8 +92,10 @@ const resolvePkg = async () => {
     await $`cp -f ${cwd}/dev/index.html ./index.html`;
     await $`cp -f ${cwd}/dev/vite.config.ts ./vite.config.ts`;
     await $`cp -f ${cwd}/dev/jest.config.js ./jest.config.js`;
+    await $`cp -f ${cwd}/dev/jest.setup.ts ./jest.setup.ts`;
+    await $`cp -f ${cwd}/dev/Tooltip.tsx ./Tooltip.tsx`;
 
-    await $`yarn generate`;
+    await $`npm run generate`;
   } catch (e) {
     console.log(e);
   }
@@ -92,9 +104,9 @@ const resolvePkg = async () => {
 // react to solid
 const react2Solid = async () => {
   cd(`${cwd}/packages/antd-icons-solid`);
-  for await (const file of await glob(`src/**/*.{ts,tsx}`)) {
-    if (file.includes("/src/icons/")) {
-      break;
+  for await (const file of await glob(`{src,tests}/**/*.{ts,tsx}`)) {
+    if (file.includes("src/icons/")) {
+      continue;
     }
     let s1 = await $`cat ${file}`;
     let s2 = reactToSolid(s1.stdout);
@@ -102,13 +114,14 @@ const react2Solid = async () => {
   }
 
   for await (const file of await glob(`src/**/*.{ts,tsx}`)) {
-    if (file.includes("/src/icons/")) {
-      break;
+    if (file.includes("src/icons/")) {
+      continue;
     }
     // console.log(file);
     let s1 = await $`cat ${file}`;
     let s2 = s1.stdout
       .replaceAll(" as IconBaseComponent<IconComponentProps>;", "")
+      .replaceAll("from '../lib';", "from '../src';")
       .replace(
         /import (\w+) from '@ant\-design\/icons\-svg\/lib/,
         `import $1 from '@ant-design/icons-svg/es`
@@ -118,8 +131,8 @@ const react2Solid = async () => {
   }
 };
 
-// await getRepo()
-// await resolvePkg()
+await getRepo()
+await resolvePkg()
 await react2Solid()
 
 // await $`rm -rf packages/ant-design-icons`;

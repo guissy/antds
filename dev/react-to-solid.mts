@@ -95,9 +95,14 @@ export const classResolve = (react: string): string => {
     })
 }
 
+export const testing = (react: string): string => {
+    return react.replace(/import (.*)from 'enzyme';/, 'import { render as renderFn } from "solid-testing-library";\nconst render = (jsx: JSX.Element) => renderFn(() => jsx);\nconst mount = render;\n')
+    .replace(/\.isEmptyRender\(\)\).toBeTruthy\(\);/g, '.container.firstChild).toBeNull()')
+}
+
 
 export const reactToSolid = (react: string): string => {
-    return classResolve(eventResolve(refResolve(jsxResolve(hookResolve(importResolve(react))))));
+    return classResolve(eventResolve(refResolve(jsxResolve(hookResolve(importResolve(testing(react)))))));
 }
 
 export default reactToSolid;
