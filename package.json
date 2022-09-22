@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "d": "ts-node --esm dev/ant-icons.ts",
+    "d": "ts-node --esm dev/ant-icons.mts",
     "storybook": "start-storybook -p 6006",
     "test": "jest",
     "test:watch": "jest --watch",
