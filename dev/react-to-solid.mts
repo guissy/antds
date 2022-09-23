@@ -102,6 +102,18 @@ export const classResolve = (react: string): string => {
     })
 }
 
+export const resolveChildren = (react: string): string => {
+    const hasChildren = /\bChildren\./g.test(react);
+    if (hasChildren) {
+        return react.replace(/\"solid-js\";/, "\"solid-js\";\nimport { spread } from 'solid-js/web';")
+        .replace(/React\.Children\.map\(([^,]+), /, "Children(() => svgProps.children).toArray().map(")
+        .replace(/React\.cloneElement\(([^,]+),([^,]+),/m, "(spread($1, $2), $1")
+        .replace(/child.type/, "child?.nodeName")
+    } else {
+        return react;
+    }
+}
+
 export const testing = (react: string): string => {
     return react.replace(/import (.*)from 'enzyme';/, 'import { render as renderFn, fireEvent } from "solid-testing-library";\nconst render = (jsx: JSX.Element) => { const dom = renderFn(() => jsx); dom.render = () => renderFn(() => jsx); dom.setProps = () => !0; return dom; };\nconst mount = render;\n')
     .replace(/\.isEmptyRender\(\)\).toBeTruthy\(\);/g, '.container.firstChild).toBeNull()')
@@ -114,7 +126,7 @@ export const testing = (react: string): string => {
 
 
 export const reactToSolid = (react: string): string => {
-    return classResolve(eventResolve(refResolve(jsxResolve(hookResolve(importResolve(testing(react)))))));
+    return resolveChildren(classResolve(eventResolve(refResolve(jsxResolve(hookResolve(importResolve(testing(react))))))));
 }
 
 export default reactToSolid;

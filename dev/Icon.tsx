@@ -82,7 +82,7 @@ const Icon: Component<IconComponentProps & JSX.CustomAttributes<HTMLDivElement>>
 
   // component > children
   const renderInnerNode = () => {
-    // const Component = props.component;
+    const Component = props.component;
     const children = Children(() => props.children)()
     if (Component) {
       return <Component {...innerSvgProps}>{children}</Component>;

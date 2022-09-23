@@ -22,8 +22,7 @@ module.exports = {
     "solid-js/web": `${solidjsPath}/web/dist/web.cjs`,
     "solid-js/store": `${solidjsPath}/store/dist/store.cjs`,
     "solid-js": `${solidjsPath}/dist/solid.cjs`,
-    "antd": `<rootDir>/Tooltip.tsx`,
-    "@ant-design/icons-svg/es/asn": `${pkgRootPath}/packages/antd-solid-icons/icons-react/node_modules/@ant-design/icons-svg/lib/asn/AccountBookFilled.js`
+    "antd": `<rootDir>/Tooltip.tsx`
   },
 
   verbose: true,

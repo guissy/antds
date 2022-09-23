@@ -29,7 +29,7 @@ const resolvePkg = async () => {
   pkg.description = "adapte @ant-design/icons for solid-js";
   pkg.module = "./src/index.ts";
   pkg.scripts.start = "vite dev";
-  pkg.scripts.test = "jest";
+  pkg.scripts.test = "NODE_ENV=production jest";
   delete pkg.scripts.compile;
   delete pkg.gitHead;
   const reactPkg = [
@@ -95,6 +95,8 @@ const resolvePkg = async () => {
     await $`cp -f ${cwd}/dev/jest.setup.ts ./jest.setup.ts`;
     await $`cp -f ${cwd}/dev/Tooltip.tsx ./Tooltip.tsx`;
     await $`cp -f ${cwd}/dev/Icon.tsx ./src/components/Icon.tsx`;
+    await $`cp -f ${cwd}/dev/IconSolid.test.tsx ./tests/IconSolid.tsx`;
+    await $`cp -f ${cwd}/dev/test-utils.tsx ./tests/test-utils.tsx`;
 
     await $`npm run generate`;
   } catch (e) {
@@ -109,7 +111,9 @@ const react2Solid = async () => {
     if (file.includes("src/icons/")) {
       continue;
     }
+    $.verbose = false;
     let s1 = await $`cat ${file}`;
+    $.verbose = true;
     let s2 = reactToSolid(s1.stdout);
     await nodeFs.writeFile(file, s2);
   }
@@ -118,8 +122,9 @@ const react2Solid = async () => {
     if (file.includes("src/icons/")) {
       continue;
     }
-    // console.log(file);
+    $.verbose = false;
     let s1 = await $`cat ${file}`;
+    $.verbose = true;
     let s2 = s1.stdout
       .replaceAll(" as IconBaseComponent<IconComponentProps>;", "")
       .replaceAll("from '../lib';", "from '../src';")
@@ -131,6 +136,7 @@ const react2Solid = async () => {
     await nodeFs.writeFile(file, s2);
   }
   await $`rm ./tests/__snapshots__/*`
+  await $`npm run test`
 };
 
 await getRepo()

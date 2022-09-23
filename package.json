@@ -26,6 +26,7 @@
     "@storybook/builder-webpack5": "6.5.12",
     "@storybook/client-api": "6.5.12",
     "@storybook/client-logger": "6.5.12",
+    "@storybook/cli": "6.5.12",
     "@storybook/components": "6.5.12",
     "@storybook/core-events": "6.5.12",
     "@storybook/manager-webpack5": "6.5.12",
