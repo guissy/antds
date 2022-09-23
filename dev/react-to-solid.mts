@@ -3,7 +3,7 @@ const events = ['cut','paste','compositionEnd','compositionStart','compositionUp
 // "import React from 'react';": "import {createEffect, createSignal, createContext, JSX, useContext} from \"solid-js\";",
 // "import { [^}]+ } from 'react';": "",
 export const importResolve = (react: string): string => {
-    const solidImport = "import {Component, createEffect, createSignal, createContext, createMemo, JSX, useContext, children as Children} from \"solid-js\";"
+    const solidImport = "import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children} from \"solid-js\";"
     return react
     .replace(/import (.*)from 'react';?/g, solidImport)
 }

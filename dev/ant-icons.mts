@@ -94,6 +94,7 @@ const resolvePkg = async () => {
     await $`cp -f ${cwd}/dev/jest.config.js ./jest.config.js`;
     await $`cp -f ${cwd}/dev/jest.setup.ts ./jest.setup.ts`;
     await $`cp -f ${cwd}/dev/Tooltip.tsx ./Tooltip.tsx`;
+    await $`cp -f ${cwd}/dev/Icon.tsx ./src/components/Icon.tsx`;
 
     await $`npm run generate`;
   } catch (e) {
