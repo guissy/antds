@@ -1,8 +1,9 @@
+const events = ['cut','paste','compositionEnd','compositionStart','compositionUpdate','keyDown','keyPress','keyUp','focus','blur','focusIn','focusOut','change','input','invalid','submit','reset','click','contextMenu','dblClick','drag','dragEnd','dragEnter','dragExit','dragLeave','dragOver','dragStart','drop','mouseDown','mouseEnter','mouseLeave','mouseMove','mouseOut','mouseOver','mouseUp','popState','select','touchCancel','touchEnd','touchMove','touchStart','scroll','wheel','abort','canPlay','canPlayThrough','durationChange','emptied','encrypted','ended','loadedData','loadedMetadata','loadStart','pause','play','playing','progress','rateChange','seeked','seeking','stalled','suspend','timeUpdate','volumeChange','waiting','load','error','animationStart','animationEnd','animationIteration','transitionEnd','doubleClick','pointerOver','pointerEnter','pointerDown','pointerMove','pointerUp','pointerCancel','pointerOut','pointerLeave','gotPointerCapture','lostPointerCapture']
 // "import (type )?\* as React from 'react';": "import {createEffect, createSignal, createContext, createMemo, JSX, useContext} from \"solid-js\";",
 // "import React from 'react';": "import {createEffect, createSignal, createContext, JSX, useContext} from \"solid-js\";",
 // "import { [^}]+ } from 'react';": "",
 export const importResolve = (react: string): string => {
-    const solidImport = "import {Component, createEffect, createSignal, createContext, createMemo, JSX, useContext} from \"solid-js\";"
+    const solidImport = "import {Component, createEffect, createSignal, createContext, createMemo, JSX, useContext, children as Children} from \"solid-js\";"
     return react
     .replace(/import (.*)from 'react';?/g, solidImport)
 }
@@ -36,8 +37,14 @@ export const jsxResolve = (react: string): string => {
     .replace(/React.FC/g, 'Component')
     .replace(/(React.)?ReactElement/g, 'JSX.Element')
     .replace(/(React.)?ReactNode/g, 'JSX.Element')
+    .replace(/(React.)?ReactNode/g, 'JSX.Element')
     .replace(/(React.)?ReactInstance/g, 'JSX.Element')
     .replace(/(React.)?CSSProperties/g, 'JSX.CSSProperties')
+    .replace(/React.HTMLProps/g, 'JSX.HTMLAttributes')
+    .replace(/React.ComponentType/g, 'Component')
+    .replace(/React.SVGProps/g, 'JSX.SvgSVGAttributes')
+    .replace(/React.AriaAttributes/g, 'JSX.AriaAttributes')
+    .replace(/React.ForwardRefExoticComponent<(.+)>/g, 'JSX.IntrinsicAttributes')
     .replace(/React.Key\b/g, 'number | string')
     .replace(/(React.)?HTMLAttributes/g, 'JSX.HTMLAttributes')
 }
@@ -96,8 +103,13 @@ export const classResolve = (react: string): string => {
 }
 
 export const testing = (react: string): string => {
-    return react.replace(/import (.*)from 'enzyme';/, 'import { render as renderFn } from "solid-testing-library";\nconst render = (jsx: JSX.Element) => renderFn(() => jsx);\nconst mount = render;\n')
+    return react.replace(/import (.*)from 'enzyme';/, 'import { render as renderFn, fireEvent } from "solid-testing-library";\nconst render = (jsx: JSX.Element) => { const dom = renderFn(() => jsx); dom.render = () => renderFn(() => jsx); dom.setProps = () => !0; return dom; };\nconst mount = render;\n')
     .replace(/\.isEmptyRender\(\)\).toBeTruthy\(\);/g, '.container.firstChild).toBeNull()')
+    .replace(/\.find\(([^)]+)\)\.first\(\)\.prop/g, ".container.querySelector($1).getAttribute")
+    .replace(/\.find\(([^)]+)\)\.first\(\)/g, ".container.querySelector($1)")
+    .replace(/\.find\(([^)]+)\)\.at\(([^)]+)\)/g, ".container.querySelectorAll($1)[$2]")
+    .replace(/\.find\(([^)]+)\)/g, ".container.querySelectorAll($1)")
+    .replace(/(\w+)\.simulate\('(\w+)'\)/g, (_, s1, s2) => `fireEvent.${events.find(e => e.toLowerCase() === s2)}(${s1})`)
 }
 
 

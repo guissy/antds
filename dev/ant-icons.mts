@@ -113,7 +113,7 @@ const react2Solid = async () => {
     await nodeFs.writeFile(file, s2);
   }
 
-  for await (const file of await glob(`src/**/*.{ts,tsx}`)) {
+  for await (const file of await glob(`{src,tests}/**/*.{ts,tsx}`)) {
     if (file.includes("src/icons/")) {
       continue;
     }
@@ -129,6 +129,7 @@ const react2Solid = async () => {
       .replace(/but got \${icon}/, `but got \${JSON.stringify(icon)}`);
     await nodeFs.writeFile(file, s2);
   }
+  await $`rm ./tests/__snapshots__/*`
 };
 
 await getRepo()
