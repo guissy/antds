@@ -790,7 +790,7 @@ import {
   ZhihuSquareFilled,
   ZoomInOutlined,
   ZoomOutOutlined
-} from "@ant-design/icons";
+} from "@ant-design/icons-solid";
 
 
 const App: Component = () => {

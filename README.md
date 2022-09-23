@@ -85,13 +85,7 @@ Antd for Solid-js
 
 ## start
 ```bash
-yarn d
 pnpm i
-yarn start
-```
-
-## dev
-```bash
 yarn d
 pnpm add -w @ant-design/icons-solid
 yarn start

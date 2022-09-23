@@ -4,6 +4,7 @@ importers:
 
   .:
     specifiers:
+      '@ant-design/icons-solid': workspace:^4.7.0
       '@babel/preset-env': ^7.19.1
       '@storybook/addon-a11y': 6.5.12
       '@storybook/addon-actions': 6.5.12
@@ -38,6 +39,7 @@ importers:
       vite-plugin-solid: ^2.3.0
       zx: ^7.0.8
     dependencies:
+      '@ant-design/icons-solid': link:packages/antd-icons-solid
       solid-js: registry.npmmirror.com/solid-js/1.5.5
     devDependencies:
       '@babel/preset-env': registry.npmmirror.com/@babel/preset-env/7.19.1
