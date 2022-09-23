@@ -1,4 +1,4 @@
-import { ParentComponent, JSX, createSignal, children as Children } from "solid-js";
+import { ParentComponent, children as Children } from "solid-js";
 import { spread } from "solid-js/web";
 
 export const Tooltip: ParentComponent<{onVisibleChange?: (visible: boolean) => void}> = (props) => {

@@ -1,4 +1,4 @@
-import {Component, createEffect, createSignal, createContext, createMemo, JSX, useContext, children as Children, splitProps} from "solid-js";
+import {type Component, type JSX, useContext, children as Children, splitProps} from "solid-js";
 import classNames from 'classnames';
 import Context from './Context';
 
