@@ -16,7 +16,6 @@ const getRepo = async () => {
     (await $`rm -rf antd-icons-solid`);
 
   await $`git clone --depth=1 https://github.com/ant-design/ant-design-icons.git`;
-  // await $`mv -f ant-design-icons/packages/icons-react antd-icons-solid`;
 };
 
 const resolvePkg = async () => {
@@ -90,20 +89,8 @@ const resolvePkg = async () => {
   );
   try {
     cd(`${cwd}/packages/antd-icons-solid`);
-    await $`npm i`;
-    await $`cp -f ${cwd}/dev/generate.ts ./scripts/generate.ts`;
-    await $`cp -f ${cwd}/dev/main.tsx ./src/main.tsx`;
-    await $`cp -f ${cwd}/dev/App.tsx ./src/App.tsx`;
-    await $`cp -f ${cwd}/dev/utils.ts ./src/utils.ts`;
-    await $`cp -f ${cwd}/dev/index.html ./index.html`;
-    await $`cp -f ${cwd}/dev/vite.config.ts ./vite.config.ts`;
-    await $`cp -f ${cwd}/dev/jest.config.js ./jest.config.js`;
-    await $`cp -f ${cwd}/dev/jest.setup.ts ./jest.setup.ts`;
-    await $`cp -f ${cwd}/dev/Tooltip.tsx ./Tooltip.tsx`;
-    await $`cp -f ${cwd}/dev/Icon.tsx ./src/components/Icon.tsx`;
-    await $`cp -f ${cwd}/dev/IconSolid.test.tsx ./tests/IconSolid.tsx`;
-    await $`cp -f ${cwd}/dev/test-utils.tsx ./tests/test-utils.tsx`;
-
+    await $`npm i --prefer-offline --no-audit --progress=false`;
+    await $`cp -rf ${cwd}/dev/antd-icons-solid-source/* ./`;
     await $`npm run generate`;
   } catch (e) {
     console.log(e);
@@ -153,7 +140,8 @@ const resolveClass = async (file: string, fileContent: string) => {
   const content = await $`esbuild ${file} --tsconfig=tsconfig.json --jsx=preserve`;
   const jsFile = file.replace(".tsx", ".jsx");
   await nodeFs.writeFile(jsFile, content.stdout);
-  await $`npx ctfc -i ${jsFile} -o ${file}`;
+  await $`npx ctfc -i ${jsFile} -o ${file}.tmp`;
+  await $`mv ${file}.tmp ${file}`;
   await $`rm ${jsFile}`;
 };
 
@@ -161,4 +149,4 @@ await getRepo()
 await resolvePkg()
 await react2Solid()
 
-// await $`rm -rf packages/ant-design-icons`;
+await $`rm -rf ${cwd}/packages/ant-design-icons`;

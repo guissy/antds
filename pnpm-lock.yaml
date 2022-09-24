@@ -104,6 +104,7 @@ importers:
       prettier: ^2.2.1
       rc-util: ^5.9.4
       rimraf: ^3.0.0
+      solid-styled-components: ^0.28.4
       solid-testing-library: ^0.3.0
       ts-jest: ^29.0.1
       ts-node: ^10.9.1
@@ -135,6 +136,7 @@ importers:
       lodash: registry.npmmirror.com/lodash/4.17.21
       prettier: registry.npmmirror.com/prettier/2.2.1
       rimraf: registry.npmmirror.com/rimraf/3.0.2
+      solid-styled-components: registry.npmmirror.com/solid-styled-components/0.28.4
       solid-testing-library: registry.npmmirror.com/solid-testing-library/0.3.0
       ts-jest: registry.npmmirror.com/ts-jest/29.0.1_jksntdpmkmo5cthob65gehuuvi
       ts-node: registry.npmmirror.com/ts-node/10.9.1_qnvrhzfywqwv2bcbrn6vmowqtu
@@ -9870,6 +9872,17 @@ packages:
       slash: registry.npmmirror.com/slash/4.0.0
     dev: true
 
+  registry.npmmirror.com/goober/2.1.11_csstype@3.1.1:
+    resolution: {integrity: sha512-5SS2lmxbhqH0u9ABEWq7WPU69a4i2pYcHeCxqaNq6Cw3mnrF0ghWNM4tEGid4dKy8XNIAUbuThuozDHHKJVh3A==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/goober/-/goober-2.1.11.tgz}
+    id: registry.npmmirror.com/goober/2.1.11
+    name: goober
+    version: 2.1.11
+    peerDependencies:
+      csstype: ^3.0.10
+    dependencies:
+      csstype: registry.npmmirror.com/csstype/3.1.1
+    dev: true
+
   registry.npmmirror.com/got/9.6.0:
     resolution: {integrity: sha512-R7eWptXuGYxwijs0eV+v3o6+XH1IqVK8dJOEecQfTmkncw9AV4dcw/Dhxi8MdlqPthxxpZyizMzyg8RTmEsG+Q==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/got/-/got-9.6.0.tgz}
     name: got
@@ -11254,7 +11267,7 @@ packages:
       pretty-format: registry.npmmirror.com/pretty-format/29.0.3
       slash: registry.npmmirror.com/slash/3.0.0
       strip-json-comments: registry.npmmirror.com/strip-json-comments/3.1.1
-      ts-node: registry.npmmirror.com/ts-node/10.9.1_typescript@4.8.3
+      ts-node: registry.npmmirror.com/ts-node/10.9.1_qnvrhzfywqwv2bcbrn6vmowqtu
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -14998,6 +15011,17 @@ packages:
       solid-js: registry.npmmirror.com/solid-js/1.5.5
     dev: true
 
+  registry.npmmirror.com/solid-styled-components/0.28.4:
+    resolution: {integrity: sha512-SGbXv5tLIs1qErr3x7M+HWE4lu+37C4myV8gbce7WnZumjBmM5sifKv/NulVeSf3nMRa3uwkAM14q7QmLGC2gQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/solid-styled-components/-/solid-styled-components-0.28.4.tgz}
+    name: solid-styled-components
+    version: 0.28.4
+    peerDependencies:
+      solid-js: ^1.4.4
+    dependencies:
+      csstype: registry.npmmirror.com/csstype/3.1.1
+      goober: registry.npmmirror.com/goober/2.1.11_csstype@3.1.1
+    dev: true
+
   registry.npmmirror.com/solid-testing-library/0.3.0:
     resolution: {integrity: sha512-6NWVbySNVzyReBm2N6p3eF8bzxRZXHZTAmPix4vFWYol16QWVjNQsEUxvr+ZOutb0yuMZmNuGx3b6WIJYmjwMQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/solid-testing-library/-/solid-testing-library-0.3.0.tgz}
     name: solid-testing-library
@@ -15864,7 +15888,7 @@ packages:
     dependencies:
       bs-logger: registry.npmmirror.com/bs-logger/0.2.6
       fast-json-stable-stringify: registry.npmmirror.com/fast-json-stable-stringify/2.1.0
-      jest: registry.npmmirror.com/jest/29.0.3_ts-node@10.9.1
+      jest: registry.npmmirror.com/jest/29.0.3_ueay6ggeznldu5fg5aptl3yb2i
       jest-util: registry.npmmirror.com/jest-util/29.0.3
       json5: registry.npmmirror.com/json5/2.2.1
       lodash.memoize: registry.npmmirror.com/lodash.memoize/4.1.2

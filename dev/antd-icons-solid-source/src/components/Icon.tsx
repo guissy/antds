@@ -4,7 +4,7 @@ import Context from './Context';
 
 import { svgBaseProps, warning, useInsertStyles } from '../utils';
 
-export interface IconBaseProps extends React.HTMLProps<HTMLSpanElement> {
+export interface IconBaseProps extends JSX.HTMLAttributes<HTMLSpanElement> {
   spin?: boolean;
   rotate?: number;
 }
@@ -56,6 +56,8 @@ const Icon: Component<IconComponentProps & JSX.CustomAttributes<HTMLDivElement>>
   const classString = classNames(
     prefixCls,
     props.className,
+    {...props.classList},
+    props["class"]
   );
 
   const svgClassString = classNames({

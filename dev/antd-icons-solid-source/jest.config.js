@@ -22,7 +22,9 @@ module.exports = {
     "solid-js/web": `${solidjsPath}/web/dist/web.cjs`,
     "solid-js/store": `${solidjsPath}/store/dist/store.cjs`,
     "solid-js": `${solidjsPath}/dist/solid.cjs`,
-    "antd": `<rootDir>/Tooltip.tsx`
+    "antd": `<rootDir>/src/Tooltip.tsx`,
+    "antd/lib/tooltip": `<rootDir>/src/Tooltip.tsx`,
+    "antd/lib/tooltip/style/index.css": `<rootDir>/src/Tooltip.css`
   },
 
   verbose: true,

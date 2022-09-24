@@ -799,7 +799,7 @@ import CustomIcon from "../docs/examples/custom-icon"
 import LoadModules from "../docs/examples/loadModules"
 import TwoTone from "../docs/examples/two-tone"
 import Tooltips from "../docs/examples/tooltip"
-// import Simple from "../docs/examples/simple"
+import Simple from "../docs/examples/simple"
 import IconfontCN from "../docs/examples/use-iconfontcn"
 
 const App: Component = () => {
@@ -810,7 +810,7 @@ const App: Component = () => {
       <CustomIcon />
       <LoadModules />
       <TwoTone />
-      {/* <Simple /> */}
+      <Simple />
       <Tooltips />
       <IconfontCN />
       <AllIcon />

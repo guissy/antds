@@ -254,7 +254,9 @@ export const styleing = (react: string): string => {
   return react.replace(
     /import styled from 'styled-components'/,
     "import {styled} from 'solid-styled-components'"
-  );
+  )
+  .replace(/\bfontSize: (\d+)/g, "'font-size': '$1px'")
+  .replace(/\bfontSize: (['"])/g, "'font-size': $1")
 };
 
 export const testing = (react: string): string => {
