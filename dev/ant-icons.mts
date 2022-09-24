@@ -16,11 +16,14 @@ const getRepo = async () => {
     (await $`rm -rf antd-icons-solid`);
 
   await $`git clone --depth=1 https://github.com/ant-design/ant-design-icons.git`;
-  await $`mv -f ant-design-icons/packages/icons-react antd-icons-solid`;
+  // await $`mv -f ant-design-icons/packages/icons-react antd-icons-solid`;
 };
 
 const resolvePkg = async () => {
   // package.json
+  await $`cp -rf ant-design-icons/packages/icons-react ./`;
+  await $`rm -rf antd-icons-solid`;
+  await $`mv icons-react antd-icons-solid`;
   const p1 = await $`cat antd-icons-solid/package.json`;
   const pkg = JSON.parse(p1.stdout);
   delete pkg.unpkg;
@@ -58,13 +61,16 @@ const resolvePkg = async () => {
     jest: "^29.0.3",
     "jest-environment-jsdom": "^29.0.3",
     "solid-testing-library": "^0.3.0",
+    "solid-styled-components": "^0.28.4",
     "ts-jest": "^29.0.1",
     "ts-node": "^10.9.1",
     vite: "^3.0.9",
-    "vite-plugin-solid": "^2.3.0"
+    "vite-plugin-solid": "^2.3.0",
   });
   // sort object by key
-  pkg.devDependencies = Object.fromEntries(Object.entries(pkg.devDependencies).sort((a, b) => a[0] < b[0] ? -1 : 1))
+  pkg.devDependencies = Object.fromEntries(
+    Object.entries(pkg.devDependencies).sort((a, b) => (a[0] < b[0] ? -1 : 1))
+  );
   pkg.peerDependencies = {
     "solid-js": ">=1.5.0",
   };
@@ -134,13 +140,25 @@ const react2Solid = async () => {
       )
       .replace(/but got \${icon}/, `but got \${JSON.stringify(icon)}`);
     await nodeFs.writeFile(file, s2);
+    if (/extends (React\.)?(Pure)?Component/.test(s2)) {
+      await resolveClass(file, s2);
+    }
   }
-  await $`rm ./tests/__snapshots__/*`
-  await $`npm run test`
+  await $`rm ./tests/__snapshots__/*`;
+  await $`npm run test`;
 };
 
-// await getRepo()
-// await resolvePkg()
+const resolveClass = async (file: string, fileContent: string) => {
+  cd(`${cwd}/packages/antd-icons-solid`);
+  const content = await $`esbuild ${file} --tsconfig=tsconfig.json --jsx=preserve`;
+  const jsFile = file.replace(".tsx", ".jsx");
+  await nodeFs.writeFile(jsFile, content.stdout);
+  await $`npx ctfc -i ${jsFile} -o ${file}`;
+  await $`rm ${jsFile}`;
+};
+
+await getRepo()
+await resolvePkg()
 await react2Solid()
 
 // await $`rm -rf packages/ant-design-icons`;

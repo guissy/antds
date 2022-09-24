@@ -797,23 +797,23 @@ import TweoToneDemo from "../docs/examples/ant-design-twotone-demo"
 import Basic from "../docs/examples/basic"
 import CustomIcon from "../docs/examples/custom-icon"
 import LoadModules from "../docs/examples/loadModules"
-// import TwoTone from "../docs/examples/two-tone"
-// import Tooltips from "../docs/examples/tooltip"
+import TwoTone from "../docs/examples/two-tone"
+import Tooltips from "../docs/examples/tooltip"
 // import Simple from "../docs/examples/simple"
 import IconfontCN from "../docs/examples/use-iconfontcn"
 
 const App: Component = () => {
   return (
     <div>
-      <AllIcon />
       <TweoToneDemo />
       <Basic />
       <CustomIcon />
       <LoadModules />
-      {/* <TwoTone /> */}
+      <TwoTone />
       {/* <Simple /> */}
-      {/* <Tooltips /> */}
+      <Tooltips />
       <IconfontCN />
+      <AllIcon />
       <main class="container">
         <AccountBookFilled />
         <AccountBookOutlined />
