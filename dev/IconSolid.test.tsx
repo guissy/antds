@@ -42,7 +42,7 @@ describe("Icon", () => {
   });
 
 
-  it.skip("should have class from class prop", () => {
+  it("should have class from class prop", () => {
     // arrange
     const stubClass = "stub";
 
@@ -72,7 +72,7 @@ describe("Icon", () => {
     expect(icon).toHaveClass(stubClass);
   });
 
-  it.skip("should have class from classList prop", () => {
+  it("should have class from classList prop", () => {
     // arrange
     const stubClass = "stub";
 

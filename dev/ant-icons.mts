@@ -107,7 +107,7 @@ const resolvePkg = async () => {
 // react to solid
 const react2Solid = async () => {
   cd(`${cwd}/packages/antd-icons-solid`);
-  for await (const file of await glob(`{src,tests}/**/*.{ts,tsx}`)) {
+  for await (const file of await glob(`{src,tests,docs}/**/*.{ts,tsx}`)) {
     if (file.includes("src/icons/")) {
       continue;
     }
@@ -118,7 +118,7 @@ const react2Solid = async () => {
     await nodeFs.writeFile(file, s2);
   }
 
-  for await (const file of await glob(`{src,tests}/**/*.{ts,tsx}`)) {
+  for await (const file of await glob(`{src,tests,docs}/**/*.{ts,tsx}`)) {
     if (file.includes("src/icons/")) {
       continue;
     }
@@ -139,8 +139,8 @@ const react2Solid = async () => {
   await $`npm run test`
 };
 
-await getRepo()
-await resolvePkg()
+// await getRepo()
+// await resolvePkg()
 await react2Solid()
 
 // await $`rm -rf packages/ant-design-icons`;

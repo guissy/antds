@@ -89,6 +89,8 @@ export const eventResolve = (react: string): string => {
     return react
     .replace(/(React.)?(Mouse|Keyboard|Focus|Touch)EventHandler<(\w+)>/g, 'JSX.EventHandlerUnion<$3, $2Event>')
     .replace(/(React.)?(Mouse|Keyboard|Focus|Touch)Event(<[^>]+>)?/g, '$2Event')
+    .replace(/(React\.)?\buseCallback\(([^\},]+)\},\s*\[[^\]]*\]\)/mg, "$2}")
+    .replace(/(React.)?\bChangeEvent<([^>]+)>?/g, 'Event & { currentTarget: $2 }')
 }
 
 export const classResolve = (react: string): string => {
@@ -114,6 +116,10 @@ export const resolveChildren = (react: string): string => {
     }
 }
 
+export const styleing = (react: string): string => {
+    return react.replace(/import styled from 'styled-components'/, "import {styled} from 'solid-styled-components'");
+}
+
 export const testing = (react: string): string => {
     return react.replace(/import (.*)from 'enzyme';/, 'import { render as renderFn, fireEvent } from "solid-testing-library";\nconst render = (jsx: JSX.Element) => { const dom = renderFn(() => jsx); dom.render = () => renderFn(() => jsx); dom.setProps = () => !0; return dom; };\nconst mount = render;\n')
     .replace(/\.isEmptyRender\(\)\).toBeTruthy\(\);/g, '.container.firstChild).toBeNull()')
@@ -126,7 +132,7 @@ export const testing = (react: string): string => {
 
 
 export const reactToSolid = (react: string): string => {
-    return resolveChildren(classResolve(eventResolve(refResolve(jsxResolve(hookResolve(importResolve(testing(react))))))));
+    return styleing(resolveChildren(classResolve(eventResolve(refResolve(jsxResolve(hookResolve(importResolve(testing(react)))))))));
 }
 
 export default reactToSolid;
