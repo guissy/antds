@@ -1,94 +1,13 @@
-const events = [
-  "cut",
-  "paste",
-  "compositionEnd",
-  "compositionStart",
-  "compositionUpdate",
-  "keyDown",
-  "keyPress",
-  "keyUp",
-  "focus",
-  "blur",
-  "focusIn",
-  "focusOut",
-  "change",
-  "input",
-  "invalid",
-  "submit",
-  "reset",
-  "click",
-  "contextMenu",
-  "dblClick",
-  "drag",
-  "dragEnd",
-  "dragEnter",
-  "dragExit",
-  "dragLeave",
-  "dragOver",
-  "dragStart",
-  "drop",
-  "mouseDown",
-  "mouseEnter",
-  "mouseLeave",
-  "mouseMove",
-  "mouseOut",
-  "mouseOver",
-  "mouseUp",
-  "popState",
-  "select",
-  "touchCancel",
-  "touchEnd",
-  "touchMove",
-  "touchStart",
-  "scroll",
-  "wheel",
-  "abort",
-  "canPlay",
-  "canPlayThrough",
-  "durationChange",
-  "emptied",
-  "encrypted",
-  "ended",
-  "loadedData",
-  "loadedMetadata",
-  "loadStart",
-  "pause",
-  "play",
-  "playing",
-  "progress",
-  "rateChange",
-  "seeked",
-  "seeking",
-  "stalled",
-  "suspend",
-  "timeUpdate",
-  "volumeChange",
-  "waiting",
-  "load",
-  "error",
-  "animationStart",
-  "animationEnd",
-  "animationIteration",
-  "transitionEnd",
-  "doubleClick",
-  "pointerOver",
-  "pointerEnter",
-  "pointerDown",
-  "pointerMove",
-  "pointerUp",
-  "pointerCancel",
-  "pointerOut",
-  "pointerLeave",
-  "gotPointerCapture",
-  "lostPointerCapture",
-];
+
 // "import (type )?\* as React from 'react';": "import {createEffect, createSignal, createContext, createMemo, JSX, useContext} from \"solid-js\";",
 // "import React from 'react';": "import {createEffect, createSignal, createContext, JSX, useContext} from \"solid-js\";",
 // "import { [^}]+ } from 'react';": "",
 export const importResolve = (react: string): string => {
   const solidImport =
     'import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children} from "solid-js";';
-  return react.replace(/import (.*)from 'react';?/g, solidImport);
+  return react
+  .replace(/import type \* as React from 'react';/g, "")
+  .replace(/import (.*)from 'react';?/g, solidImport);
 };
 
 // "(React.)?useState": "createSignal",
@@ -180,10 +99,15 @@ export const refResolve = (react: string): string => {
       ": Component<$2 & JSX.CustomAttributes<HTMLDivElement>> = ((props)"
     )
     .replace(/React.forwardRef<.+>\(/g, "(")
+    .replace(/forwardRef<.+>\(/g, "(")
     .replace(/const (\w+)Ref/g, "let $1Ref")
     .replace(/(\w+)Ref.current/g, "$1Ref")
-    .replace(/\bref=\{[^}]+\}/g, "")
-    .replace(/(&\s)*React.RefAttributes<\w+>/g, "");
+    // .replace(/\bref=\{[^}]+\}/g, "") // testing need it
+    .replace(/(const|let) ([^=]+)= (React\.)?useRef<([^\)]+)>\(\)/g, "let $2 = null as ($4 | null)")
+    .replace(/(const|let) ([^=]+)= (React\.)?useRef<([^\)]+)>\(([^\)]+)\)/g, "let $2 = $5 as $4")
+    .replace(/(const|let) ([^=]+)= (React\.)?useRef\(([^\)]+)\)/g, "let $2 = $4")
+    .replace(/(&\s)*React.RefAttributes<\w+>/g, "")
+    .replace(/(const|let) ([^=]+)= (React\.)?createRef<(\w+)>\(\)/g, "let $2:$4 = null");
 };
 
 // "(React.)?MouseEventHandler<(\w+)>": "JSX.EventHandlerUnion<$2, MouseEvent>",
@@ -259,39 +183,13 @@ export const styleing = (react: string): string => {
   .replace(/\bfontSize: (['"])/g, "'font-size': $1")
 };
 
-export const testing = (react: string): string => {
-  return react
-    .replace(
-      /import (.*)from 'enzyme';/,
-      'import { render as renderFn, fireEvent } from "solid-testing-library";\nconst render = (jsx: JSX.Element) => { const dom = renderFn(() => jsx); dom.render = () => renderFn(() => jsx); dom.setProps = () => !0; return dom; };\nconst mount = render;\n'
-    )
-    .replace(
-      /\.isEmptyRender\(\)\).toBeTruthy\(\);/g,
-      ".container.firstChild).toBeNull()"
-    )
-    .replace(
-      /\.find\(([^)]+)\)\.first\(\)\.prop/g,
-      ".container.querySelector($1).getAttribute"
-    )
-    .replace(/\.find\(([^)]+)\)\.first\(\)/g, ".container.querySelector($1)")
-    .replace(
-      /\.find\(([^)]+)\)\.at\(([^)]+)\)/g,
-      ".container.querySelectorAll($1)[$2]"
-    )
-    .replace(/\.find\(([^)]+)\)/g, ".container.querySelectorAll($1)")
-    .replace(
-      /(\w+)\.simulate\('(\w+)'\)/g,
-      (_, s1, s2) =>
-        `fireEvent.${events.find((e) => e.toLowerCase() === s2)}(${s1})`
-    );
-};
 
 export const reactToSolid = (react: string): string => {
   return styleing(
     resolveChildren(
       classResolve(
         eventResolve(
-          refResolve(jsxResolve(hookResolve(importResolve(testing(react)))))
+          refResolve(jsxResolve(hookResolve(importResolve(react))))
         )
       )
     )
