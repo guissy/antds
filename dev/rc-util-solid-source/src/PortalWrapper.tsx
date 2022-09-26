@@ -188,7 +188,7 @@ const getContainer = () => {
   };
 
   onMount(() => {
-    updateOpenCount();
+    // updateOpenCount();
 
     if (!attachToParent()) {
       rafId = raf(() => {
@@ -214,8 +214,8 @@ const getContainer = () => {
 
     setWrapperClassName();
     attachToParent();
-    return props;
-  }, props)
+    return {...props};
+  })
 
   // const { children, forceRender, visible } = this.props;
   let portal = null;

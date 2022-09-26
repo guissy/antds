@@ -118,18 +118,20 @@ export const testingTransform = (react: string): string => {
             /import { render } from '@testing-library\/react';/,
             !hasRerender ? `import { render, fireEvent } from "solid-testing-library";`
             : `import { render, fireEvent } from "solid-testing-library";
-import { createSignal } from "solid-js";            
+import { createSignal } from "solid-js";      
 const wrapFC = (Cmp) => {
     const fn = (props) => {
         const [state, setState] = createSignal(props);
-        (fn as unknown as {setProps}).setProps = (n) => setState(p => ({...p, ...n}));
+        (fn as unknown as { setProps }).setProps = (n) => {
+            setState(p => Object.keys(n).some((k) => p[k] !== n[k]) ? Object.assign({}, p, n) : p);
+        };
         return <Cmp {...state}>{state().children}</Cmp>
     }
     return fn as typeof fn & { setProps: (o: object) => void }
 }`
         )
     if (hasTesting) {
-        react.replace(/render\(/, "render(() => ")
+        react = react.replace(/render\(/g, "render(() => ")
     }
     return react;
 };

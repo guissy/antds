@@ -10,8 +10,8 @@ const cwd = (await $`pwd`).stdout.toString().trim();
 await $`mkdir packages`.catch(() => 1);
 console.log(cwd);
 cd(`${cwd}/packages`);
-let hasInstall = await fs.pathExists("${cwd}/packages/rc-util-solid/node_modules");
-
+let hasInstall = await fs.pathExists(`rc-util-solid/node_modules`);
+console.log("hasInstall = ", hasInstall)
 const getRepo = async () => {
   await $`rm -rf ant-design-icons`;
   (await fs.pathExists("rc-util-solid")) &&
