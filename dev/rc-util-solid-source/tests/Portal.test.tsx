@@ -11,7 +11,7 @@ const wrapFC = (Cmp) => {
   }
   return fn as typeof fn & { setProps: (o: object) => void }
 }
-import { act } from 'react-dom/test-utils';
+// import { act } from 'react-dom/test-utils';
 import PortalWrapper, { getOpenCount } from '../src/PortalWrapper';
 import Portal from '../src/Portal';
 
@@ -122,9 +122,9 @@ describe('Portal', () => {
         </div>,
       );
 
-      act(() => {
-        jest.runAllTimers();
-      });
+      // act(() => {
+      //   jest.runAllTimers();
+      // });
 
       expect(divRef.childElementCount).toEqual(1);
       jest.useRealTimers();

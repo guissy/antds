@@ -10,6 +10,8 @@ const cwd = (await $`pwd`).stdout.toString().trim();
 await $`mkdir packages`.catch(() => 1);
 console.log(cwd);
 cd(`${cwd}/packages`);
+let hasInstall = await fs.pathExists(`antd-icons-solid/node_modules`);
+console.log("hasInstall = ", hasInstall)
 
 const getRepo = async () => {
   await $`rm -rf ant-design-icons`;
@@ -90,7 +92,11 @@ const resolvePkg = async () => {
   );
   try {
     cd(`${cwd}/packages/antd-icons-solid`);
-    await $`npm i --prefer-offline --no-audit --progress=false`;
+    if (hasInstall) {
+      await $`npm i --prefer-offline --no-audit --progress=false --legacy-peer-deps`;
+    } else {
+      await $`npm i`
+    }
     await $`cp -rf ${cwd}/dev/antd-icons-solid-source/* ./`;
     await $`npm run generate`;
   } catch (e) {
