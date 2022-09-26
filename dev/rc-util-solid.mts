@@ -10,6 +10,7 @@ const cwd = (await $`pwd`).stdout.toString().trim();
 await $`mkdir packages`.catch(() => 1);
 console.log(cwd);
 cd(`${cwd}/packages`);
+let hasInstall = await fs.pathExists("${cwd}/packages/rc-util-solid/node_modules");
 
 const getRepo = async () => {
   await $`rm -rf ant-design-icons`;
@@ -28,7 +29,7 @@ const resolvePkg = async () => {
   const pkg = JSON.parse(p1.stdout);
   delete pkg.unpkg;
   delete pkg.main;
-  pkg.name = "@ant-design/icons-solid";
+  pkg.name = "rc-util-solid";
   pkg.description = "adapte @ant-design/icons for solid-js";
   pkg.module = "./src/index.ts";
   pkg.scripts.start = "vite dev";
@@ -91,7 +92,11 @@ const resolvePkg = async () => {
   );
   try {
     cd(`${cwd}/packages/rc-util-solid`);
-    await $`npm i --prefer-offline --no-audit --progress=false`;
+    if (hasInstall) {
+      await $`npm i --prefer-offline --no-audit --progress=false --legacy-peer-deps`;
+    } else {
+      await $`npm i`
+    }
     await $`cp -Rf ${cwd}/dev/rc-util-solid-source/* ./`;
     await $`mv src/switchScrollingEffect.js src/switchScrollingEffect.ts`;
     // await $`npm run generate`;

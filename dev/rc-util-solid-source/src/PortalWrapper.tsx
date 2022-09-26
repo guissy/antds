@@ -98,7 +98,7 @@ const PortalWrapper: ParentComponent<PortalWrapperProps> = (props) => {
     if (
       props.visible !== prevProps?.visible &&
       supportDom &&
-      getParent(getContainer) === document.body
+      getParent(props.getContainer) === document.body
     ) {
       if (props.visible && !prevProps?.visible) {
         openCount += 1;
@@ -208,13 +208,14 @@ const getContainer = () => {
     raf.cancel(rafId);
   })
 
-  createEffect((prevProps) => {
+  createEffect<PortalWrapperProps>((prevProps) => {
     updateOpenCount(prevProps);
     updateScrollLocker(prevProps);
 
     setWrapperClassName();
     attachToParent();
-  }, [props])
+    return props;
+  }, props)
 
   // const { children, forceRender, visible } = this.props;
   let portal = null;

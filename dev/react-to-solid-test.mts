@@ -111,12 +111,27 @@ export const enzymeTransform = (react: string): string => {
 };
 
 export const testingTransform = (react: string): string => {
-    return react
+    const hasRerender = react.includes('rerender(');
+    const hasTesting = react.includes('@testing-library\/react');
+    react = react
         .replace(
             /import { render } from '@testing-library\/react';/,
-            'import { render as renderFn, fireEvent } from "solid-testing-library";\nconst render = (ui, o?) => { const dom = renderFn(() => ui, o); (dom as unknown as { rerender }).rerender = (ui, o?) => renderFn(() => ui, o); return dom; }\n'
+            !hasRerender ? `import { render, fireEvent } from "solid-testing-library";`
+            : `import { render, fireEvent } from "solid-testing-library";
+import { createSignal } from "solid-js";            
+const wrapFC = (Cmp) => {
+    const fn = (props) => {
+        const [state, setState] = createSignal(props);
+        (fn as unknown as {setProps}).setProps = (n) => setState(p => ({...p, ...n}));
+        return <Cmp {...state}>{state().children}</Cmp>
+    }
+    return fn as typeof fn & { setProps: (o: object) => void }
+}`
         )
-
+    if (hasTesting) {
+        react.replace(/render\(/, "render(() => ")
+    }
+    return react;
 };
 
 

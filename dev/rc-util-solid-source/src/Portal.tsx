@@ -33,7 +33,7 @@ const Portal: ParentComponent<PortalProps> = ((props) => {
   // [Legacy] Used by `rc-trigger`
   createEffect(() => {
     props.didUpdate?.(props);
-  });
+  }, []);
 
   createEffect(() => {
     // Restore container to original place
