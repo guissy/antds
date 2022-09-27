@@ -28,7 +28,7 @@ export const hookResolve = (react: string): string => {
     return _;
   });
   Array.from(signals.entries()).concat(Array.from(memos.entries())).forEach(([s, n]) => {
-    react = react.slice(0, n) + react.slice(n).replaceAll(s, s.concat("()"));
+    react = react.slice(0, n) + react.slice(n).replace(new RegExp(`\b${s}\b`, "g"), s.concat("()"));
   });
   console.log(Array.from(signals.entries()).concat(Array.from(memos.entries())))
   return react
@@ -181,6 +181,8 @@ export const styleing = (react: string): string => {
   )
   .replace(/\bfontSize: (\d+)/g, "'font-size': '$1px'")
   .replace(/\bfontSize: (['"])/g, "'font-size': $1")
+  .replace(/\b\.pointerEvents/g, "['pointer-events']")
+  .replace(/\bpointerEvents/g, "'pointer-events'")
 };
 
 
