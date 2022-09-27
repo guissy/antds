@@ -99,6 +99,7 @@ const resolvePkg = async () => {
     }
     await $`cp -Rf ${cwd}/dev/rc-util-solid-source/* ./`;
     await $`mv src/switchScrollingEffect.js src/switchScrollingEffect.ts`;
+    await $`mv src/ref.test.js src/ref.test.tsx`;
     // await $`npm run generate`;
   } catch (e) {
     console.log(e);
@@ -127,7 +128,7 @@ const react2Solid = async () => {
     let s1 = await $`cat ${file}`;
     $.verbose = true;
     let s2 = s1.stdout
-    //   .replaceAll("from '../lib';", "from '../src';")
+      .replaceAll("import createMemo from './hooks/createMemo';", "import createMemo from './hooks/useMemo';")
     await nodeFs.writeFile(file, s2);
     if (/extends (React\.)?(Pure)?Component/.test(s2)) {
       // await resolveClass(file, s2);
