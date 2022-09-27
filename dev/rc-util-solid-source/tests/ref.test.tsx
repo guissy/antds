@@ -18,7 +18,6 @@ describe('ref', () => {
 
     it('ignore empty', () => {
       let ref = { current: null };
-      console.log(composeRef(undefined, ref, null).toString())
       expect(composeRef(undefined, ref, null)).toBe(ref);
       expect(composeRef(undefined, null)).toBeFalsy();
     });

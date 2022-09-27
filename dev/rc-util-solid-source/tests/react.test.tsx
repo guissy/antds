@@ -1,7 +1,7 @@
-import { act } from 'react-dom/test-utils';
+// import { act } from 'react-dom/test-utils';
 import { render, unmount, _r, _u } from '../src/React/render';
 
-globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+// globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 describe('React', () => {
   afterEach(() => {
@@ -17,15 +17,11 @@ describe('React', () => {
     document.body.appendChild(div);
 
     // Mount
-    act(() => {
-      render(() => <div class="bamboo" />, div);
-    });
+    render(() => <div class="bamboo" />, div);
     expect(div.querySelector('.bamboo')).toBeTruthy();
 
     // Unmount
-    await act(async () => {
-      await unmount(div);
-    });
+    unmount(div);
     expect(div.querySelector('.bamboo')).toBeFalsy();
 
     expect(errorSpy).not.toHaveBeenCalled();
@@ -36,15 +32,11 @@ describe('React', () => {
     document.body.appendChild(div);
 
     // Mount
-    act(() => {
-      _r(() => <div class="bamboo" />, div);
-    });
+    _r(() => <div class="bamboo" />, div);
     expect(div.querySelector('.bamboo')).toBeTruthy();
 
     // Unmount
-    act(() => {
-      _u(div);
-    });
+    _u(div);
     expect(div.querySelector('.bamboo')).toBeFalsy();
   });
 });

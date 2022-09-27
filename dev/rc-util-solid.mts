@@ -98,8 +98,10 @@ const resolvePkg = async () => {
       await $`npm i`
     }
     await $`cp -Rf ${cwd}/dev/rc-util-solid-source/* ./`;
-    await $`rm tests/ref.text.js`
+    await $`rm tests/ref.test.js`
     await $`rm tests/setup.js`
+    await $`rm src/Children/mapSelf.js`
+    await $`mv tests/toArray.test.js tests/toArray.test.tsx`;
     await $`mv tests/hooks.test.js tests/hooks.test.tsx`;
     await $`mv src/switchScrollingEffect.js src/switchScrollingEffect.ts`;
     // await $`npm run generate`;
