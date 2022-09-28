@@ -1,6 +1,6 @@
-import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children} from "solid-js";
+import { createEffect, createSignal, onCleanup, Accessor} from "solid-js";
 
-type Updater<T> = T | ((prevValue: T) => T);
+type Updater<T> = (prev: T | (() => T) | undefined) => T;
 
 export type SetState<T> = (
   nextValue: Updater<T>,
@@ -18,17 +18,18 @@ export type SetState<T> = (
  */
 export default function useSafeState<T>(
   defaultValue?: T | (() => T),
-): [T, SetState<T>] {
-  let destroyRef  = false;
+): [Accessor<T | (() => T) | undefined>, SetState<T>] {
+  let destroyRef = false;
   const [value, setValue] = createSignal(defaultValue);
 
   createEffect(() => {
     destroyRef = false;
-
-    return () => {
-      destroyRef = true;
-    };
   }, []);
+
+  onCleanup(() => {
+    destroyRef = true;
+  });
+
 
   function safeSetState(updater: Updater<T>, ignoreDestroy?: boolean) {
     if (ignoreDestroy && destroyRef) {

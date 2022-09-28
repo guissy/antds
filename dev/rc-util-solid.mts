@@ -102,11 +102,12 @@ const resolvePkg = async () => {
     await $`rm src/Children/mapSelf.js`;
     await $`rm tests/toArray.test.js`;
     await $`rm tests/warning.test.js`;
+    await $`rm tests/hooks.test.js`;
     // await $`mv tests/toArray.test.js tests/toArray.test.tsx`;
-    await $`mv tests/hooks.test.js tests/hooks.test.tsx`;
+    // await $`mv tests/hooks.test.js tests/hooks.test.tsx`;
     await $`mv tests/style.test.js tests/style.test.ts`;
     await $`mv src/switchScrollingEffect.js src/switchScrollingEffect.ts`;
-    await $`cp -Rf ${cwd}/dev/rc-util-solid-source/* ./`;
+    await $`cp -Rf ${cwd}/dev/rc-util-solid-source/* ${cwd}/packages/rc-util-solid`;
     // await $`npm run generate`;
   } catch (e) {
     console.log(e);
@@ -127,7 +128,7 @@ const react2Solid = async () => {
     // s2 = s2.replaceAll("{ wrapper: StrictMode }", "{ /* wrapper: StrictMode */ }");
     // s2 = s2.replaceAll("it('should restore to original place in StrictMode'", "it.skip('should restore to original place in StrictMode'");
     s2 = s2.replaceAll("it('delay'", "it.skip('delay'");
-    s2 = s2.replaceAll(/overflow: hidden; overflow-x: hidden; overflow-y: hidden;/, "width: calc(100% - 20px); $0");
+    s2 = s2.replace(/(overflow: hidden; overflow-x: hidden; overflow-y: hidden;)/, "width: calc(100% - 20px); $1");
     await nodeFs.writeFile(file, s2);
   }
 

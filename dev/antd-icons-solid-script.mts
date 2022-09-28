@@ -97,7 +97,7 @@ const resolvePkg = async () => {
     } else {
       await $`npm i`
     }
-    await $`cp -rf ${cwd}/dev/antd-icons-solid-source/* ./`;
+    await $`cp -rf ${cwd}/dev/antd-icons-solid-source/* ${cwd}/packages/antd-icons-solid`;
     await $`npm run generate`;
   } catch (e) {
     console.log(e);
