@@ -1,13 +1,27 @@
-import {type Component, type JSX, createEffect, createContext, useContext, children as Children} from "solid-js";
+import { batch, type Component, type JSX, createEffect, createContext, createMemo as createMemoSolid, useContext, children as Children, batch} from "solid-js";
 // import { renderToString } from 'react-dom/server';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent } from "solid-testing-library";
 import createMemo from '../src/hooks/useMemo';
 import useMergedState from '../src/hooks/useMergedState';
 import useLayoutEffect from '../src/hooks/useLayoutEffect';
 import createSignal from '../src/hooks/useState';
 import useId, { resetUuid } from '../src/hooks/useId';
+     
+const wrapFC = (Cmp) => {
+  const fn = (props) => {
+      const [state, setState] = createSignal(props);
+      (fn as unknown as { setProps }).setProps = (n) => {
+          setState(p => {
+            const pp = Object.keys(n).some((k) => p[k] !== n[k]) ? Object.assign({}, p, n) : p;
+            return pp;
+          })
+      };
+      return <Cmp {...state}>{state().children}</Cmp>
+  }
+  return fn as typeof fn & { setProps: (o: object) => void }
+}
 
-global.disableUseId = false;
+// global.disableUseId = false;
 
 // jest.mock('react', () => {
 //   const react = jest.requireActual('solid-js');
@@ -22,26 +36,30 @@ global.disableUseId = false;
 // });
 
 describe('hooks', () => {
-  it('createMemo', () => {
-    const FC = ({ open, data }) => {
+  it.only('createMemo', () => {
+    const FC_ = (props) => {
       const memoData = createMemo(
-        () => data,
-        [open, data],
+        () => props.data,
+        () => [props.open, props.data],
         (prev, next) => next[0] && prev[1] !== next[1],
       );
       return <div>{memoData}</div>;
     };
+    const FC = wrapFC(FC_)
 
-    const { container, rerender } = render(() => <FC data="open" open />);
+    const { container, debug } = render(() => <FC data="open" open />);
     expect(container.querySelector('div').textContent).toEqual('open');
 
-    rerender(() => <FC data="again" open />);
+    // rerender(() => () => <FC data="again" open />);
+    FC.setProps({data: "again", open: true });
     expect(container.querySelector('div').textContent).toEqual('again');
 
-    rerender(() => <FC data="close" open={false} />);
+    // rerender(() => () => <FC data="close" open={false} />);
+    FC.setProps({data: "close", open: false});
     expect(container.querySelector('div').textContent).toEqual('again');
 
-    rerender(() => <FC data="repeat" open />);
+    // rerender(() => () => <FC data="repeat" open />);
+    FC.setProps({data: "repeat", open: true});
     expect(container.querySelector('div').textContent).toEqual('repeat');
   });
 
@@ -59,23 +77,23 @@ describe('hooks', () => {
     };
 
     it('still control of to undefined', () => {
-      const { container, rerender } = render(() => <FC value="test" />);
+      const { container, rerender } = render(() => () => <FC value="test" />);
 
       expect(container.querySelector('input').value).toEqual('test');
 
-      rerender(() => <FC value={undefined} />);
+      rerender(() => () => <FC value={undefined} />);
       expect(container.querySelector('input').value).toEqual('test');
     });
 
     describe('correct defaultValue', () => {
       it('raw', () => {
-        const { container } = render(() => <FC defaultValue="test" />);
+        const { container } = render(() => () => <FC defaultValue="test" />);
 
         expect(container.querySelector('input').value).toEqual('test');
       });
 
       it('func', () => {
-        const { container } = render(() => <FC defaultValue={() => 'bamboo'} />);
+        const { container } = render(() => () => <FC defaultValue={() => 'bamboo'} />);
 
         expect(container.querySelector('input').value).toEqual('bamboo');
       });
@@ -97,7 +115,7 @@ describe('hooks', () => {
         return <div>{val}</div>;
       };
 
-      const { container } = render(() => <Test />);
+      const { container } = render(() => () => <Test />);
       expect(container.firstChild.textContent).toEqual('1');
     });
 
@@ -108,7 +126,7 @@ describe('hooks', () => {
         return <div>{val}</div>;
       };
 
-      const { container } = render(() => 
+      const { container } = render(() => () => 
         <>
           <Demo />
         </>,
@@ -124,7 +142,7 @@ describe('hooks', () => {
         return <div>{val}</div>;
       };
 
-      const { container } = render(() => 
+      const { container } = render(() => () => 
         <>
           <Demo />
         </>,
@@ -161,7 +179,7 @@ describe('hooks', () => {
           };
 
           const onChange = jest.fn();
-          const { container } = render(() => 
+          const { container } = render(() => () => 
             postWrapper(<Demo onChange={onChange} />),
           );
 
@@ -210,17 +228,17 @@ describe('hooks', () => {
         );
       };
 
-      const { container, rerender } = render(() => <Demo />);
+      const { container, rerender } = render(() => () => <Demo />);
       expect(container.textContent).toEqual('233');
       expect(onChange).not.toHaveBeenCalled();
 
       // Update value
-      rerender(() => <Demo value={1} />);
+      rerender(() => () => <Demo value={1} />);
       expect(container.textContent).toEqual('1');
       expect(onChange).not.toHaveBeenCalled();
 
       // Click update
-      rerender(() => <Demo value={undefined} />);
+      rerender(() => () => <Demo value={undefined} />);
       fireEvent.mouseEnter(container.querySelector('span'));
       fireEvent.click(container.querySelector('span'));
       expect(container.textContent).toEqual('3');
@@ -249,7 +267,7 @@ describe('hooks', () => {
         );
       };
 
-      const { container } = render(() => <Test value={1} />);
+      const { container } = render(() => () => <Test value={1} />);
       fireEvent.click(container.querySelector('span'));
       expect(onChange).not.toHaveBeenCalled();
 
@@ -276,7 +294,7 @@ describe('hooks', () => {
         );
       };
 
-      const { container } = render(() => <Test value={1} />);
+      const { container } = render(() => () => <Test value={1} />);
       fireEvent.click(container.querySelector('span'));
 
       expect(container.textContent).toBe('1');
@@ -291,7 +309,7 @@ describe('hooks', () => {
         return null;
       };
 
-      render(() => <Demo />);
+      render(() => () => <Demo />);
       expect(count).toBe(1);
     });
   });
@@ -321,7 +339,7 @@ describe('hooks', () => {
         .spyOn(console, 'error')
         .mockImplementation(() => {});
 
-      const { container } = render(() => <FC defaultValue="test" />);
+      const { container } = render(() => () => <FC defaultValue="test" />);
       expect(container.querySelector('label').textContent).toEqual('testa');
 
       fireEvent.change(container.querySelector('input'), {
@@ -366,7 +384,7 @@ describe('hooks', () => {
         );
       };
 
-      const { container, unmount } = render(() => 
+      const { container, unmount } = render(() => () => 
         <>
           <Demo />
         </>,
@@ -404,7 +422,7 @@ describe('hooks', () => {
         return null;
       };
 
-      const { unmount } = render(() => <Demo />);
+      const { unmount } = render(() => () => <Demo />);
       unmount();
 
       setTimeout(() => {
@@ -426,12 +444,12 @@ describe('hooks', () => {
     }
 
     it('id passed', () => {
-      const { container } = render(() => <Demo id="bamboo" />);
+      const { container } = render(() => () => <Demo id="bamboo" />);
       matchId(container, 'bamboo');
     });
 
     it('test env', () => {
-      const { container } = render(() => <Demo />);
+      const { container } = render(() => () => <Demo />);
       matchId(container, 'test-id');
     });
 
@@ -441,13 +459,13 @@ describe('hooks', () => {
       process.env.NODE_ENV = 'development';
 
       // SSR
-      const content = renderToString(<Demo />);
+      const content = render(() => <Demo />, { hydrate: true });
       expect(content).not.toContain('test-id');
 
       // Hydrate
       const holder = document.createElement('div');
       holder.innerHTML = content;
-      const {} = render(() => <Demo />, {
+      const {} = render(() => () => <Demo />, {
         hydrate: true,
         container: holder,
       });
@@ -465,18 +483,18 @@ describe('hooks', () => {
       global.disableUseId = true;
 
       // SSR
-      const content = renderToString(
+      const content = render(() =>
         <>
           <Demo />
         </>,
-      );
+      { hydrate: true });
       expect(content).toContain('ssr-id');
 
       // Hydrate
       resetUuid();
       const holder = document.createElement('div');
       holder.innerHTML = content;
-      const { container } = render(() => 
+      const { container } = render(() => () => 
         <>
           <Demo />
         </>,

@@ -97,7 +97,6 @@ const resolvePkg = async () => {
     } else {
       await $`npm i`
     }
-    await $`cp -rf ${cwd}/dev/antd-icons-solid-source/* ${cwd}/packages/antd-icons-solid`;
     await $`npm run generate`;
   } catch (e) {
     console.log(e);
@@ -158,5 +157,5 @@ const resolveClass = async (file: string, fileContent: string) => {
 await getRepo()
 await resolvePkg()
 await react2Solid()
-
+await $`cp -rf ${cwd}/dev/antd-icons-solid-source/* ${cwd}/packages/antd-icons-solid`;
 await $`rm -rf ${cwd}/packages/ant-design-icons`;

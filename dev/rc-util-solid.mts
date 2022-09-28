@@ -107,7 +107,6 @@ const resolvePkg = async () => {
     // await $`mv tests/hooks.test.js tests/hooks.test.tsx`;
     await $`mv tests/style.test.js tests/style.test.ts`;
     await $`mv src/switchScrollingEffect.js src/switchScrollingEffect.ts`;
-    await $`cp -Rf ${cwd}/dev/rc-util-solid-source/* ${cwd}/packages/rc-util-solid`;
     // await $`npm run generate`;
   } catch (e) {
     console.log(e);
@@ -159,5 +158,5 @@ const resolveClass = async (file: string, fileContent: string) => {
 await getRepo()
 await resolvePkg()
 await react2Solid()
-
+await $`cp -Rf ${cwd}/dev/rc-util-solid-source/* ${cwd}/packages/rc-util-solid`;
 await $`rm -rf packages/rc-util`;
