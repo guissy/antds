@@ -50,6 +50,7 @@ const resolvePkg = async () => {
   const aliPkg = ["father", "@umijs/fabric", "antd", "dumi"];
   for (let k of [...reactPkg, ...aliPkg]) {
     delete pkg.devDependencies[k];
+    delete pkg.dependencies[k];
   }
   if (pkg.devDependencies["styled-components"]) {
     pkg["solid-styled-components"] = "lastest";
@@ -100,15 +101,17 @@ const resolvePkg = async () => {
       await $`npm i`
     }
     await $`rm tests/ref.test.js`;
-    await $`rm tests/setup.js`;
+    await $`rm src/ContainerRender.js`;
     await $`rm src/Children/mapSelf.js`;
+    await $`rm src/PureRenderMixin.js`;
+    await $`rm src/switchScrollingEffect.js`;
+    await $`rm src/unsafeLifecyclesPolyfill.js`;
+    await $`rm src/getContainerRenderMixin.jsx`;
+    await $`rm tests/setup.js`;
     await $`rm tests/toArray.test.js`;
     await $`rm tests/warning.test.js`;
     await $`rm tests/hooks.test.js`;
-    // await $`mv tests/toArray.test.js tests/toArray.test.tsx`;
-    // await $`mv tests/hooks.test.js tests/hooks.test.tsx`;
     await $`mv tests/style.test.js tests/style.test.ts`;
-    await $`mv src/switchScrollingEffect.js src/switchScrollingEffect.ts`;
     // await $`npm run generate`;
   } catch (e) {
     console.log(e);
@@ -161,4 +164,4 @@ await getRepo()
 await resolvePkg()
 await react2Solid()
 await $`cp -Rf ${cwd}/dev/rc-util-solid-source/* ${cwd}/packages/rc-util-solid`;
-await $`rm -rf packages/rc-util`;
+// await $`rm -rf packages/rc-util`;
