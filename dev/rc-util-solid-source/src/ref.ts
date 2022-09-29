@@ -38,7 +38,7 @@ export function composeRef<T>(...refs: Ref<T>[]): RefCallback<T> {
 export function useComposeRef<T>(...refs: Ref<T>[]): RefCallback<T> {
   return createMemo(
     () => composeRef(...refs),
-    refs,
+    () => refs,
     (prev, next) =>
       prev.length === next.length && prev.every((ref, i) => ref === next[i]),
   );
