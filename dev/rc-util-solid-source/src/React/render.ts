@@ -2,44 +2,6 @@
 import { render as solidRender } from "solid-js/web";
 import type { MountableElement } from "solid-js/web";
 import type { JSX } from "solid-js";
-// import * as ReactDOM from 'react-dom';
-// import type { Root } from 'react-dom/client';
-
-// Let compiler not to search module usage
-// const fullClone = {
-//   ...ReactDOM,
-// } as typeof ReactDOM & {
-//   __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED?: {
-//     usingClientEntryPoint?: boolean;
-//   };
-//   createRoot?: CreateRoot;
-// };
-
-// type CreateRoot = (container: ContainerType) => Root;
-
-// const { version, render: reactRender, unmountComponentAtNode } = fullClone;
-
-// let createRoot: CreateRoot;
-// try {
-//   const mainVersion = Number((version || '').split('.')[0]);
-//   if (mainVersion >= 18) {
-//     ({ createRoot } = fullClone);
-//   }
-// } catch (e) {
-//   // Do nothing;
-// }
-
-// function toggleWarning(skip: boolean) {
-//   const { __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED } = fullClone;
-
-//   if (
-//     __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED &&
-//     typeof __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED === 'object'
-//   ) {
-//     __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.usingClientEntryPoint =
-//       skip;
-//   }
-// }
 
 const MARK = '__rc_react_root__';
 // ========================== Render ==========================
@@ -59,10 +21,6 @@ function modernRender(node: JSX.Element, container: ContainerType) {
 
   container[MARK] = root;
 }
-
-// function legacyRender(node: JSX.Element, container: ContainerType) {
-//   reactRender(node, container);
-// }
 
 /** @private Test usage. Not work in prod */
 export function _r(node: JSX.Element, container: ContainerType) {

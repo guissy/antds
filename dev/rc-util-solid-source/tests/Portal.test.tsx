@@ -11,7 +11,7 @@ const wrapFC = (Cmp) => {
   }
   return fn as typeof fn & { setProps: (o: object) => void }
 }
-// import { act } from 'react-dom/test-utils';
+
 import PortalWrapper, { getOpenCount } from '../src/PortalWrapper';
 import Portal from '../src/Portal';
 

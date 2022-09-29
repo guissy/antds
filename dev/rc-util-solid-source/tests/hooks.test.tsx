@@ -1,5 +1,4 @@
-import { batch, type Component, type JSX, createEffect, createContext, createMemo as createMemoSolid, useContext, children as Children, batch} from "solid-js";
-// import { renderToString } from 'react-dom/server';
+import { createEffect } from "solid-js";
 import { render, fireEvent } from "solid-testing-library";
 import createMemo from '../src/hooks/useMemo';
 import useMergedState from '../src/hooks/useMergedState';
@@ -20,20 +19,6 @@ const wrapFC = (Cmp) => {
   }
   return fn as typeof fn & { setProps: (o: object) => void }
 }
-
-// global.disableUseId = false;
-
-// jest.mock('react', () => {
-//   const react = jest.requireActual('solid-js');
-
-//   const clone = { ...react };
-
-//   Object.defineProperty(clone, 'useId', {
-//     get: () => (global.disableUseId ? undefined : react.useId),
-//   });
-
-//   return clone;
-// });
 
 describe('hooks', () => {
   it.only('createMemo', () => {

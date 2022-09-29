@@ -1,5 +1,4 @@
 import { type JSX, children as Children} from "solid-js";
-// import { isFragment } from 'react-is';
 
 export interface Option {
   keepEmpty?: boolean;

@@ -26,7 +26,7 @@ export interface PortalWrapperProps {
     switchScrollingEffect: () => void;
     scrollLocker: ScrollLocker;
     ref?: (c: any) => void;
-  }) => React.ReactNode;
+  }) => JSX.Element;
 }
 
 const getParent = (getContainer?: GetContainer) => {

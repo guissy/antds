@@ -1,7 +1,4 @@
 /* eslint-disable no-param-reassign */
-
-// import { isMemo } from 'react-is';
-// import { Ref } from 'solid-js';
 import createMemo from './hooks/useMemo';
 
 type RefObject<T> = { current: T | null };

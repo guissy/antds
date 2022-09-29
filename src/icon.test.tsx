@@ -62,7 +62,6 @@ describe("Icon", () => {
 
     // act
     renderWithAntdProvider(() => (
-      // eslint-disable-next-line solid/no-react-specific-props
       <Icon className={stubClass} data-testid="icon" />
     ));
 

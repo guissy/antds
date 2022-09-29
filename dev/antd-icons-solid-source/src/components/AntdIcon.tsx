@@ -4,7 +4,7 @@ import type { IconDefinition } from '@ant-design/icons-svg/lib/types';
 
 import Context from './Context';
 import type { IconBaseProps } from './Icon';
-import ReactIcon from './IconBase';
+import SolidIcon from './IconBase';
 import { getTwoToneColor, TwoToneColor, setTwoToneColor } from './twoTonePrimaryColor';
 import { normalizeTwoToneColors } from '../utils';
 
@@ -85,7 +85,7 @@ const Icon: Component<IconComponentProps & JSX.CustomAttributes<HTMLDivElement>>
       onClick={props.onClick}
       class={classString}
     >
-      <ReactIcon
+      <SolidIcon
         icon={props.icon}
         primaryColor={primaryColor}
         secondaryColor={secondaryColor}

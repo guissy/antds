@@ -48,9 +48,9 @@ describe('warning', () => {
   });
 
   // https://github.com/ant-design/ant-design/issues/9792
-  // it('should not warning React componentWillReceiveProps', () => {
+  // it('should not warning componentWillReceiveProps', () => {
     // const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-    // class App extends React.Component {
+    // class App extends Component {
     //   state = {};
 
     //   render() {

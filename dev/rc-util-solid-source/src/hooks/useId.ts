@@ -1,13 +1,4 @@
-import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children} from "solid-js";
-
-// function getUseId() {
-//   // We need fully clone React function here to avoid webpack warning React 17 do not export `useId`
-//   const fullClone = {
-//     ...React,
-//   };
-
-//   return fullClone.useId;
-// }
+import { createEffect, createSignal } from "solid-js";
 
 let uuid = 0;
 
@@ -23,7 +14,6 @@ export default function useId(id?: string) {
   const [innerId, setInnerId] = createSignal<string>('ssr-id');
 
   const useOriginId = undefined; //getUseId();
-  const reactNativeId = undefined; //useOriginId?.();
 
   createEffect(() => {
     if (!useOriginId) {
@@ -44,6 +34,5 @@ export default function useId(id?: string) {
     return 'test-id';
   }
 
-  // Return react native id or inner id
-  return reactNativeId || innerId;
+  return innerId;
 }

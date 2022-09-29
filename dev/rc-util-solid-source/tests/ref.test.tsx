@@ -38,11 +38,6 @@ describe('ref', () => {
   });
 
   describe('supportRef', () => {
-    // class Holder extends React.Component {
-    //   render() {
-    //     return this.props.children;
-    //   }
-    // }
     const Holder = (props) => <div ref={props.ref}>{props.children}</div>;
 
     it('function component', () => {
@@ -84,7 +79,7 @@ describe('ref', () => {
     it.skip('forwardRef function component', () => {
       let holderRef = null;;
 
-      // const FRC = React.forwardRef(() => <div />);
+      // const FRC = forwardRef(() => <div />);
       const FRC = (() => <div />);
       render(() => 
         <Holder ref={holderRef}>
@@ -119,7 +114,7 @@ describe('ref', () => {
 
       const FC = () => <div />;
       const MemoFC = (FC);
-      // const MemoFC = React.memo(FC);
+      // const MemoFC = memo(FC);
       render(() =>
         <Holder ref={holderRef}>
           <MemoFC />
@@ -132,8 +127,8 @@ describe('ref', () => {
     it.skip('memo of forwardRef function component', () => {
       let holderRef = null;;
 
-      // const FRC = React.forwardRef(() => <div />);
-      // const MemoFC = React.memo(FRC);
+      // const FRC = forwardRef(() => <div />);
+      // const MemoFC = memo(FRC);
       const FC = () => <div />;
       const MemoFC = (FC);
       render(() =>

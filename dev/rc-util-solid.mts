@@ -44,6 +44,8 @@ const resolvePkg = async () => {
     "@types/enzyme",
     "enzyme",
     "enzyme-to-json",
+    "create-react-class",
+    "react-is"
   ];
   const aliPkg = ["father", "@umijs/fabric", "antd", "dumi"];
   for (let k of [...reactPkg, ...aliPkg]) {
