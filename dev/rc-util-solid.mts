@@ -112,6 +112,14 @@ const resolvePkg = async () => {
     await $`rm tests/warning.test.js`;
     await $`rm tests/hooks.test.js`;
     await $`mv tests/style.test.js tests/style.test.ts`;
+    await $`mv tests/composeProps.test.js tests/composeProps.test.ts`;
+    await $`mv tests/debug.test.js tests/debug.test.ts`;
+    await $`mv tests/domHook.test.js tests/domHook.test.ts`;
+    await $`mv tests/index.test.js tests/index.test.ts`;
+    await $`mv tests/raf.test.js tests/raf.test.ts`;
+    await $`mv tests/utils.test.js tests/utils.test.ts`;
+    await $`mv src/debug/diff.js src/debug/diff.ts`;
+    await $`mv src/createChainedFunction.js src/createChainedFunction.ts`;
     // await $`npm run generate`;
   } catch (e) {
     console.log(e);
@@ -132,15 +140,10 @@ const react2Solid = async () => {
     // s2 = s2.replaceAll("{ wrapper: StrictMode }", "{ /* wrapper: StrictMode */ }");
     // s2 = s2.replaceAll("it('should restore to original place in StrictMode'", "it.skip('should restore to original place in StrictMode'");
     s2 = s2.replaceAll("it('delay'", "it.skip('delay'");
+    s2 = s2.replaceAll("width: '23px'", "width: 23");
+    s2 = s2.replaceAll("height: '93px'", "height: 93");
     s2 = s2.replace(/(overflow: hidden; overflow-x: hidden; overflow-y: hidden;)/, "width: calc(100% - 20px); $1");
-    await nodeFs.writeFile(file, s2);
-  }
-
-  for await (const file of await glob(`{src,tests,docs}/**/*.{ts,tsx}`)) {
-    $.verbose = false;
-    let s1 = await $`cat ${file}`;
-    $.verbose = true;
-    let s2 = s1.stdout
+    s2 = s2
       .replaceAll("import createMemo from './hooks/createMemo';", "import createMemo from './hooks/useMemo';")
     await nodeFs.writeFile(file, s2);
     if (/extends (React\.)?(Pure)?Component/.test(s2)) {
@@ -164,4 +167,5 @@ await getRepo()
 await resolvePkg()
 await react2Solid()
 await $`cp -Rf ${cwd}/dev/rc-util-solid-source/* ${cwd}/packages/rc-util-solid`;
-// await $`rm -rf packages/rc-util`;
+await $`cd ${cwd}/packages/rc-util-solid`;
+await $`npx jest`;

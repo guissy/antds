@@ -183,8 +183,8 @@ export const styleing = (react: string): string => {
   .replace(/\bfontSize: (['"])/g, "'font-size': $1")
   .replace(/\b\.pointerEvents/g, "['pointer-events']")
   .replace(/\bpointerEvents/g, "'pointer-events'")
-  .replace(/\bwidth\b: (\d+)\b/g, "width: '$1px'")
-  .replace(/\bheight\b: (\d+)\b/g, "height: '$1px'")
+  .replace(/\bwidth\b: ([1-9]\d*)\b/g, "width: '$1px'")
+  .replace(/\bheight\b: ([1-9]\d*)\b/g, "height: '$1px'")
 };
 
 

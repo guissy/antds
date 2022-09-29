@@ -44,7 +44,7 @@ export default function getScrollBarSize(fresh?: boolean) {
 }
 
 function ensureSize(str: string) {
-  const match = str.match(/^(.*)px$/);
+  const match = String(str).match(/^(.*)(px)?$/);
   const value = Number(match?.[1]);
   return Number.isNaN(value) ? getScrollBarSize() : value;
 }
