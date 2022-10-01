@@ -1,4 +1,4 @@
-import {type Component, type JSX, createEffect, createContext, createMemo, useContext, children as Children, Accessor} from "solid-js";
+import {type Component, type JSX, createEffect, createContext, createMemo, useContext, children as Children, Accessor, onCleanup, on} from "solid-js";
 import createSignal from 'rc-util-solid/lib/hooks/useState';
 import {
   STATUS_APPEAR,
@@ -60,7 +60,7 @@ export default function useStatus(
   }
 
   // ========================== Motion End ==========================
-  let activeRef  = false;
+  let activeRef: Accessor<boolean> = () => false;
 
   function onInternalMotionEnd(event: MotionEvent) {
     const element = getDomElement();
@@ -71,7 +71,7 @@ export default function useStatus(
       return;
     }
 
-    const currentActive = activeRef;
+    const currentActive = activeRef();
 
     let canEnd: boolean | void;
     if (status() === STATUS_APPEAR && currentActive) {
@@ -158,13 +158,14 @@ export default function useStatus(
     return DoStep;
   });
 
-  const active = isActive(step());
-  activeRef = active;
+  // const active = isActive(step());
+  activeRef = createMemo(() => isActive(step()));
 
   // ============================ Status ============================
   // Update with new status
-  useIsomorphicLayoutEffect(() => {
-    setAsyncVisible(visible);
+  useIsomorphicLayoutEffect(on(visible, () => {
+    console.log("useIsomorphicLayoutEffect", asyncVisible(), visible())
+    setAsyncVisible(visible());
 
     const isMounted = mountedRef;
     mountedRef = true;
@@ -176,19 +177,19 @@ export default function useStatus(
     let nextStatus: MotionStatus;
 
     // Appear
-    if (!isMounted && visible && motionAppear) {
+    if (!isMounted && visible() && motionAppear) {
       nextStatus = STATUS_APPEAR;
     }
 
     // Enter
-    if (isMounted && visible && motionEnter) {
+    if (isMounted && visible() && motionEnter) {
       nextStatus = STATUS_ENTER;
     }
 
     // Leave
     if (
-      (isMounted && !visible && motionLeave) ||
-      (!isMounted && motionLeaveImmediately && !visible && motionLeave)
+      (isMounted && !visible() && motionLeave) ||
+      (!isMounted && motionLeaveImmediately && !visible() && motionLeave)
     ) {
       nextStatus = STATUS_LEAVE;
     }
@@ -198,7 +199,7 @@ export default function useStatus(
       setStatus(nextStatus);
       startStep();
     }
-  }, [visible]);
+  }));
 
   // ============================ Effect ============================
   // Reset when motion changed
@@ -215,40 +216,46 @@ export default function useStatus(
     }
   }, [motionAppear, motionEnter, motionLeave]);
 
-  createEffect(
-    () => () => {
+  onCleanup(() => {
       mountedRef = false;
       clearTimeout(deadlineRef);
-    },
-    [],
-  );
+  });
 
   // Trigger `onVisibleChanged`
   let firstMountChangeRef  = false;
   createEffect(() => {
     // [visible & motion not end] => [!visible & motion end] still need trigger onVisibleChanged
-    if (asyncVisible) {
+    if (asyncVisible()) {
       firstMountChangeRef = true;
     }
 
-    if (asyncVisible !== undefined && status() === STATUS_NONE) {
+    if (asyncVisible() !== undefined && status() === STATUS_NONE) {
       // Skip first render is invisible since it's nothing changed
-      if (firstMountChangeRef || asyncVisible) {
+      if (firstMountChangeRef || asyncVisible()) {
         onVisibleChanged?.(asyncVisible());
       }
       firstMountChangeRef = true;
     }
-  }, [asyncVisible, status]);
+  }, [asyncVisible(), status]);
 
   // ============================ Styles ============================
-  let mergedStyle = style;
-  // console.log("style... merged...", eventHandlers()[STEP_PREPARE])
-  if (eventHandlers()[STEP_PREPARE] && step() === STEP_START) {
-    mergedStyle = {
+  // let mergedStyle = style;
+  // if (eventHandlers()[STEP_PREPARE] && step() === STEP_START) {
+  //   mergedStyle = {
+  //     transition: 'none',
+  //     ...mergedStyle(),
+  //   };
+  // }
+  let mergedStyle = createMemo(() => {
+    return eventHandlers()[STEP_PREPARE] && step() === STEP_START 
+    ? {
       transition: 'none',
       ...mergedStyle(),
-    };
-  }
+    } : style()
+  });
 
-  return [status, step, mergedStyle, asyncVisible ?? visible];
+  const _visible = createMemo(() => { 
+    return asyncVisible() == null ? visible() : asyncVisible();
+  })
+  return [status, step, mergedStyle, _visible];
 }

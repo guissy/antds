@@ -1,5 +1,6 @@
 /* eslint-disable react/default-props-match-prop-types, react/no-multi-comp, react/prop-types */
-import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, mergeProps} from "solid-js";
+import { type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, mergeProps, onMount, onCleanup } from "solid-js";
+import { spread } from 'solid-js/web'
 // import findDOMNode from 'rc-util/lib/Dom/findDOMNode';
 import { fillRef, supportRef } from 'rc-util-solid/lib/ref';
 import classNames from 'classnames';
@@ -18,21 +19,21 @@ import { isActive } from './hooks/useStepQueue';
 export type CSSMotionConfig =
   | boolean
   | {
-      transitionSupport?: boolean;
-      /** @deprecated, no need this anymore since `rc-motion` only support latest react */
-      forwardRef?: boolean;
-    };
+    transitionSupport?: boolean;
+    /** @deprecated, no need this anymore since `rc-motion` only support latest react */
+    forwardRef?: boolean;
+  };
 
 export type MotionName =
   | string
   | {
-      appear?: string;
-      enter?: string;
-      leave?: string;
-      appearActive?: string;
-      enterActive?: string;
-      leaveActive?: string;
-    };
+    appear?: string;
+    enter?: string;
+    leave?: string;
+    appearActive?: string;
+    enterActive?: string;
+    leaveActive?: string;
+  };
 
 export interface CSSMotionProps {
   motionName?: MotionName;
@@ -117,22 +118,22 @@ export function genCSSMotion(
 
   const CSSMotion: Component<CSSMotionProps & JSX.CustomAttributes<HTMLDivElement>> = ((props) => {
     // const {
-      // Default config
-      // visible = true,
-      // removeOnLeave = true,
+    // Default config
+    // visible = true,
+    // removeOnLeave = true,
 
-      // forceRender,
-      // children,
-      // motionName,
-      // leavedClassName,
-      // eventProps,
+    // forceRender,
+    // children,
+    // motionName,
+    // leavedClassName,
+    // eventProps,
     // } = props;
 
     // const supportMotion = isSupportTransition(props);
     const supportMotion = createMemo(() => !!(props.motionName && transitionSupport));
 
     // Ref to the react node, it may be a HTMLElement
-    let nodeRef  = null as (any | null);
+    let nodeRef = null as (any | null);
     // Ref to the dom wrapper in case ref can not pass to HTMLElement
     // let wrapperNodeRef = useRef();
 
@@ -143,8 +144,8 @@ export function genCSSMotion(
         // an instance of DOM HTMLElement. Otherwise use
         // findDOMNode as a final resort
         return nodeRef;// instanceof HTMLElement
-          // ? nodeRef
-          // : findDOMNode<HTMLElement>(wrapperNodeRef);
+        // ? nodeRef
+        // : findDOMNode<HTMLElement>(wrapperNodeRef);
       } catch (e) {
         // Only happen when `motionDeadline` trigger but element removed.
         return null;
@@ -169,35 +170,53 @@ export function genCSSMotion(
 
     // ====================== Refs ======================
     let setNodeRef = (node: any) => {
-        nodeRef = node;
-        fillRef(props.ref, node);
-      };
+      nodeRef = node;
+      fillRef(props.ref, node);
+    };
 
+    // const child = Children(() => props.children(props))() as Element;
     // ===================== Render =====================
-    let motionChildren: JSX.Element = createMemo(() => {
-      console.log("props.visible", props.visible)
-      const mergedProps = mergeProps(props.eventProps, {visible: visible()});
+    const mergedProps = mergeProps(props.eventProps, { visible: visible() });
+    let motionChildren = Children(() =>
+      typeof props.children === 'function'
+        ? props.children({ ...mergedProps }, setNodeRef)
+        : null
+    )() as HTMLElement;
+    const className = motionChildren.className;
+    createMemo(([child, styleOld]: [HTMLElement, CSSProperties]) => {
+      console.log("status", status(), "visible=", props.visible)
+      // const className = child?.classList.toString();
+      const style = child?.style;
+      const mergedProps = mergeProps(props.eventProps, { visible: visible() });
       const removeOnLeave = props.removeOnLeave || true;
-      let motionChildren: JSX.Element;
+      // let motionChildrenOuter = Children(() =>
+      //   typeof props.children === 'function'
+      //     ? props.children({ ...mergedProps }, setNodeRef)
+      //     : null
+      // )() as HTMLElement;
       if (!props.children) {
         // No children
-        motionChildren = null;
+        // motionChildren = null;
       } else if (status() === STATUS_NONE || !supportMotion()) {
         // Stable children
-        if (mergedVisible) {
-          motionChildren = props.children({ ...mergedProps }, setNodeRef);
+        if (mergedVisible()) {
+          // motionChildren = props.children({ ...mergedProps }, setNodeRef);
+          spread(motionChildren, { ...mergedProps, className })
         } else if (!removeOnLeave && renderedRef) {
-          motionChildren = props.children(
-            { ...mergedProps, className: props.leavedClassName },
-            setNodeRef,
-          );
+          // motionChildren = props.children(
+          //   { ...mergedProps, className: props.leavedClassName },
+          //   setNodeRef,
+          // );
+          spread(motionChildren, mergeProps(mergedProps, { 'class': classNames(className, props.leavedClassName) }));
         } else if (props.forceRender) {
-          motionChildren = props.children(
-            { ...mergedProps, style: { display: 'none' } },
-            setNodeRef,
-          );
+          // motionChildren = props.children(
+          //   { ...mergedProps, style: { display: 'none' } },
+          //   setNodeRef,
+          // );
+          spread(motionChildren, mergeProps(mergedProps, { 'style': { display: 'none' } }));
         } else {
-          motionChildren = null;
+          // motionChildren = null;
+          spread(motionChildren, mergeProps(mergedProps, { 'style': { display: 'none' } }));
         }
       } else {
         // In motion
@@ -209,22 +228,31 @@ export function genCSSMotion(
         } else if (statusStep() === STEP_START) {
           statusSuffix = 'start';
         }
+        const cleanStyle = Object.fromEntries(Object.entries(styleOld || {}).map(([k, v]) => [k, ""]))        
+        spread(motionChildren, mergeProps(mergedProps, {
+          'class': classNames(className, getTransitionName(props.motionName, status()), {
+            [getTransitionName(props.motionName, `${status()}-${statusSuffix}`)]:
+              statusSuffix,
+            [props.motionName as string]: typeof props.motionName === 'string',
+          }),
+          style: statusStyle() ?? cleanStyle
+        }));
 
-        motionChildren = props.children(
-          {
-            ...mergedProps,
-            className: classNames(getTransitionName(props.motionName, status()), {
-              [getTransitionName(props.motionName, `${status()}-${statusSuffix}`)]:
-                statusSuffix,
-              [props.motionName as string]: typeof props.motionName === 'string',
-            }),
-            style: statusStyle(),
-          },
-          setNodeRef,
-        );
+        // motionChildren = props.children(
+        //   {
+        //     ...mergedProps,
+        //     className: classNames(getTransitionName(props.motionName, status()), {
+        //       [getTransitionName(props.motionName, `${status()}-${statusSuffix}`)]:
+        //         statusSuffix,
+        //       [props.motionName as string]: typeof props.motionName === 'string',
+        //     }),
+        //     style: statusStyle(),
+        //   },
+        //   setNodeRef,
+        // );
       }
-      return motionChildren
-    });
+      return [motionChildren, statusStyle()]
+    }, [motionChildren, statusStyle()]);
 
     // Auto inject ref if child node not have `ref` props
     // if (React.isValidElement(motionChildren) && supportRef(motionChildren)) {
@@ -236,11 +264,10 @@ export function genCSSMotion(
     //     });
     //   }
     // }
-
     return motionChildren;
   });
 
-  ;(CSSMotion as unknown as { displayName: string }).displayName = 'CSSMotion';
+  ; (CSSMotion as unknown as { displayName: string }).displayName = 'CSSMotion';
 
   return CSSMotion;
 }
