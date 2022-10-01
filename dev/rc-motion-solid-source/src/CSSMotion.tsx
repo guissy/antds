@@ -1,7 +1,7 @@
 /* eslint-disable react/default-props-match-prop-types, react/no-multi-comp, react/prop-types */
 import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, mergeProps} from "solid-js";
-import findDOMNode from 'rc-util/lib/Dom/findDOMNode';
-import { fillRef, supportRef } from 'rc-util/lib/ref';
+// import findDOMNode from 'rc-util/lib/Dom/findDOMNode';
+import { fillRef, supportRef } from 'rc-util-solid/lib/ref';
 import classNames from 'classnames';
 import { getTransitionName, supportTransition } from './util/motion';
 import type {
@@ -116,17 +116,17 @@ export function genCSSMotion(
   // }
 
   const CSSMotion: Component<CSSMotionProps & JSX.CustomAttributes<HTMLDivElement>> = ((props) => {
-    const {
+    // const {
       // Default config
       // visible = true,
-      removeOnLeave = true,
+      // removeOnLeave = true,
 
-      forceRender,
-      children,
-      motionName,
-      leavedClassName,
-      eventProps,
-    } = props;
+      // forceRender,
+      // children,
+      // motionName,
+      // leavedClassName,
+      // eventProps,
+    // } = props;
 
     // const supportMotion = isSupportTransition(props);
     const supportMotion = createMemo(() => !!(props.motionName && transitionSupport));
@@ -152,7 +152,7 @@ export function genCSSMotion(
     }
 
     // isSupportTransition
-    const visible = createMemo(() => props.visible || true)
+    const visible = createMemo(() => props.visible ?? true)
     const [status, statusStep, statusStyle, mergedVisible] = useStatus(
       supportMotion,
       visible,
@@ -175,22 +175,24 @@ export function genCSSMotion(
 
     // ===================== Render =====================
     let motionChildren: JSX.Element = createMemo(() => {
+      console.log("props.visible", props.visible)
       const mergedProps = mergeProps(props.eventProps, {visible: visible()});
-
-      if (!children) {
+      const removeOnLeave = props.removeOnLeave || true;
+      let motionChildren: JSX.Element;
+      if (!props.children) {
         // No children
         motionChildren = null;
       } else if (status() === STATUS_NONE || !supportMotion()) {
         // Stable children
         if (mergedVisible) {
-          motionChildren = children({ ...mergedProps }, setNodeRef);
+          motionChildren = props.children({ ...mergedProps }, setNodeRef);
         } else if (!removeOnLeave && renderedRef) {
-          motionChildren = children(
-            { ...mergedProps, className: leavedClassName },
+          motionChildren = props.children(
+            { ...mergedProps, className: props.leavedClassName },
             setNodeRef,
           );
-        } else if (forceRender) {
-          motionChildren = children(
+        } else if (props.forceRender) {
+          motionChildren = props.children(
             { ...mergedProps, style: { display: 'none' } },
             setNodeRef,
           );
@@ -208,13 +210,13 @@ export function genCSSMotion(
           statusSuffix = 'start';
         }
 
-        motionChildren = children(
+        motionChildren = props.children(
           {
             ...mergedProps,
-            className: classNames(getTransitionName(motionName, status), {
-              [getTransitionName(motionName, `${status}-${statusSuffix}`)]:
+            className: classNames(getTransitionName(props.motionName, status()), {
+              [getTransitionName(props.motionName, `${status()}-${statusSuffix}`)]:
                 statusSuffix,
-              [motionName as string]: typeof motionName === 'string',
+              [props.motionName as string]: typeof props.motionName === 'string',
             }),
             style: statusStyle(),
           },

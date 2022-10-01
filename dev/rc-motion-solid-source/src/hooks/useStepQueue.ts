@@ -1,5 +1,5 @@
 import {type Component, type JSX, createEffect, createContext, createMemo, useContext, children as Children, Accessor} from "solid-js";
-import createSignal from 'rc-util-solid/hooks/useState';
+import createSignal from 'rc-util-solid/lib/hooks/useState';
 import type { StepStatus, MotionStatus } from '../interface';
 import {
   STEP_PREPARE,

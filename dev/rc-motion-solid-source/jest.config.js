@@ -22,6 +22,8 @@ module.exports = {
     "solid-js/web": `${solidjsPath}/web/dist/web.cjs`,
     "solid-js/store": `${solidjsPath}/store/dist/store.cjs`,
     "solid-js": `${solidjsPath}/dist/solid.cjs`,
+    "rc-util-solid/lib/hooks/useState": `${pkgRootPath}/../rc-util-solid/src/hooks/useState.ts`,
+    "rc-util-solid/lib/ref": `${pkgRootPath}/../rc-util-solid/src/ref.ts`
   },
 
   verbose: true,

@@ -1,5 +1,5 @@
 import {type Component, type JSX, createEffect, createContext, createMemo, useContext, children as Children, Accessor} from "solid-js";
-import createSignal from 'rc-util-solid/hooks/useState';
+import createSignal from 'rc-util-solid/lib/hooks/useState';
 import {
   STATUS_APPEAR,
   STATUS_NONE,
@@ -128,7 +128,7 @@ export default function useStatus(
   const [startStep, step] = useStepQueue(status, newStep => {
     // Only prepare step can be skip
     if (newStep === STEP_PREPARE) {
-      const onPrepare = eventHandlers[STEP_PREPARE];
+      const onPrepare = eventHandlers()[STEP_PREPARE];
       if (!onPrepare) {
         return SkipStep;
       }
@@ -137,8 +137,8 @@ export default function useStatus(
     }
 
     // Rest step is sync update
-    if (step() in eventHandlers) {
-      setStyle(eventHandlers[step()]?.(getDomElement(), null) || null);
+    if (step() in eventHandlers()) {
+      setStyle(eventHandlers()[step()]?.(getDomElement(), null) || null);
     }
 
     if (step() === STEP_ACTIVE) {
@@ -242,10 +242,11 @@ export default function useStatus(
 
   // ============================ Styles ============================
   let mergedStyle = style;
-  if (eventHandlers[STEP_PREPARE] && step() === STEP_START) {
+  // console.log("style... merged...", eventHandlers()[STEP_PREPARE])
+  if (eventHandlers()[STEP_PREPARE] && step() === STEP_START) {
     mergedStyle = {
       transition: 'none',
-      ...mergedStyle,
+      ...mergedStyle(),
     };
   }
 
