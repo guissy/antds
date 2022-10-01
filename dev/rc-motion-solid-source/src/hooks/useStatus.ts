@@ -164,7 +164,7 @@ export default function useStatus(
   // ============================ Status ============================
   // Update with new status
   useIsomorphicLayoutEffect(on(visible, () => {
-    console.log("useIsomorphicLayoutEffect", asyncVisible(), visible())
+    // console.log("useIsomorphicLayoutEffect", asyncVisible(), visible())
     setAsyncVisible(visible());
 
     const isMounted = mountedRef;
@@ -240,6 +240,7 @@ export default function useStatus(
 
   // ============================ Styles ============================
   // let mergedStyle = style;
+  // // console.log("style... merged...", eventHandlers()[STEP_PREPARE])
   // if (eventHandlers()[STEP_PREPARE] && step() === STEP_START) {
   //   mergedStyle = {
   //     transition: 'none',

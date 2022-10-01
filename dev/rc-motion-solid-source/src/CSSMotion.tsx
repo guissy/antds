@@ -1,5 +1,5 @@
 /* eslint-disable react/default-props-match-prop-types, react/no-multi-comp, react/prop-types */
-import { type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, mergeProps, onMount, onCleanup } from "solid-js";
+import { type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, mergeProps, onMount, onCleanup, Show } from "solid-js";
 import { spread } from 'solid-js/web'
 // import findDOMNode from 'rc-util/lib/Dom/findDOMNode';
 import { fillRef, supportRef } from 'rc-util-solid/lib/ref';
@@ -173,20 +173,21 @@ export function genCSSMotion(
       nodeRef = node;
       fillRef(props.ref, node);
     };
-
+    let parentRef = null;
     // const child = Children(() => props.children(props))() as Element;
     // ===================== Render =====================
     const mergedProps = mergeProps(props.eventProps, { visible: visible() });
     let motionChildren = Children(() =>
       typeof props.children === 'function'
-        ? props.children({ ...mergedProps }, setNodeRef)
+        ? props.children({ ...mergedProps, id: "oo" }, setNodeRef)
         : null
     )() as HTMLElement;
-    const className = motionChildren.className;
+    const className = motionChildren?.className;
+    const [removed, setRemoved] = createSignal(false);
     createMemo(([child, styleOld]: [HTMLElement, CSSProperties]) => {
-      console.log("status", status(), "visible=", props.visible)
       // const className = child?.classList.toString();
       const style = child?.style;
+      setRemoved(false);
       const mergedProps = mergeProps(props.eventProps, { visible: visible() });
       const removeOnLeave = props.removeOnLeave || true;
       // let motionChildrenOuter = Children(() =>
@@ -194,9 +195,9 @@ export function genCSSMotion(
       //     ? props.children({ ...mergedProps }, setNodeRef)
       //     : null
       // )() as HTMLElement;
-      if (!props.children) {
+      if (!motionChildren) {
         // No children
-        // motionChildren = null;
+        setRemoved(true)
       } else if (status() === STATUS_NONE || !supportMotion()) {
         // Stable children
         if (mergedVisible()) {
@@ -213,10 +214,10 @@ export function genCSSMotion(
           //   { ...mergedProps, style: { display: 'none' } },
           //   setNodeRef,
           // );
-          spread(motionChildren, mergeProps(mergedProps, { 'style': { display: 'none' } }));
+          spread(motionChildren, mergeProps(mergedProps, { 'style': { ...style, display: 'none' } }));
         } else {
           // motionChildren = null;
-          spread(motionChildren, mergeProps(mergedProps, { 'style': { display: 'none' } }));
+          setRemoved(true)
         }
       } else {
         // In motion
@@ -228,7 +229,8 @@ export function genCSSMotion(
         } else if (statusStep() === STEP_START) {
           statusSuffix = 'start';
         }
-        const cleanStyle = Object.fromEntries(Object.entries(styleOld || {}).map(([k, v]) => [k, ""]))        
+        const cleanStyle = Object.fromEntries(Object.entries(styleOld || {}).map(([k, v]) => [k, ""]))
+        
         spread(motionChildren, mergeProps(mergedProps, {
           'class': classNames(className, getTransitionName(props.motionName, status()), {
             [getTransitionName(props.motionName, `${status()}-${statusSuffix}`)]:
@@ -264,7 +266,7 @@ export function genCSSMotion(
     //     });
     //   }
     // }
-    return motionChildren;
+    return <Show when={!removed()}>{motionChildren}</Show>;
   });
 
   ; (CSSMotion as unknown as { displayName: string }).displayName = 'CSSMotion';

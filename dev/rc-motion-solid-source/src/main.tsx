@@ -161,11 +161,11 @@ const Demo: Component = () => {
                 console.log('Visible Changed:', visible);
               }}
             >
-              {({ style, className }, ref) => (
+              {(props, ref) => (
                 <Div
                   ref={ref}
-                  className={classNames('demo-block', className)}
-                  style={style}
+                  class={classNames('demo-block', props.className)}
+                  style={props.style}
                 />
               )}
             </CSSMotion>
@@ -222,4 +222,4 @@ const Demo: Component = () => {
 }
 
 
-render(() => <Demo visible>Portal</Demo>, document.getElementById('root') as HTMLElement);
+render(() => <Demo />, document.getElementById('root') as HTMLElement);

@@ -1,4 +1,4 @@
-import {type Component, type JSX, createEffect, createContext, createMemo, useContext, children as Children, Accessor, onCleanup} from "solid-js";
+import {type Component, type JSX, createEffect, createContext, createMemo, useContext, children as Children, Accessor, onCleanup, on} from "solid-js";
 import createSignal from 'rc-util-solid/lib/hooks/useState';
 import type { StepStatus, MotionStatus } from '../interface';
 import {
@@ -28,7 +28,7 @@ export function isActive(step: StepStatus) {
 }
 
 export default (
-  status: MotionStatus,
+  status: Accessor<MotionStatus>,
   callback: (
     step: StepStatus,
   ) => Promise<void> | void | typeof SkipStep | typeof DoStep,
@@ -41,7 +41,7 @@ export default (
     setStep(STEP_PREPARE, true);
   }
 
-  useIsomorphicLayoutEffect(() => {
+  useIsomorphicLayoutEffect((on([status, step], () => {
     if (step() !== STEP_NONE && step() !== STEP_ACTIVATED) {
       const index = STEP_QUEUE.indexOf(step());
       const nextStep = STEP_QUEUE[index + 1];
@@ -70,7 +70,7 @@ export default (
         });
       }
     }
-  }, [status, step]);
+  })));
 
   onCleanup(() => {
     cancelNextFrame();
