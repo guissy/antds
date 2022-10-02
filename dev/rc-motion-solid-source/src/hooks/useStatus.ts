@@ -83,6 +83,7 @@ export default function useStatus(
     }
 
     // Only update status when `canEnd` and not destroyed
+    // console.log(status(), currentActive, canEnd)
     if (status() !== STATUS_NONE && currentActive && canEnd !== false) {
       setStatus(STATUS_NONE, true);
       setStyle(null, true);
@@ -247,13 +248,13 @@ export default function useStatus(
   //     ...mergedStyle(),
   //   };
   // }
-  let mergedStyle = createMemo(() => {
+  let mergedStyle = createMemo(on([step, style], () => {
     return eventHandlers()[STEP_PREPARE] && step() === STEP_START 
     ? {
       transition: 'none',
       ...mergedStyle(),
     } : style()
-  });
+  }));
 
   const _visible = createMemo(() => { 
     return asyncVisible() == null ? visible() : asyncVisible();

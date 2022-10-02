@@ -99,6 +99,18 @@ export interface CSSMotionState {
   prevProps?: CSSMotionProps;
 }
 
+export const toStyleObject = (style: string | JSX.CSSProperties) => {
+  if (typeof style === "object") {
+    return style;
+  }
+  const styleObject: JSX.CSSProperties = {};
+  (style || "").replace(/([\w-]+)\s*:\s*([^;]+)/g, (_, prop, value) => {
+    styleObject[prop] = value;
+    return "";
+  });
+  return styleObject;
+};
+
 /**
  * `transitionSupport` is used for none transition test case.
  * Default we use browser transition event support check.
@@ -179,45 +191,51 @@ export function genCSSMotion(
     const mergedProps = mergeProps(props.eventProps, { visible: visible() });
     let motionChildren = Children(() =>
       typeof props.children === 'function'
-        ? props.children({ ...mergedProps, id: "oo" }, setNodeRef)
+        ? props.children({ ...mergedProps }, () => { console.warn("setRef is depredated") })
         : null
     )() as HTMLElement;
-    const className = motionChildren?.className;
+    setNodeRef(motionChildren)
+    const classNameInit = motionChildren?.className;
+    const styleInit = toStyleObject(motionChildren?.style.cssText);
+    // const styleInit = motionChildren?.style;
     const [removed, setRemoved] = createSignal(false);
-    createMemo(([child, styleOld]: [HTMLElement, CSSProperties]) => {
-      // const className = child?.classList.toString();
-      const style = child?.style;
+    createEffect(([child]) => {
       setRemoved(false);
-      const mergedProps = mergeProps(props.eventProps, { visible: visible() });
-      const removeOnLeave = props.removeOnLeave || true;
+      const styleInitForce = Object.fromEntries(Object.keys(toStyleObject(child?.style.cssText)).map(k => [k, styleInit[k] || '']));
+      const mergedProps = mergeProps(props.eventProps, { style: styleInitForce, 'class': classNameInit, visible: visible() });
+      const removeOnLeave = props.removeOnLeave ?? true;
       // let motionChildrenOuter = Children(() =>
       //   typeof props.children === 'function'
       //     ? props.children({ ...mergedProps }, setNodeRef)
       //     : null
       // )() as HTMLElement;
+      // console.debug("createEffect status()=", status())
       if (!motionChildren) {
         // No children
         setRemoved(true)
       } else if (status() === STATUS_NONE || !supportMotion()) {
         // Stable children
-        if (mergedVisible()) {
+        if (mergedVisible()) {    
           // motionChildren = props.children({ ...mergedProps }, setNodeRef);
-          spread(motionChildren, { ...mergedProps, className })
-        } else if (!removeOnLeave && renderedRef) {
+          spread(motionChildren, { ...mergedProps })
+        } else if (!removeOnLeave && !props.forceRender) {
           // motionChildren = props.children(
           //   { ...mergedProps, className: props.leavedClassName },
           //   setNodeRef,
           // );
-          spread(motionChildren, mergeProps(mergedProps, { 'class': classNames(className, props.leavedClassName) }));
+          // console.debug("createEffect !removeOnLeave && !props.forceRender", props.leavedClassName)
+          spread(motionChildren, mergeProps(mergedProps, { 'class': classNames(classNameInit, props.leavedClassName) }));
         } else if (props.forceRender) {
           // motionChildren = props.children(
           //   { ...mergedProps, style: { display: 'none' } },
           //   setNodeRef,
           // );
-          spread(motionChildren, mergeProps(mergedProps, { 'style': { ...style, display: 'none' } }));
+          spread(motionChildren, mergeProps(mergedProps, { 'style': { ...styleInitForce, display: 'none' } }));
         } else {
           // motionChildren = null;
-          setRemoved(true)
+          if (!props.forceRender && removeOnLeave) {
+            setRemoved(true)
+          }
         }
       } else {
         // In motion
@@ -228,16 +246,14 @@ export function genCSSMotion(
           statusSuffix = 'active';
         } else if (statusStep() === STEP_START) {
           statusSuffix = 'start';
-        }
-        const cleanStyle = Object.fromEntries(Object.entries(styleOld || {}).map(([k, v]) => [k, ""]))
-        
+        }    
         spread(motionChildren, mergeProps(mergedProps, {
-          'class': classNames(className, getTransitionName(props.motionName, status()), {
+          'class': classNames(classNameInit, getTransitionName(props.motionName, status()), {
             [getTransitionName(props.motionName, `${status()}-${statusSuffix}`)]:
               statusSuffix,
             [props.motionName as string]: typeof props.motionName === 'string',
           }),
-          style: statusStyle() ?? cleanStyle
+          style: {...styleInitForce, ...statusStyle()}
         }));
 
         // motionChildren = props.children(
@@ -253,8 +269,9 @@ export function genCSSMotion(
         //   setNodeRef,
         // );
       }
-      return [motionChildren, statusStyle()]
-    }, [motionChildren, statusStyle()]);
+
+      return [motionChildren] as const
+    }, [motionChildren] as const);
 
     // Auto inject ref if child node not have `ref` props
     // if (React.isValidElement(motionChildren) && supportRef(motionChildren)) {

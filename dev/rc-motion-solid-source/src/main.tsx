@@ -5,7 +5,7 @@ import { render } from 'solid-js/web';
 import classNames from 'classnames';
 import CSSMotion from './CSSMotion';
 import '../examples/CSSMotion.less';
-import { createSignal, onCleanup, onMount } from 'solid-js';
+import { createSignal, onCleanup, onMount, Show } from 'solid-js';
 
 interface DemoState {
   show: boolean;
@@ -17,7 +17,10 @@ interface DemoState {
 }
 
 async function forceDelay(): Promise<void> {
+  console.log("forceDelay: ㊂㊂㊂➁➁➁");
+  
   return new Promise(resolve => {
+    console.log("forceDelay ➎➎➎")
     setTimeout(resolve, 2000);
   });
 }
@@ -30,7 +33,7 @@ const Div = ((props) => {
         console.log('DIV >>> UnMounted!');
     })
 
-  return <div {...props} ref={props.ref} />;
+  return <div {...props} ref={props?.ref} />;
 });
 
 const Demo: Component = () => {
@@ -163,32 +166,33 @@ const Demo: Component = () => {
             >
               {(props, ref) => (
                 <Div
-                  ref={ref}
+                  // ref={ref}
                   class={classNames('demo-block', props.className)}
                   style={props.style}
                 />
               )}
             </CSSMotion>
           </div>
-
-          <div>
-            <h2>With Animation Class</h2>
-            <CSSMotion
-              visible={state().show}
-              forceRender={state().forceRender}
-              motionName={state().hasMotionClassName ? 'animation' : null}
-              removeOnLeave={state().removeOnLeave}
-              leavedClassName="hidden"
-              onLeaveActive={styleGreen}
-            >
-              {({ style, className }) => (
-                <div
-                  class={classNames('demo-block', className)}
-                  style={style}
-                />
-              )}
-            </CSSMotion>
-          </div>
+          <Show when={true}>
+            <div>
+              <h2>With Animation Class</h2>
+              <CSSMotion
+                visible={state().show}
+                forceRender={state().forceRender}
+                motionName={state().hasMotionClassName ? 'animation' : null}
+                removeOnLeave={state().removeOnLeave}
+                leavedClassName="hidden"
+                onLeaveActive={styleGreen}
+              >
+                {({ style, className }) => (
+                  <div
+                    class={classNames('demo-block', className)}
+                    style={style}
+                  />
+                )}
+              </CSSMotion>
+            </div>
+          </Show>
         </div>
 
         <div>
@@ -196,6 +200,7 @@ const Demo: Component = () => {
             motionLeaveImmediately
           </button>
 
+          <Show when={true}>
           <div>
             {state().motionLeaveImmediately && (
               <CSSMotion
@@ -216,6 +221,7 @@ const Demo: Component = () => {
               </CSSMotion>
             )}
           </div>
+          </Show>
         </div>
       </div>
     );
