@@ -1,5 +1,3 @@
-/* eslint-disable react/no-render-return-value, react/prefer-stateless-function,
-react/no-multi-comp, @typescript-eslint/no-implied-eval */
 import { type Component, createSignal } from "solid-js";
 import classNames from 'classnames';
 import { render, fireEvent, screen } from "solid-testing-library";

@@ -1,4 +1,4 @@
-import {type Component, type JSX, createEffect, createContext, createMemo, useContext, children as Children, Accessor, onCleanup, on} from "solid-js";
+import { type JSX, createEffect, createMemo, Accessor, onCleanup, on, splitProps } from "solid-js";
 import createSignal from 'rc-util-solid/lib/hooks/useState';
 import {
   STATUS_APPEAR,
@@ -25,7 +25,13 @@ export default function useStatus(
   supportMotion: Accessor<boolean>,
   visible: Accessor<boolean>,
   getElement: () => HTMLElement,
-  {
+  props: CSSMotionProps,
+): [Accessor<MotionStatus>, Accessor<StepStatus>, Accessor<JSX.CSSProperties>, Accessor<boolean>] {
+  // Used for outer render usage to avoid `visible: false & status: none` to render nothing
+  const [asyncVisible, setAsyncVisible] = createSignal<boolean>();
+  const [status, setStatus] = createSignal<MotionStatus>(STATUS_NONE);
+  const [style, setStyle] = createSignal<JSX.CSSProperties | undefined>(null);
+  const [{
     motionEnter = true,
     motionAppear = true,
     motionLeave = true,
@@ -44,15 +50,12 @@ export default function useStatus(
     onEnterEnd,
     onLeaveEnd,
     onVisibleChanged,
-  }: CSSMotionProps,
-): [Accessor<MotionStatus>, Accessor<StepStatus>, Accessor<JSX.CSSProperties>, Accessor<boolean>] {
-  // Used for outer render usage to avoid `visible: false & status: none` to render nothing
-  const [asyncVisible, setAsyncVisible] = createSignal<boolean>();
-  const [status, setStatus] = createSignal<MotionStatus>(STATUS_NONE);
-  const [style, setStyle] = createSignal<JSX.CSSProperties | undefined>(null);
-
-  let mountedRef  = false;
-  let deadlineRef  = null;
+  }] = splitProps(props, ['motionEnter', 'motionAppear', 'motionLeave', 'motionDeadline', 'motionLeaveImmediately', 'onAppearPrepare',
+    'onEnterPrepare', 'onLeavePrepare', 'onAppearStart', 'onEnterStart', 'onLeaveStart', 'onAppearActive', 'onEnterActive', 'onLeaveActive',
+    'onAppearEnd', 'onEnterEnd', 'onLeaveEnd', 'onVisibleChanged',
+  ])
+  let mountedRef = false;
+  let deadlineRef = null;
 
   // =========================== Dom Node ===========================
   function getDomElement() {
@@ -73,6 +76,7 @@ export default function useStatus(
 
     const currentActive = activeRef();
 
+    // console.log("status()", status(), currentActive)
     let canEnd: boolean | void;
     if (status() === STATUS_APPEAR && currentActive) {
       canEnd = onAppearEnd?.(element, event);
@@ -218,12 +222,12 @@ export default function useStatus(
   }, [motionAppear, motionEnter, motionLeave]);
 
   onCleanup(() => {
-      mountedRef = false;
-      clearTimeout(deadlineRef);
+    mountedRef = false;
+    clearTimeout(deadlineRef);
   });
 
   // Trigger `onVisibleChanged`
-  let firstMountChangeRef  = false;
+  let firstMountChangeRef = false;
   createEffect(() => {
     // [visible & motion not end] => [!visible & motion end] still need trigger onVisibleChanged
     if (asyncVisible()) {
@@ -248,14 +252,14 @@ export default function useStatus(
   //   };
   // }
   let mergedStyle = createMemo(on([step, style], () => {
-    return eventHandlers()[STEP_PREPARE] && step() === STEP_START 
-    ? {
-      transition: 'none',
-      ...mergedStyle(),
-    } : style()
+    return eventHandlers()[STEP_PREPARE] && step() === STEP_START
+      ? {
+        transition: 'none',
+        ...mergedStyle(),
+      } : style()
   }));
 
-  const _visible = createMemo(() => { 
+  const _visible = createMemo(() => {
     return asyncVisible() == null ? visible() : asyncVisible();
   })
   return [status, step, mergedStyle, _visible];

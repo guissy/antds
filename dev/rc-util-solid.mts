@@ -146,11 +146,10 @@ const react2Solid = async () => {
     s2 = s2
       .replaceAll("import createMemo from './hooks/createMemo';", "import createMemo from './hooks/useMemo';")
     await nodeFs.writeFile(file, s2);
-    if (/extends (React\.)?(Pure)?Component/.test(s2)) {
+    // if (/extends (React\.)?(Pure)?Component/.test(s2)) {
       // await resolveClass(file, s2);
-    }
+    // }
   }
-  // await $`npm run test`;
 };
 
 const resolveClass = async (file: string, fileContent: string) => {

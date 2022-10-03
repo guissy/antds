@@ -95,6 +95,7 @@ const resolvePkg = async () => {
   );
   try {
     cd(`${cwd}/packages/rc-motion-solid`);
+    await $`rm src/DomWrapper.tsx`;
     if (hasInstall) {
       await $`npm i --prefer-offline --no-audit --progress=false --legacy-peer-deps`;
     } else {
@@ -120,11 +121,10 @@ const react2Solid = async () => {
     s2 = s2.replace(/\bact\(\(\) => {([^}]+)}\);/g, "$1");
     s2 = s2.replace(/(import ReactDOM from 'react-dom';)/, "");
     await nodeFs.writeFile(file, s2);
-    if (/extends (React\.)?(Pure)?Component/.test(s2)) {
+    // if (/extends (React\.)?(Pure)?Component/.test(s2)) {
       // await resolveClass(file, s2);
-    }
+    // }
   }
-  // await $`npm run test`;
 };
 
 const resolveClass = async (file: string, fileContent: string) => {
