@@ -13,10 +13,8 @@ interface DemoState {
 }
 
 async function forceDelay(): Promise<void> {
-  console.log("forceDelay: ㊂㊂㊂➁➁➁");
   
   return new Promise(resolve => {
-    console.log("forceDelay ➎➎➎")
     setTimeout(resolve, 2000);
   });
 }

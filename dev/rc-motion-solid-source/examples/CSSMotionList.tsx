@@ -1,6 +1,6 @@
 // import React from 'react';
 import classNames from 'classnames';
-import { createSignal, onMount, type Component } from 'solid-js';
+import { createEffect, createSignal, onMount, type Component } from 'solid-js';
 import { CSSMotionList } from '../src';
 import './CSSMotionList.less';
 

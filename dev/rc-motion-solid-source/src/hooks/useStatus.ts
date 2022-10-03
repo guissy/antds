@@ -186,7 +186,7 @@ export default function useStatus(
     if (isMounted && visible() && motionEnter) {
       nextStatus = STATUS_ENTER;
     }
-
+    // console.log("isMounted, !visible(), motionLeave", isMounted, !visible(), motionLeave);
     // Leave
     if (
       (isMounted && !visible() && motionLeave) ||
@@ -241,7 +241,6 @@ export default function useStatus(
 
   // ============================ Styles ============================
   // let mergedStyle = style;
-  // // console.log("style... merged...", eventHandlers()[STEP_PREPARE])
   // if (eventHandlers()[STEP_PREPARE] && step() === STEP_START) {
   //   mergedStyle = {
   //     transition: 'none',

@@ -1,5 +1,5 @@
 /* eslint-disable react/default-props-match-prop-types, react/no-multi-comp, react/prop-types */
-import { type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, mergeProps, onMount, onCleanup, Show } from "solid-js";
+import { type ParentComponent, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, mergeProps, onMount, onCleanup, Show } from "solid-js";
 import { spread } from 'solid-js/web'
 // import findDOMNode from 'rc-util/lib/Dom/findDOMNode';
 import { fillRef, supportRef } from 'rc-util-solid/lib/ref';
@@ -117,7 +117,7 @@ export const toStyleObject = (style: string | JSX.CSSProperties) => {
  */
 export function genCSSMotion(
   config: CSSMotionConfig,
-): JSX.IntrinsicAttributes {
+): ParentComponent<CSSMotionProps & JSX.CustomAttributes<HTMLDivElement>> {
   let transitionSupport = config;
 
   if (typeof config === 'object') {
@@ -128,7 +128,7 @@ export function genCSSMotion(
   //   return !!(props.motionName && transitionSupport);
   // }
 
-  const CSSMotion: Component<CSSMotionProps & JSX.CustomAttributes<HTMLDivElement>> = ((props) => {
+  const CSSMotion: ParentComponent<CSSMotionProps & JSX.CustomAttributes<HTMLDivElement>> = ((props) => {
     // const {
     // Default config
     // visible = true,
@@ -140,6 +140,13 @@ export function genCSSMotion(
     // leavedClassName,
     // eventProps,
     // } = props;
+
+    onMount(() => {
+      console.log('DIV >>> Mounted!');
+  })
+  onCleanup(() => {
+      console.log('DIV >>> UnMounted!');
+  })
 
     // const supportMotion = isSupportTransition(props);
     const supportMotion = createMemo(() => !!(props.motionName && transitionSupport));
@@ -204,6 +211,7 @@ export function genCSSMotion(
       const styleInitForce = Object.fromEntries(Object.keys(toStyleObject(child?.style.cssText)).map(k => [k, styleInit[k] || '']));
       const mergedProps = mergeProps(props.eventProps, { style: styleInitForce, 'class': classNameInit, visible: visible() });
       const removeOnLeave = props.removeOnLeave ?? true;
+
       // let motionChildrenOuter = Children(() =>
       //   typeof props.children === 'function'
       //     ? props.children({ ...mergedProps }, setNodeRef)
@@ -269,7 +277,6 @@ export function genCSSMotion(
         //   setNodeRef,
         // );
       }
-
       return [motionChildren] as const
     }, [motionChildren] as const);
 
