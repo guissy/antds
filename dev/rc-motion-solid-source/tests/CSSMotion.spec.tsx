@@ -2,7 +2,7 @@
   react/no-render-return-value, max-classes-per-file,
   react/prefer-stateless-function, react/no-multi-comp
 */
-import { type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children } from "solid-js";
+import { type Component,  createSignal } from "solid-js";
 import { act } from 'react-dom/test-utils';
 import classNames from 'classnames';
 import { render, fireEvent, screen } from "solid-testing-library";
@@ -301,7 +301,7 @@ describe('CSSMotion', () => {
       // test(
       //   'FC but not dom ref',
       //  (props => {
-      //     // React.useImperativeHandle(ref, () => ({}));
+      //     // useImperativeHandle(ref, () => ({}));
       //     return <div {...props} />;
       //   }),
       // );
@@ -718,7 +718,6 @@ describe('CSSMotion', () => {
     });
 
     it('calls findDOMNode when refs are forwarded but not assigned', () => {
-      // let domRef = React.createRef();
       let domRef = null;
       const Div = () => <div />;
 
@@ -736,7 +735,6 @@ describe('CSSMotion', () => {
     });
 
     it('does not call findDOMNode when refs are forwarded and assigned', () => {
-      // let domRef = React.createRef();
       let domRef = null;
       render(() =>
         <CSSMotion motionName="transition" visible ref={domRef}>

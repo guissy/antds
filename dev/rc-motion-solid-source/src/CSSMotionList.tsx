@@ -1,5 +1,5 @@
 /* eslint react/prop-types: 0 */
-import { type ParentComponent, type JSX, createEffect, createMemo, createSignal, For, on, splitProps, VoidComponent } from "solid-js";
+import { type Component, type JSX, createEffect, createMemo, createSignal, For, on, splitProps, VoidComponent } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import OriginCSSMotion from './CSSMotion';
 import type { CSSMotionProps } from './CSSMotion';
@@ -42,8 +42,7 @@ export interface CSSMotionListProps
   extends Omit<CSSMotionProps, 'onVisibleChanged'>,
   Omit<JSX.HTMLAttributes<any>, 'children'> {
   keys: (number | string | { key: number | string;[name: string]: any })[];
-  component?: string | ParentComponent | false;
-
+  component?: string | Component | false;
   /** This will always trigger after final visible changed. Even if no motion configured. */
   onVisibleChanged?: (visible: boolean, info: { key: number | string }) => void;
   /** All motion leaves in the screen */
@@ -62,8 +61,8 @@ type Key = KeyObject['key']
 export function genCSSMotionList(
   transitionSupport: boolean,
   CSSMotion = OriginCSSMotion,
-): ParentComponent<CSSMotionListProps> {
-  const CSSMotionList: ParentComponent<CSSMotionListProps> = (props) => {
+): Component<CSSMotionListProps> {
+  const CSSMotionList: Component<CSSMotionListProps> = (props) => {
     // static defaultProps = {
     //   component: 'div',
     // };
@@ -177,7 +176,6 @@ export function genCSSMotionList(
     // })
 
     const [motionProps] = splitProps(restProps, MOTION_PROP_NAMES as (keyof typeof restProps)[])
-
 
     // const items = createMemo<KeyObject[]>(() => keyEntities(), [] as KeyObject[], {
     //   equals: (p, n) => {

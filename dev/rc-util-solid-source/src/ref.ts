@@ -1,9 +1,9 @@
 /* eslint-disable no-param-reassign */
 import createMemo from './hooks/useMemo';
 
-type RefObject<T> = { current: T | null };
+// type RefObject<T> = { current: T | null };
 type RefCallback<T> = { bivarianceHack(instance: T | null): void }["bivarianceHack"];
-export type Ref<T> = RefCallback<T> | RefObject<T> | null;
+export type Ref<T> = T | RefCallback<T> | null;
 
 export function fillRef<T>(ref: Ref<T>, node: T) {
   if (typeof ref === 'function') {

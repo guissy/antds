@@ -1,8 +1,6 @@
-/* eslint-disable react/default-props-match-prop-types, react/no-multi-comp, react/prop-types */
-import { type ParentComponent, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, mergeProps, onMount, onCleanup, Show } from "solid-js";
+import { type Component, type JSX, createEffect, createSignal, createMemo, children as Children, mergeProps, Show } from "solid-js";
 import { spread } from 'solid-js/web'
-// import findDOMNode from 'rc-util/lib/Dom/findDOMNode';
-import { fillRef, supportRef } from 'rc-util-solid/lib/ref';
+import { fillRef } from 'rc-util-solid/lib/ref';
 import classNames from 'classnames';
 import { getTransitionName, supportTransition } from './util/motion';
 import type {
@@ -13,7 +11,6 @@ import type {
 } from './interface';
 import { STATUS_NONE, STEP_PREPARE, STEP_START } from './interface';
 import useStatus from './hooks/useStatus';
-// import DomWrapper from './DomWrapper';
 import { isActive } from './hooks/useStepQueue';
 
 export type CSSMotionConfig =
@@ -36,6 +33,7 @@ export type MotionName =
   };
 
 export interface CSSMotionProps {
+  key?: number | string;
   motionName?: MotionName;
   visible?: boolean;
   motionAppear?: boolean;
@@ -78,16 +76,17 @@ export interface CSSMotionProps {
   /** This will always trigger after final visible changed. Even if no motion configured. */
   onVisibleChanged?: (visible: boolean) => void;
 
-  internalRef?: React.Ref<any>;
+  // internalRef?: Ref<any>;
 
   children?: (
     props: {
+      key?: string | number;
       visible?: boolean;
       className?: string;
       style?: JSX.CSSProperties;
       [key: string]: any;
     },
-    ref: (node: any) => void,
+    ref?: (node: any) => void,
   ) => JSX.Element;
 }
 
@@ -117,7 +116,7 @@ export const toStyleObject = (style: string | JSX.CSSProperties) => {
  */
 export function genCSSMotion(
   config: CSSMotionConfig,
-): ParentComponent<CSSMotionProps & JSX.CustomAttributes<HTMLDivElement>> {
+): Component<CSSMotionProps & JSX.CustomAttributes<HTMLDivElement>> {
   let transitionSupport = config;
 
   if (typeof config === 'object') {
@@ -128,7 +127,7 @@ export function genCSSMotion(
   //   return !!(props.motionName && transitionSupport);
   // }
 
-  const CSSMotion: ParentComponent<CSSMotionProps & JSX.CustomAttributes<HTMLDivElement>> = ((props) => {
+  const CSSMotion: Component<CSSMotionProps & JSX.CustomAttributes<HTMLDivElement>> = ((props) => {
     // const {
     // Default config
     // visible = true,
@@ -140,13 +139,6 @@ export function genCSSMotion(
     // leavedClassName,
     // eventProps,
     // } = props;
-
-    onMount(() => {
-      console.log('DIV >>> Mounted!');
-  })
-  onCleanup(() => {
-      console.log('DIV >>> UnMounted!');
-  })
 
     // const supportMotion = isSupportTransition(props);
     const supportMotion = createMemo(() => !!(props.motionName && transitionSupport));
@@ -280,16 +272,7 @@ export function genCSSMotion(
       return [motionChildren] as const
     }, [motionChildren] as const);
 
-    // Auto inject ref if child node not have `ref` props
-    // if (React.isValidElement(motionChildren) && supportRef(motionChildren)) {
-    //   const { ref: originNodeRef } = motionChildren as any;
 
-    //   if (!originNodeRef) {
-    //     motionChildren = React.cloneElement(motionChildren, {
-    //       ref: setNodeRef,
-    //     });
-    //   }
-    // }
     return <Show when={!removed()}>{motionChildren}</Show>;
   });
 

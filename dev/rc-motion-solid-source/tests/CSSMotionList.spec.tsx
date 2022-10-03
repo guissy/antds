@@ -1,12 +1,22 @@
 /* eslint-disable react/no-render-return-value, react/prefer-stateless-function,
 react/no-multi-comp, @typescript-eslint/no-implied-eval */
-import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children} from "solid-js";
+import { type Component, createSignal } from "solid-js";
 import classNames from 'classnames';
-// import { act } from 'react-dom/test-utils';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, screen } from "solid-testing-library";
 import { genCSSMotionList } from '../src/CSSMotionList';
 import type { CSSMotionListProps } from '../src/CSSMotionList';
 import { genCSSMotion } from '../src/CSSMotion';
+
+const wrapFC = (Cmp) => {
+  const fn = (props) => {
+    const [state, setState] = createSignal(props);
+    (fn as unknown as { setProps }).setProps = (n) => {
+      setState(p => Object.keys(n).some((k) => p[k] !== n[k]) ? Object.assign({}, p, n) : p);
+    };
+    return <Cmp {...state}>{state().children}</Cmp>
+  }
+  return fn as typeof fn & { setProps: (o: object) => void }
+}
 
 describe('CSSMotionList', () => {
   beforeEach(() => {
@@ -17,7 +27,7 @@ describe('CSSMotionList', () => {
     jest.useRealTimers();
   });
 
-  describe('diff should work', () => {
+  describe.only('diff should work', () => {
     function testMotion(
       CSSMotionList: Component<CSSMotionListProps>,
       injectLeave?: (wrapper: HTMLElement) => void,
@@ -27,25 +37,29 @@ describe('CSSMotionList', () => {
         leaveCalled += 1;
       }
 
-      const Demo = ({ keys }: { keys: string[] }) => (
+      const Demo_ = (props: { keys: string[] }) => (
         <CSSMotionList
           motionName="transition"
-          keys={keys}
+          motionAppear={false}
+          motionEnter={false}
+          // motionLeave={false}
+          keys={props.keys}
           onLeaveEnd={onLeaveEnd}
         >
-          {({ key, style, className }) => (
+          {(props: { key, style, className }) => (
             <div
-              key={key}
-              style={style}
-              class={classNames('motion-box', className)}
+              data-key={props.key}
+              style={props.style}
+              class={classNames('motion-box', props.className)}
             >
-              {key}
+              {props.key}
             </div>
           )}
         </CSSMotionList>
       );
 
-      const { container, rerender } = render(() => <Demo keys={['a', 'b']} />);
+      const Demo = wrapFC(Demo_)
+      const { container } = render(() => <Demo keys={['a', 'b']} />);
 
       function checkKeys(targetKeys: number | string[]) {
         const nodeList = Array.from(
@@ -62,7 +76,8 @@ describe('CSSMotionList', () => {
         jest.runAllTimers();
       
 
-      rerender(() => <Demo keys={['c', 'd']} />);
+      // rerender(() => <Demo keys={['c', 'd']} />);
+      Demo.setProps({ keys: ["c", "d"] });
       
         jest.runAllTimers();
       
@@ -80,6 +95,7 @@ describe('CSSMotionList', () => {
       checkKeys(['c', 'd']);
 
       if (injectLeave) {
+        screen.debug()
         expect(leaveCalled).toEqual(2);
       }
     }
@@ -109,20 +125,20 @@ describe('CSSMotionList', () => {
     const onAllRemoved = jest.fn();
     const CSSMotionList = genCSSMotionList(false);
 
-    const Demo = ({ keys }) => (
+    const Demo = (props) => (
       <CSSMotionList
         motionName="transition"
-        keys={keys}
+        keys={props.keys}
         onVisibleChanged={onVisibleChanged}
         onAllRemoved={onAllRemoved}
       >
-        {({ key, style, className }) => (
+        {(props: { key, style, className }) => (
           <div
-            key={key}
-            style={style}
-            class={classNames('motion-box', className)}
+            data-key={props.key}
+            style={props.style}
+            class={classNames('motion-box', props.className)}
           >
-            {key}
+            {props.key}
           </div>
         )}
       </CSSMotionList>

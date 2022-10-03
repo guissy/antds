@@ -1,14 +1,7 @@
-// import React from 'react';
 import classNames from 'classnames';
-import { createEffect, createSignal, onMount, type Component } from 'solid-js';
+import { createSignal, onMount, type Component } from 'solid-js';
 import { CSSMotionList } from '../src';
 import './CSSMotionList.less';
-
-interface DemoState {
-  count: number;
-  checkedMap: Record<string, boolean>;
-  keyList: React.Key[];
-}
 
 const CSSMomtionList: Component = (props) => {
   const [state, setState] = createSignal({
