@@ -97,12 +97,11 @@ describe('CSSMotion', () => {
               visible={props_.visible}
               {...props}
             >
-              {(props: { style, className, visible }, ref) => {
+              {(props: { style, className, visible }) => {
                 // TODO: visible
                 // expect(props.visible).toEqual(props_.visible);
                 return (
                   <div
-                    ref={ref}
                     style={props.style}
                     class={classNames('motion-box', props.className)}
                   />
@@ -180,9 +179,8 @@ describe('CSSMotion', () => {
     it('stop transition if config motion to false', () => {
       const Demo_ = (props?: CSSMotionProps) => (
         <CSSMotion motionName="transition" visible {...props}>
-          {({ style, className }, ref) => (
+          {({ style, className }) => (
             <div
-              ref={ref}
               style={style}
               class={classNames('motion-box', className)}
             />
@@ -210,9 +208,8 @@ describe('CSSMotion', () => {
     it('quick switch should have correct status', async () => {
       const Demo_ = (props?: CSSMotionProps) => (
         <CSSMotion motionName="transition" {...props}>
-          {({ style, className }, ref) => (
+          {({ style, className }) => (
             <div
-              ref={ref}
               style={style}
               class={classNames('motion-box', className)}
             />
@@ -265,9 +262,8 @@ describe('CSSMotion', () => {
               onAppearEnd={onAppearEnd}
               visible
             >
-              {({ style, className }, ref) => (
+              {({ style, className }) => (
                 <Component
-                  ref={ref}
                   style={style}
                   class={classNames('motion-box', className)}
                 />
@@ -295,7 +291,7 @@ describe('CSSMotion', () => {
 
       test(
         'FC with ref',
-        (props) => <div {...props} ref={props.ref} />,
+        (props) => <div {...props} />,
       );
 
       // test(
@@ -344,9 +340,8 @@ describe('CSSMotion', () => {
           visible={props.visible}
           {...props}
         >
-          {(props: { style, className }, ref) => (
+          {(props: { style, className }) => (
             <div
-              ref={ref}
               style={props.style}
               class={classNames('motion-box', props.className)}
             />
@@ -386,8 +381,8 @@ describe('CSSMotion', () => {
   it('not block motion when motion set delay', () => {
     const Demo_ = (props?: CSSMotionProps) => (
       <CSSMotion visible {...props}>
-        {({ style, className }, ref) => (
-          <div ref={ref} style={style} class={classNames('motion-box', className)} />
+        {({ style, className }) => (
+          <div style={style} class={classNames('motion-box', className)} />
         )}
       </CSSMotion>
     );
@@ -473,9 +468,8 @@ describe('CSSMotion', () => {
     let domRef = null;
     render(() =>
       <RefCSSMotion motionName="transition" ref={domRef}>
-        {({ style, className }, ref) => (
+        {({ style, className }) => (
           <div
-            ref={ref}
             style={style}
             class={classNames('motion-box', className)}
           />
@@ -497,8 +491,8 @@ describe('CSSMotion', () => {
         removeOnLeave={false}
         {...props}
       >
-        {(_, ref) => (
-          <div class="outer-block" ref={ref}>
+        {(_) => (
+          <div class="outer-block">
             <div class="inner-block" />
           </div>
         )}
@@ -590,8 +584,8 @@ describe('CSSMotion', () => {
 
     const { container } = render(() =>
       <CSSMotion visible motionName="bamboo" onAppearPrepare={onAppearPrepare}>
-        {(props, ref) => (
-          <div ref={ref} style={props.style} class={classNames('motion-box', props.className)} />
+        {(props) => (
+          <div style={props.style} class={classNames('motion-box', props.className)} />
         )}
       </CSSMotion>,
     );
@@ -621,8 +615,8 @@ describe('CSSMotion', () => {
   it('forceRender', () => {
     const Demo_ = (props?: CSSMotionProps) => (
       <CSSMotion removeOnLeave={false} forceRender motionName="bamboo" visible={false} {...props}>
-        {({ style, className }, ref) => (
-          <div ref={ref} style={style} class={classNames('motion-box', className)} />
+        {({ style, className }) => (
+          <div style={style} class={classNames('motion-box', className)} />
         )}
       </CSSMotion>
     );
@@ -649,8 +643,8 @@ describe('CSSMotion', () => {
         visible={false}
         {...props}
       >
-        {({ style, className }, ref) => (
-          <div ref={ref} style={style} class={classNames('motion-box', className)} />
+        {({ style, className }) => (
+          <div style={style} class={classNames('motion-box', className)} />
         )}
       </CSSMotion>
     );
@@ -706,7 +700,7 @@ describe('CSSMotion', () => {
     it('does not call findDOMNode when ref is passed internally', () => {
       render(() =>
         <CSSMotion motionName="transition" visible>
-          {(props, ref) => <div ref={ref} />}
+          {(props) => <div />}
         </CSSMotion>,
       );
 
@@ -738,7 +732,7 @@ describe('CSSMotion', () => {
       let domRef = null;
       render(() =>
         <CSSMotion motionName="transition" visible ref={domRef}>
-          {(props, ref) => <div ref={ref} />}
+          {() => <div />}
         </CSSMotion>,
       );
 
@@ -815,9 +809,8 @@ describe('CSSMotion', () => {
           visible={props.visible}
           onVisibleChanged={onVisibleChanged}
         >
-          {({ style, className }, ref) => (
+          {({ style, className }) => (
             <div
-              ref={ref}
               style={style}
               class={classNames('motion-box', className)}
             />

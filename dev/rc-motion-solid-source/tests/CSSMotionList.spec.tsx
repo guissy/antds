@@ -93,7 +93,6 @@ describe('CSSMotionList', () => {
       checkKeys(['c', 'd']);
 
       if (injectLeave) {
-        screen.debug()
         expect(leaveCalled).toEqual(2);
       }
     }
