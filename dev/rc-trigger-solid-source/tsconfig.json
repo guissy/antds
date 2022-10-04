@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "moduleResolution": "node",
+    "baseUrl": "./",
+    "jsx": "preserve",
+    "declaration": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "paths": {
+      "@/*": [
+        "src/*"
+      ],
+      "@@/*": [
+        "src/.umi/*"
+      ],
+      "rc-menu": [
+        "src/index.tsx"
+      ],
+      "rc-util-solid/lib/*": [
+        "../rc-util-solid/src/*"
+      ]
+    },
+    "jsxImportSource": "solid-js"
+  }
+}

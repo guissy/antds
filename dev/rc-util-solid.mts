@@ -107,6 +107,7 @@ const resolvePkg = async () => {
     await $`rm src/switchScrollingEffect.js`;
     await $`rm src/unsafeLifecyclesPolyfill.js`;
     await $`rm src/getContainerRenderMixin.jsx`;
+    await $`rm src/Dom/addEventListener.js`;
     await $`rm tests/setup.js`;
     await $`rm tests/toArray.test.js`;
     await $`rm tests/warning.test.js`;

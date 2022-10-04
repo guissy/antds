@@ -1,6 +1,6 @@
-import { createEffect, createSignal, onCleanup, Accessor} from "solid-js";
+import { createEffect, createSignal, onCleanup, Accessor, Setter} from "solid-js";
 
-type Updater<T> = (prev: T | (() => T) | undefined) => T;
+type Updater<T> = Parameters<Setter<T>>[0];
 
 export type SetState<T> = (
   nextValue: Updater<T>,
@@ -18,7 +18,7 @@ export type SetState<T> = (
  */
 export default function useSafeState<T>(
   defaultValue?: T | (() => T),
-): [Accessor<T | (() => T) | undefined>, SetState<T>] {
+): [Accessor<T>, SetState<T>] {
   let destroyRef = false;
   const [value, setValue] = createSignal(defaultValue);
 

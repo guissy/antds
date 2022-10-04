@@ -1,4 +1,4 @@
-import { type JSX, createEffect, createMemo, Accessor, onCleanup, on, splitProps } from "solid-js";
+import { type JSX, createEffect, createMemo, Accessor, onCleanup, on, splitProps, mergeProps } from "solid-js";
 import createSignal from 'rc-util-solid/lib/hooks/useState';
 import {
   STATUS_APPEAR,
@@ -25,35 +25,37 @@ export default function useStatus(
   supportMotion: Accessor<boolean>,
   visible: Accessor<boolean>,
   getElement: () => HTMLElement,
-  props: CSSMotionProps,
+  props_: CSSMotionProps,
 ): [Accessor<MotionStatus>, Accessor<StepStatus>, Accessor<JSX.CSSProperties>, Accessor<boolean>] {
   // Used for outer render usage to avoid `visible: false & status: none` to render nothing
   const [asyncVisible, setAsyncVisible] = createSignal<boolean>();
   const [status, setStatus] = createSignal<MotionStatus>(STATUS_NONE);
   const [style, setStyle] = createSignal<JSX.CSSProperties | undefined>(null);
-  const [{
-    motionEnter = true,
-    motionAppear = true,
-    motionLeave = true,
-    motionDeadline,
-    motionLeaveImmediately,
-    onAppearPrepare,
-    onEnterPrepare,
-    onLeavePrepare,
-    onAppearStart,
-    onEnterStart,
-    onLeaveStart,
-    onAppearActive,
-    onEnterActive,
-    onLeaveActive,
-    onAppearEnd,
-    onEnterEnd,
-    onLeaveEnd,
-    onVisibleChanged,
-  }] = splitProps(props, ['motionEnter', 'motionAppear', 'motionLeave', 'motionDeadline', 'motionLeaveImmediately', 'onAppearPrepare',
-    'onEnterPrepare', 'onLeavePrepare', 'onAppearStart', 'onEnterStart', 'onLeaveStart', 'onAppearActive', 'onEnterActive', 'onLeaveActive',
-    'onAppearEnd', 'onEnterEnd', 'onLeaveEnd', 'onVisibleChanged',
-  ])
+  // {
+  //   motionEnter = true,
+  //   motionAppear = true,
+  //   motionLeave = true,
+  //   motionDeadline,
+  //   motionLeaveImmediately,
+  //   onAppearPrepare,
+  //   onEnterPrepare,
+  //   onLeavePrepare,
+  //   onAppearStart,
+  //   onEnterStart,
+  //   onLeaveStart,
+  //   onAppearActive,
+  //   onEnterActive,
+  //   onLeaveActive,
+  //   onAppearEnd,
+  //   onEnterEnd,
+  //   onLeaveEnd,
+  //   onVisibleChanged,
+  // }
+  const props = mergeProps(props_, {
+    motionEnter: true,
+    motionAppear: true,
+    motionLeave: true,
+  })
   let mountedRef = false;
   let deadlineRef = null;
 
@@ -79,11 +81,11 @@ export default function useStatus(
     // console.log("status()", status(), currentActive)
     let canEnd: boolean | void;
     if (status() === STATUS_APPEAR && currentActive) {
-      canEnd = onAppearEnd?.(element, event);
+      canEnd = props.onAppearEnd?.(element, event);
     } else if (status() === STATUS_ENTER && currentActive) {
-      canEnd = onEnterEnd?.(element, event);
+      canEnd = props.onEnterEnd?.(element, event);
     } else if (status() === STATUS_LEAVE && currentActive) {
-      canEnd = onLeaveEnd?.(element, event);
+      canEnd = props.onLeaveEnd?.(element, event);
     }
 
     // Only update status when `canEnd` and not destroyed
@@ -105,23 +107,23 @@ export default function useStatus(
     switch (status()) {
       case STATUS_APPEAR:
         return {
-          [STEP_PREPARE]: onAppearPrepare,
-          [STEP_START]: onAppearStart,
-          [STEP_ACTIVE]: onAppearActive,
+          [STEP_PREPARE]: props.onAppearPrepare,
+          [STEP_START]: props.onAppearStart,
+          [STEP_ACTIVE]: props.onAppearActive,
         };
 
       case STATUS_ENTER:
         return {
-          [STEP_PREPARE]: onEnterPrepare,
-          [STEP_START]: onEnterStart,
-          [STEP_ACTIVE]: onEnterActive,
+          [STEP_PREPARE]: props.onEnterPrepare,
+          [STEP_START]: props.onEnterStart,
+          [STEP_ACTIVE]: props.onEnterActive,
         };
 
       case STATUS_LEAVE:
         return {
-          [STEP_PREPARE]: onLeavePrepare,
-          [STEP_START]: onLeaveStart,
-          [STEP_ACTIVE]: onLeaveActive,
+          [STEP_PREPARE]: props.onLeavePrepare,
+          [STEP_START]: props.onLeaveStart,
+          [STEP_ACTIVE]: props.onLeaveActive,
         };
 
       default:
@@ -150,13 +152,13 @@ export default function useStatus(
       // Patch events when motion needed
       patchMotionEvents(getDomElement());
 
-      if (motionDeadline > 0) {
+      if (props.motionDeadline > 0) {
         clearTimeout(deadlineRef);
         deadlineRef = setTimeout(() => {
           onInternalMotionEnd({
             deadline: true,
           } as MotionEvent);
-        }, motionDeadline);
+        }, props.motionDeadline);
       }
     }
 
@@ -182,19 +184,19 @@ export default function useStatus(
     let nextStatus: MotionStatus;
 
     // Appear
-    if (!isMounted && visible() && motionAppear) {
+    if (!isMounted && visible() && props.motionAppear) {
       nextStatus = STATUS_APPEAR;
     }
 
     // Enter
-    if (isMounted && visible() && motionEnter) {
+    if (isMounted && visible() && props.motionEnter) {
       nextStatus = STATUS_ENTER;
     }
     // console.log("isMounted, !visible(), motionLeave", isMounted, !visible(), motionLeave);
     // Leave
     if (
-      (isMounted && !visible() && motionLeave) ||
-      (!isMounted && motionLeaveImmediately && !visible() && motionLeave)
+      (isMounted && !visible() && props.motionLeave) ||
+      (!isMounted && props.motionLeaveImmediately && !visible() && props.motionLeave)
     ) {
       nextStatus = STATUS_LEAVE;
     }
@@ -211,15 +213,15 @@ export default function useStatus(
   createEffect(() => {
     if (
       // Cancel appear
-      (status() === STATUS_APPEAR && !motionAppear) ||
+      (status() === STATUS_APPEAR && !props.motionAppear) ||
       // Cancel enter
-      (status() === STATUS_ENTER && !motionEnter) ||
+      (status() === STATUS_ENTER && !props.motionEnter) ||
       // Cancel leave
-      (status() === STATUS_LEAVE && !motionLeave)
+      (status() === STATUS_LEAVE && !props.motionLeave)
     ) {
       setStatus(STATUS_NONE);
     }
-  }, [motionAppear, motionEnter, motionLeave]);
+  });
 
   onCleanup(() => {
     mountedRef = false;
@@ -237,7 +239,7 @@ export default function useStatus(
     if (asyncVisible() !== undefined && status() === STATUS_NONE) {
       // Skip first render is invisible since it's nothing changed
       if (firstMountChangeRef || asyncVisible()) {
-        onVisibleChanged?.(asyncVisible());
+        props.onVisibleChanged?.(asyncVisible());
       }
       firstMountChangeRef = true;
     }
