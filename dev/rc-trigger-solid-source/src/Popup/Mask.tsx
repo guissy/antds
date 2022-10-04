@@ -35,22 +35,24 @@ const Mask: Component<MaskProps> = (props) => {
     return null;
   }
 
-  let motion: CSSMotionProps = {};
-
-  if (props.maskMotion || props.maskTransitionName || props.maskAnimation) {
-    motion = {
-      motionAppear: true,
-      ...getMotion({
-        motion: props.maskMotion,
-        prefixCls: props.prefixCls,
-        transitionName: props.maskTransitionName,
-        animation: props.maskAnimation,
-      }),
-    };
-  }
+  let motion: CSSMotionProps = createMemo(() => {
+    let motion: CSSMotionProps = {};
+    if (props.maskMotion || props.maskTransitionName || props.maskAnimation) {
+      motion = {
+        motionAppear: true,
+        ...getMotion({
+          motion: props.maskMotion,
+          prefixCls: props.prefixCls,
+          transitionName: props.maskTransitionName,
+          animation: props.maskAnimation,
+        }),
+      };
+    }
+    return motion;
+  });
 
   return (
-    <CSSMotion {...motion} visible={props.visible} removeOnLeave>
+    <CSSMotion {...motion()} visible={props.visible} removeOnLeave>
       {({ className }) => (
         <div
           style={{ 'z-index': props.zIndex } as {}}

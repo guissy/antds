@@ -1,4 +1,4 @@
-import { type Setter, createEffect, onCleanup, Accessor } from "solid-js";
+import { type Setter, createEffect, onCleanup, Accessor, on } from "solid-js";
 import raf from 'rc-util-solid/lib/raf';
 import createSignal from 'rc-util-solid/lib/hooks/useState';
 
@@ -32,7 +32,7 @@ const StatusQueue: PopupStatus[] = [
 ];
 
 export default (
-  visible: boolean,
+  visible: Accessor<boolean>,
   doMeasure: Func,
 ): [Accessor<PopupStatus>, (callback?: () => void) => void] => {
   const [status, setInternalStatus] = createSignal<PopupStatus>(null);
@@ -41,7 +41,6 @@ export default (
   function setStatus(
     nextStatus: Parameters<Setter<PopupStatus>>[0],
   ) {
-    console.log("ο▬▬▬▬▬▬▬▬◙▅▅▆▆▇▇◤", typeof nextStatus === 'string' ? nextStatus : nextStatus())
     setInternalStatus(nextStatus, true);
   }
 
@@ -70,12 +69,12 @@ export default (
   }
 
   // Init status
-  createEffect(() => {
+  createEffect(on(visible, () => {
     setStatus('measure');
-  }, [visible]);
+  }));
 
   // Go next status
-  createEffect(() => {
+  createEffect(on(status, () => {
     switch (status()) {
       case 'measure':
         doMeasure();
@@ -83,7 +82,7 @@ export default (
       default:
     }
 
-    if (status) {
+    if (status()) {
       rafRef = raf(async () => {
         const index = StatusQueue.indexOf(status());
         const nextStatus = StatusQueue[index + 1];
@@ -92,7 +91,7 @@ export default (
         }
       });
     }
-  }, [status]);
+  }));
 
   onCleanup(() => {
       cancelRaf();

@@ -99,7 +99,7 @@ const PopupInner: Component<PopupInnerProps> = (props) => {
   }
 
   // ======================== Status ========================
-  const [status, goNextStatus] = useVisibleStatus(props.visible, doMeasure);
+  const [status, goNextStatus] = useVisibleStatus(() => props.visible, doMeasure);
 
   // ======================== Aligns ========================
   /**
@@ -153,6 +153,12 @@ const PopupInner: Component<PopupInnerProps> = (props) => {
       // Repeat until not more align needed
       if (alignTimes() < 2) {
         forceAlign();
+        // TODO: solid
+        if (alignTimes() === 1) {
+          goNextStatus(function () {
+            prepareResolveRef?.(undefined);
+          });
+        }
       } else {
         goNextStatus(function () {
           prepareResolveRef?.(undefined);
@@ -162,16 +168,18 @@ const PopupInner: Component<PopupInnerProps> = (props) => {
   }, [alignTimes]);
 
   // ======================== Motion ========================
-  const motion = { ...getMotion(props) };
+  const motion = createMemo(() => {
+    const motion = { ...getMotion(props) };
   
-  ['onAppearEnd', 'onEnterEnd', 'onLeaveEnd'].forEach((eventName) => {
-    const originHandler: MotionEndEventHandler = motion[eventName];
-    motion[eventName] = (element, event) => {
-      // if (eventName !== 'onLeaveEnd')
-      goNextStatus();
-      return originHandler?.(element, event);
-    };
-  });
+    ['onAppearEnd', 'onEnterEnd', 'onLeaveEnd'].forEach((eventName) => {
+      const originHandler: MotionEndEventHandler = motion[eventName];
+      motion[eventName] = (element, event) => {
+        goNextStatus();
+        return originHandler?.(element, event);
+      };      
+    });
+    return motion;
+  })
 
   function onShowPrepare() {
     return new Promise((resolve) => {
@@ -181,10 +189,10 @@ const PopupInner: Component<PopupInnerProps> = (props) => {
 
   // Go to stable directly when motion not provided
   createEffect(() => {
-    if (!motion.motionName && status() === 'motion') {
+    if (!motion().motionName && status() === 'motion') {
       goNextStatus();
     }
-  }, [motion.motionName, status]);
+  }, [motion().motionName, status]);
 
   // ========================= Refs =========================
   props.ref = () => ({
@@ -193,16 +201,18 @@ const PopupInner: Component<PopupInnerProps> = (props) => {
   });
 
   // ======================== Render ========================
-  const mergedStyle: Accessor<JSX.CSSProperties> = createMemo(() => ({
-    ...stretchStyle,
-    'z-index': props.zIndex,
-    opacity:
-      status() === 'motion' || status() === 'stable' || !props.visible ? undefined : 0,
-    // Cannot interact with disappearing elements
-    // https://github.com/ant-design/ant-design/issues/35051#issuecomment-1101340714
-    'pointer-events': !props.visible && status() !== 'stable' ? 'none' : undefined,
-    ...props.style,
-  }));
+  const mergedStyle: Accessor<JSX.CSSProperties> = createMemo(() => {    
+    return ({
+      ...stretchStyle,
+      'z-index': props.zIndex,
+      opacity:
+        (status() === 'motion' || status() === 'stable' || !props.visible) ? undefined : 0,
+      // Cannot interact with disappearing elements
+      // https://github.com/ant-design/ant-design/issues/35051#issuecomment-1101340714
+      'pointer-events': !props.visible && status() !== 'stable' ? 'none' : undefined,
+      ...props.style,
+    })
+  });
 
   // Align status
   let alignDisabled = createMemo(() => {
@@ -210,7 +220,6 @@ const PopupInner: Component<PopupInnerProps> = (props) => {
     if (props.align?.points && (status() === 'align' || status() === 'stable')) {
       alignDisabled = false;
     }
-    console.log("Align status", status(), props.align?.points, alignDisabled)
     return alignDisabled;
   })
 
@@ -221,14 +230,13 @@ const PopupInner: Component<PopupInnerProps> = (props) => {
   if (resolved.toArray().length > 1) {
     childNode = <div class={`${props.prefixCls}-content`}>{props.children}</div>;
   }
-  console.log("PopupInner");
 
   return (
     <CSSMotion
       visible={props.visible}
       ref={elementRef}
       leavedClassName={`${props.prefixCls}-hidden`}
-      {...motion}
+      {...motion()}
       onAppearPrepare={onShowPrepare}
       onEnterPrepare={onShowPrepare}
       removeOnLeave={props.destroyPopupOnHide}

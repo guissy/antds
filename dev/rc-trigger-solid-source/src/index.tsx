@@ -191,7 +191,6 @@ export function generateTrigger(
     }
     // TODO: solid
     // popupVisibleInit = true;
-    console.log("props.defaultPopupVisible", props.popupVisible, props.defaultPopupVisible)
     const [prevPopupVisible, setPrevPopupVisible] = createSignal(popupVisibleInit);
     const [popupVisible, setPopupVisibleRaw] = createSignal(popupVisibleInit);
     const [point, setPointRaw] = createSignal({ pageX: 0, pageY: 0 });
@@ -337,7 +336,6 @@ export function generateTrigger(
     };
 
     const onClick = (event) => {
-      console.log("onClick")
       fireEvents('onClick', event);
       // focus will trigger click
       if (focusTime) {
@@ -538,7 +536,6 @@ export function generateTrigger(
 
       mouseProps.onMouseDown = onPopupMouseDown;
       mouseProps.onTouchStart = onPopupMouseDown;
-      console.log("getComponent", mouseProps, props.popup);
 
       return (
         <Popup
@@ -830,7 +827,6 @@ export function generateTrigger(
       }
 
       // >>> Click
-      console.log("isClickToHide() isClickToShow()", isClickToHide() || isClickToShow());
       if (isClickToHide() || isClickToShow()) {
         newChildProps.onClick = onClick;
         newChildProps.onMouseDown = onMouseDown;
@@ -892,7 +888,6 @@ export function generateTrigger(
     // const trigger = child; //React.cloneElement(child, cloneProps);
     let portal = createMemo((lastPortal: boolean) => {
       // prevent unmounting after it's rendered
-      console.log("render: ", popupVisible(), popupRef, props.forceRender);
       let portal: boolean = lastPortal;
       if (popupVisible() || popupRef || props.forceRender) {
         portal = true;

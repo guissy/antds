@@ -56,9 +56,6 @@ const Popup: ParentComponent<PopupProps> = (props) => {
   const [innerVisible, serInnerVisible] = createSignal(props.visible);
   const [inMobile, setInMobile] = createSignal(false);
   // const cloneProps = createMemo(() => mergeProps(restProps, { visible: innerVisible() }));
-  onCleanup(() => {
-    console.log("popup", "㊁㊁㊁㊇㊇㊇")
-  })
   // We check mobile in visible changed here.
   // And this also delay set `innerVisible` to avoid popup component render flash
   createEffect(() => {
