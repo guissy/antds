@@ -242,7 +242,7 @@ const PopupInner: Component<PopupInnerProps> = (props) => {
       removeOnLeave={props.destroyPopupOnHide}
       forceRender={props.forceRender}
     >
-      {({ className: motionClassName, style: motionStyle }, motionRef) => {
+      {({ className: motionClassName, style: motionStyle }) => {
         return (
           <Align
             target={getAlignTarget()}
@@ -254,8 +254,7 @@ const PopupInner: Component<PopupInnerProps> = (props) => {
             onAlign={onInternalAlign}
           >
             <div
-              data-key="popupInnerAlignChild"
-              ref={motionRef}
+              data-key="popup-inner"
               class={classNames(
                 props.prefixCls,
                 props.className,

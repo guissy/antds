@@ -2,8 +2,8 @@ import type { AbstractNode, IconDefinition } from '@ant-design/icons-svg/lib/typ
 import { generate as generateColor } from '@ant-design/colors';
 import { createEffect, useContext } from "solid-js";
 import { insert, spread, template } from 'solid-js/web';
-import warn from 'rc-util/lib/warning';
-import { updateCSS } from 'rc-util/lib/Dom/dynamicCSS';
+import warn from 'rc-util-solid/lib/warning';
+import { updateCSS } from 'rc-util-solid/lib/Dom/dynamicCSS';
 import IconContext from './components/Context';
 
 export function warning(valid: boolean, message: string) {

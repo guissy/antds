@@ -195,13 +195,13 @@ export function genCSSMotion(
     )() as HTMLElement;
     setNodeRef(motionChildren)
     const classNameInit = motionChildren?.className;
-    const styleInit = toStyleObject(motionChildren?.style.cssText);
+    const styleInit = toStyleObject(motionChildren?.style?.cssText);
     // const styleInit = motionChildren?.style;
     const [removed, setRemoved] = createSignal(false);
-    createEffect(([child]) => {
-      setRemoved(false);
-      const styleInitForce = Object.fromEntries(Object.keys(toStyleObject(child?.style.cssText)).map(k => [k, styleInit[k] || '']));
-      const mergedProps = mergeProps(props.eventProps, { style: styleInitForce, 'class': classNameInit, visible: visible() });
+    createEffect(({child, styleKeys}) => {
+      setRemoved(false);      
+      const styleInitForce = Object.fromEntries(Object.keys(toStyleObject(child?.style?.cssText)).filter(k => styleKeys.includes(k)).map(k => [k, styleInit[k] ?? '']));
+      const mergedProps = mergeProps(props.eventProps, { 'class': classNames(classNameInit, props.className), visible: visible() });
       const removeOnLeave = props.removeOnLeave ?? true;
 
       // let motionChildrenOuter = Children(() =>
@@ -224,13 +224,13 @@ export function genCSSMotion(
           //   setNodeRef,
           // );
           // console.debug("createEffect !removeOnLeave && !props.forceRender", props.leavedClassName)
-          spread(motionChildren, mergeProps(mergedProps, { 'class': classNames(classNameInit, props.leavedClassName) }));
+          spread(motionChildren, mergeProps(mergedProps, { style: { ...styleInitForce }, 'class': classNames(classNameInit, props.leavedClassName) }));
         } else if (props.forceRender) {
           // motionChildren = props.children(
           //   { ...mergedProps, style: { display: 'none' } },
           //   setNodeRef,
           // );
-          spread(motionChildren, mergeProps(mergedProps, { 'style': { ...styleInitForce, display: 'none' } }));
+          spread(motionChildren, mergeProps(mergedProps, { style: {  display: 'none' } }));
         } else {
           // motionChildren = null;
           if (!props.forceRender && removeOnLeave) {
@@ -247,6 +247,8 @@ export function genCSSMotion(
         } else if (statusStep() === STEP_START) {
           statusSuffix = 'start';
         }    
+        const newer = Array.from(new Set(Object.keys(statusStyle() || {}).concat(styleKeys)))
+        styleKeys.splice(0, styleKeys.length,  ...newer);
         spread(motionChildren, mergeProps(mergedProps, {
           'class': classNames(classNameInit, getTransitionName(props.motionName, status()), {
             [getTransitionName(props.motionName, `${status()}-${statusSuffix}`)]:
@@ -269,8 +271,8 @@ export function genCSSMotion(
         //   setNodeRef,
         // );
       }
-      return [motionChildren] as const
-    }, [motionChildren] as const);
+      return {child: motionChildren, styleKeys };
+    }, {motionChildren, styleKeys: []});
 
 
     return <Show when={!removed()}>{motionChildren}</Show>;

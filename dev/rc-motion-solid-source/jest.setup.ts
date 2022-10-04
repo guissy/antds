@@ -6,3 +6,5 @@ import "@testing-library/jest-dom";
 window.requestAnimationFrame = func => {
     window.setTimeout(func, 16);
 };
+window.AnimationEvent = window.AnimationEvent || (() => {});
+window.TransitionEvent = window.TransitionEvent || (() => {});

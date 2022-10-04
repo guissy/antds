@@ -1,5 +1,5 @@
-import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, onCleanup} from "solid-js";
-import raf from 'rc-util/lib/raf';
+import { onCleanup } from "solid-js";
+import raf from 'rc-util-solid/lib/raf';
 
 export default (): [
   (callback: (info: { isCanceled: () => boolean }) => void) => void,
