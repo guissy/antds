@@ -4,7 +4,7 @@
 import { $, cd, fs, glob } from "zx";
 import { checkPkgInstall, cwd, getRepo, react2Solid, resolvePkg } from "./a-rc-template.mjs";
 
-const rc = 'motion'
+const rc = 'resize-observer'
 await checkPkgInstall(rc);
 await getRepo(rc);
 await resolvePkg(rc);
