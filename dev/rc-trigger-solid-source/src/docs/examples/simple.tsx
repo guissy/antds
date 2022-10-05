@@ -372,7 +372,7 @@ const Test: Component = () => {
                   padding: '16px',
                   'border-top': '1px solid red',
                   background: '#FFF',
-                  textAlign: 'center',
+                  'text-align': 'center',
                 },
                 popupRender: (node) => (
                   <>

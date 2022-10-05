@@ -26,7 +26,7 @@ const MobilePopupInner: Component<MobilePopupInnerProps> = (props) => {
     let elementRef  = null as (HTMLDivElement | null);
 
     // ========================= Refs =========================
-    props.ref = ({
+    props.ref?.({
       forceAlign: () => {},
       getElement: () => elementRef,
     });

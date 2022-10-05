@@ -442,6 +442,12 @@ export function generateTrigger(
       return popupRef?.getElement() || null;
     }
 
+    props.ref?.({
+      getPopupDomNode,
+      onDocumentClick,
+      props // TODO: solid jest
+    });
+
     const getRootDomNode = (): HTMLElement => {
       // const { getTriggerDOMNode } = props;
       if (props.getTriggerDOMNode) {
@@ -882,7 +888,12 @@ export function generateTrigger(
       //   cloneProps.ref = composeRef(triggerRef, (child as any).ref);
       // }
       triggerRef = trigger;
-      spread(trigger, newChildProps);
+      if (Array.isArray(trigger)) {
+        // TODO: solid
+        spread(trigger.filter(Boolean)[0], newChildProps);
+      } else {
+        spread(trigger, newChildProps);
+      }
       return trigger;
     });
     // const trigger = child; //React.cloneElement(child, cloneProps);

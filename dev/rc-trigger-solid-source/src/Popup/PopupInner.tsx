@@ -1,4 +1,4 @@
-import { type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, Accessor } from "solid-js";
+import { type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, Accessor, Ref } from "solid-js";
 import Align from 'rc-align-solid';
 import useLayoutEffect from 'rc-util-solid/lib/hooks/useLayoutEffect';
 import type { RefAlign } from 'rc-align/lib/Align';
@@ -17,6 +17,7 @@ import { getMotion } from '../utils/legacyUtil';
 import useStretchStyle from './useStretchStyle';
 
 export interface PopupInnerProps {
+  ref?: Ref<PopupInnerRef>;
   visible?: boolean;
 
   prefixCls: string;
@@ -195,7 +196,7 @@ const PopupInner: Component<PopupInnerProps> = (props) => {
   }, [motion().motionName, status]);
 
   // ========================= Refs =========================
-  props.ref = () => ({
+  props.ref?.({
     forceAlign,
     getElement: () => elementRef,
   });
@@ -263,8 +264,8 @@ const PopupInner: Component<PopupInnerProps> = (props) => {
               )}
               onMouseEnter={props.onMouseEnter}
               onMouseLeave={props.onMouseLeave}
-              onMouseDownCapture={props.onMouseDown}
-              onTouchStartCapture={props.onTouchStart}
+              oncapture:mousedown={props.onMouseDown}
+              oncapture:touchstart={props.onTouchStart}
               onClick={props.onClick}
               style={{
                 ...motionStyle,
