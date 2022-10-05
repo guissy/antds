@@ -115,7 +115,7 @@ export const testingTransform = (react: string): string => {
     const hasTesting = react.includes('@testing-library\/react');
     react = react
         .replace(
-            /import { render } from '@testing-library\/react';/,
+            /import .+ from '@testing-library\/react';/,
             !hasRerender ? `import { render, fireEvent } from "solid-testing-library";`
             : `import { render, fireEvent } from "solid-testing-library";
 import { createSignal } from "solid-js";      
@@ -131,7 +131,8 @@ const wrapFC = (Cmp) => {
 }`
         )
     if (hasTesting) {
-        react = react.replace(/render\(/g, "render(() => ")
+        react = react.replace(/\bmount\(/g, "render(() => ")
+        react = react.replace(/\brender\(/g, "render(() => ")
     }
     return react;
 };

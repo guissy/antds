@@ -72,7 +72,9 @@ export const jsxResolve = (react: string): string => {
       "JSX.IntrinsicAttributes"
     )
     .replace(/React.Key\b/g, "number | string")
-    .replace(/(React.)?HTMLAttributes/g, "JSX.HTMLAttributes");
+    .replace(/(React\.)?HTMLAttributes/g, "JSX.HTMLAttributes")
+    .replace(/<(React\.)StrictMode>/g, "<>")
+    .replace(/<\/(React\.)StrictMode>/g, "</>");
 };
 
 // " = (React.)?useRef<(\w+)>\(\)": ": $2 = null as unknown as $2",

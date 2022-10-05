@@ -3,7 +3,7 @@ const solidjsPath = `<rootDir>/../../node_modules/solid-js`;
 
 module.exports = {
   preset: "ts-jest",
-  testMatch: ['<rootDir>/(src|tests)/**/*.test.(ts|tsx|js)'],
+  testMatch: ['<rootDir>/(src|tests)/**/*.(spec|test).(ts|tsx|js)'],
   transform: {
     '^.+\\.tsx?$': ['ts-jest',{
       tsconfig: `./tsconfig.json`,

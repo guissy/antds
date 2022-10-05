@@ -86,7 +86,7 @@ export const resolvePkg = async (rc: string) => {
         "ts-node": "^10.9.1",
         vite: "^3.0.9",
         "vite-plugin-solid": "^2.3.0",
-        "dom-align": "^1.7.0",
+        ...(rc === 'trigger' ? {"dom-align": "^1.7.0"} : {})
     });
     // sort object by key
     pkg.devDependencies = Object.fromEntries(
@@ -131,7 +131,7 @@ export const resolvePkg = async (rc: string) => {
 // react to solid
 export const react2Solid = async (rc: string) => {
     cd(`${cwd}/packages/rc-${rc}-solid`);
-    for await (const file of await glob(`{src,tests,docs}/**/*.{ts,tsx}`)) {
+    for await (const file of await glob(`{src,tests,docs,examples}/**/*.{ts,tsx}`)) {
         $.verbose = false;
         let s1 = await $`cat ${file}`;
         $.verbose = true;
