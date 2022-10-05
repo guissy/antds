@@ -442,12 +442,6 @@ export function generateTrigger(
       return popupRef?.getElement() || null;
     }
 
-    props.ref?.({
-      getPopupDomNode,
-      onDocumentClick,
-      props // TODO: solid jest
-    });
-
     const getRootDomNode = (): HTMLElement => {
       // const { getTriggerDOMNode } = props;
       if (props.getTriggerDOMNode) {
@@ -812,7 +806,12 @@ export function generateTrigger(
     }
 
     const triggerContextValue = { onPopupMouseDown };
-
+    props.ref?.({
+      getPopupDomNode,
+      getRootDomNode,
+      onDocumentClick,
+      props // TODO: solid jest
+    });
     // ======================== Render ========================
 
     // const { popupVisible } = state;
@@ -820,8 +819,8 @@ export function generateTrigger(
     //   props;
     // const child = React.Children.only(children) as JSX.Element;
     const trigger = createMemo(() => {
-      const newChildProps: JSX.HTMLAttributes<HTMLElement> & { key: string } = {
-        key: 'trigger',
+      const newChildProps: JSX.HTMLAttributes<HTMLElement> & { key?: string } = {
+        // key: 'trigger',
       };
 
       // ============================== Visible Handlers ==============================
@@ -896,6 +895,7 @@ export function generateTrigger(
       }
       return trigger;
     });
+
     // const trigger = child; //React.cloneElement(child, cloneProps);
     let portal = createMemo((lastPortal: boolean) => {
       // prevent unmounting after it's rendered

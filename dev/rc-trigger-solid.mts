@@ -101,6 +101,7 @@ const resolvePkg = async () => {
     await $`mv tests/motion.test.jsx tests/motion.test.tsx`;
     await $`mv tests/point.test.jsx tests/point.test.tsx`;
     await $`mv tests/util.test.jsx tests/util.test.tsx`;
+    await $`rm -f tests/__snapshots__/*`;
     if (hasInstall) {
       await $`npm i --prefer-offline --no-audit --progress=false --legacy-peer-deps`;
     } else {
