@@ -11,8 +11,10 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "rc-util-solid/lib/ref": resolve(__dirname, "../rc-util-solid/src/ref.ts"),
-      "rc-util-solid/lib/hooks/useState": resolve(__dirname, "../rc-util-solid/src/hooks/useState.ts")
+      "rc-util-solid/lib": resolve(__dirname, "../rc-util-solid/src"),
+      "rc-motion-solid": resolve(__dirname, "../rc-motion-solid/src/index.tsx"),
+      "rc-align-solid": resolve(__dirname, "../rc-align-solid/src/index.ts"),
+      "dom-align": resolve(__dirname, "./node_modules/dom-align"),
     }
   }
 });

@@ -32,6 +32,7 @@ module.exports = {
     "rc-util-solid/lib/Dom/canUseDom": `${pkgRootPath}/../rc-util-solid/src/Dom/canUseDom.ts`,
     "rc-util-solid/lib/Dom/addEventListener": `${pkgRootPath}/../rc-util-solid/src/Dom/addEventListener.ts`,
     "rc-util-solid/lib/hooks/useLayoutEffect": `${pkgRootPath}/../rc-util-solid/src/hooks/useLayoutEffect.ts`,
+    "rc-util-solid/lib/test/domHook": `${pkgRootPath}/../rc-util-solid/src/test/domHook.ts`,
     "rc-util-solid/lib/Portal": `${pkgRootPath}/../rc-util-solid/src/Portal.tsx`,
     "rc-util-solid/lib/isMobile": `${pkgRootPath}/../rc-util-solid/src/isMobile.ts`,
     "rc-motion-solid": `${pkgRootPath}/../rc-motion-solid/src/index.tsx`,
