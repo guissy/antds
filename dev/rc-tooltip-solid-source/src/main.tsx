@@ -6,7 +6,6 @@ import Placement from '../docs/examples/placement';
 import FormError from '../docs/examples/formError';
 import OnVisibleChange from '../docs/examples/onVisibleChange';
 import ArrowContent from '../docs/examples/arrowContent';
-import "solid-devtools"
 
 render(() => <>
 <Simple />

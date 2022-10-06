@@ -186,9 +186,8 @@ export function genCSSMotionList(
     // })
 
     const items = createMemo(() => keyEntities().map(it => it.key));
-
     return (
-      <Dynamic component={"div"} {...restProps}>
+      <Dynamic component={component()} {...restProps} id="dynamic">
         <For each={items()}>{(_key, i) => {
           // const it: Accessor<KeyObject> = createMemo(JSON.parse(item()));
           const it = () => keyEntities()[i()];

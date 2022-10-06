@@ -34,5 +34,5 @@ export default function useId(id?: string) {
     return 'test-id';
   }
 
-  return innerId;
+  return innerId();
 }

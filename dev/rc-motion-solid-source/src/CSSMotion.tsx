@@ -34,6 +34,7 @@ export type MotionName =
 
 export interface CSSMotionProps {
   key?: number | string;
+  className?: string;
   motionName?: MotionName;
   visible?: boolean;
   motionAppear?: boolean;
@@ -204,12 +205,12 @@ export function genCSSMotion(
       const mergedProps = mergeProps(props.eventProps, { 'class': classNames(classNameInit, props.className), visible: visible() });
       const removeOnLeave = props.removeOnLeave ?? true;
 
-      // let motionChildrenOuter = Children(() =>
-      //   typeof props.children === 'function'
-      //     ? props.children({ ...mergedProps }, setNodeRef)
-      //     : null
-      // )() as HTMLElement;
-      // console.debug("createEffect status()=", status())
+      // TODO: solid notification works, but tooltip not work (it has no key) 
+      if (props.key) {
+        const childNew = Children(() => props.children({ ...mergedProps }))() as HTMLElement;
+        motionChildren.firstChild?.replaceWith(childNew.firstChild);
+      }
+
       if (!motionChildren) {
         // No children
         setRemoved(true)
