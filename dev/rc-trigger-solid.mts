@@ -11,4 +11,5 @@ await resolvePkg(rc);
 await react2Solid(rc);
 await $`cp -Rf ${cwd}/dev/rc-${rc}-solid-source/* ${cwd}/packages/rc-${rc}-solid`;
 await $`cd ${cwd}/packages/rc-${rc}-solid`;
+await $`git commit -am 'react to solid'`;
 // await $`npx jest`;

@@ -87,7 +87,7 @@ export const enzymeTransform = (react: string): string => {
     return react
         .replace(
             /import (.*)from 'enzyme';/,
-            'import { render as renderFn, fireEvent } from "solid-testing-library";\nconst render = (jsx: JSX.Element) => { const dom = renderFn(() => jsx); dom.render = () => renderFn(() => jsx); dom.setProps = () => !0; return dom; };\nconst mount = render;\n'
+            'import { render, fireEvent } from "solid-testing-library";'
         )
         .replace(
             /\.isEmptyRender\(\)\).toBeTruthy\(\);/g,
@@ -107,7 +107,8 @@ export const enzymeTransform = (react: string): string => {
             /(\w+)\.simulate\('(\w+)'\)/g,
             (_, s1, s2) =>
                 `fireEvent.${events.find((e) => e.toLowerCase() === s2)}(${s1})`
-        );
+        ).replace(/\bmount\(/g, "render(() => ")
+        ;
 };
 
 export const testingTransform = (react: string): string => {
@@ -131,7 +132,6 @@ const wrapFC = (Cmp) => {
 }`
         )
     if (hasTesting) {
-        react = react.replace(/\bmount\(/g, "render(() => ")
         react = react.replace(/\brender\(/g, "render(() => ")
     }
     return react;

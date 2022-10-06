@@ -7,7 +7,7 @@ export const importResolve = (react: string): string => {
     'import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children} from "solid-js";';
   return react
   .replace(/import type \* as React from 'react';/g, "")
-  .replace(/import (.*)from 'react';?/g, solidImport);
+  .replace(/(import (.*)from 'react';?\n?)+/g, solidImport);
 };
 
 // "(React.)?useState": "createSignal",
@@ -36,7 +36,8 @@ export const hookResolve = (react: string): string => {
     .replace(/(React.)?useEffect/g, "createEffect")
     .replace(/(React.)?useMemo/g, "createMemo")
     .replace(/(React.)?useContext/g, "useContext")
-    .replace(/(React.)?createContext/g, "createContext");
+    .replace(/(React.)?createContext/g, "createContext")
+    .replace(/(React.)?useImperativeHandle\(ref, \(\) => /g, "props.ref?.(");
 };
 
 // "React.FC": "Component",

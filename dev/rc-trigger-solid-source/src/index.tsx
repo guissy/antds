@@ -1,4 +1,4 @@
-import { type Component, type JSX, mergeProps, createEffect, createSignal, createContext, createMemo, useContext, children as Children, onCleanup, Show, } from "solid-js";
+import { type Component, type JSX, mergeProps, createEffect, createSignal, createContext, createMemo, useContext, children as Children, onCleanup, Show, on, } from "solid-js";
 import raf from 'rc-util-solid/lib/raf';
 import contains from 'rc-util-solid/lib/Dom/contains';
 import findDOMNode from 'rc-util-solid/lib/Dom/findDOMNode';
@@ -184,7 +184,7 @@ export function generateTrigger(
 
 
     let popupVisibleInit: boolean;
-    if ('popupVisible' in mergeProps(props)) {
+    if (props.popupVisible !== undefined) {
       popupVisibleInit = !!props.popupVisible;
     } else {
       popupVisibleInit = !!props.defaultPopupVisible;
@@ -427,7 +427,7 @@ export function generateTrigger(
     //   }
     //   return newState;
     // }
-    createEffect(() => {
+    createEffect(on(() => props.popupVisible, () => {
       setPopupVisibleRaw(popupVisiblePrev => {
         const shouldUpdate = props.popupVisible !== undefined && popupVisiblePrev !== props.popupVisible;
         if (shouldUpdate) {
@@ -435,7 +435,7 @@ export function generateTrigger(
         }
         return shouldUpdate ? props.popupVisible! : popupVisiblePrev
       });
-    })
+    }))
 
     const getPopupDomNode = () => {
       // for test
@@ -499,75 +499,6 @@ export function generateTrigger(
       }
       return props.popupAlign;
     }
-
-    const getComponent = () => {
-      // const {
-      // prefixCls,
-      // destroyPopupOnHide,
-      // popupClassName,
-      // onPopupAlign,
-      // popupMotion,
-      // popupAnimation,
-      // popupTransitionName,
-      // popupStyle,
-      // mask,
-      // maskAnimation,
-      // maskTransitionName,
-      // maskMotion,
-      // zIndex,
-      // popup,
-      // stretch,
-      // alignPoint,
-      // mobile,
-      // forceRender,
-      // onPopupClick,
-      // } = props;
-      // const { popupVisible, point } = state;
-
-      const align = getPopupAlign();
-
-      const mouseProps: JSX.HTMLAttributes<HTMLElement> = {};
-      if (isMouseEnterToShow()) {
-        mouseProps.onMouseEnter = onPopupMouseEnter;
-      }
-      if (isMouseLeaveToHide()) {
-        mouseProps.onMouseLeave = onPopupMouseLeave;
-      }
-
-      mouseProps.onMouseDown = onPopupMouseDown;
-      mouseProps.onTouchStart = onPopupMouseDown;
-
-      return (
-        <Popup
-          prefixCls={props.prefixCls}
-          destroyPopupOnHide={props.destroyPopupOnHide}
-          visible={popupVisible()}
-          point={props.alignPoint && point()}
-          class={props.popupClassName}
-          align={align}
-          onAlign={props.onPopupAlign}
-          animation={props.popupAnimation}
-          getClassNameFromAlign={getPopupClassNameFromAlign}
-          {...mouseProps}
-          stretch={props.stretch}
-          getRootDomNode={getRootDomNode}
-          style={props.popupStyle}
-          mask={props.mask}
-          zIndex={props.zIndex}
-          transitionName={props.popupTransitionName}
-          maskAnimation={props.maskAnimation}
-          maskTransitionName={props.maskTransitionName}
-          maskMotion={props.maskMotion}
-          ref={popupRef}
-          motion={props.popupMotion}
-          mobile={props.mobile}
-          forceRender={props.forceRender}
-          onClick={props.onPopupClick}
-        >
-          {props.popup}
-        </Popup>
-      );
-    };
 
     const attachParent = (popupContainer: HTMLElement) => {
       raf.cancel(attachId);
@@ -636,7 +567,7 @@ export function generateTrigger(
       setPopupVisibleRaw((prevPopupVisible) => {
         let visible = prevPopupVisible;
         if (prevPopupVisible !== popupVisible) {
-          if (!('popupVisible' in mergeProps(props))) {
+          if (props.popupVisible === undefined) {
             // setState({ popupVisible, prevPopupVisible });
             setPrevPopupVisible(prevPopupVisible);
             visible = popupVisible;
@@ -903,25 +834,58 @@ export function generateTrigger(
       if (popupVisible() || popupRef || props.forceRender) {
         portal = true;
       }
-  
+
       if (!popupVisible() && props.autoDestroy) {
         portal = false;
       }
-      
       return portal;
     });
 
+    const mouseProps = () => {
+      const mouseProps: JSX.HTMLAttributes<HTMLElement> = {};
+      if (isMouseEnterToShow()) {
+        mouseProps.onMouseEnter = onPopupMouseEnter;
+      }
+      if (isMouseLeaveToHide()) {
+        mouseProps.onMouseLeave = onPopupMouseLeave;
+      }
+
+      mouseProps.onMouseDown = onPopupMouseDown;
+      mouseProps.onTouchStart = onPopupMouseDown;
+      return mouseProps;
+    }
     return (
       <TriggerContext.Provider value={triggerContextValue}>
         {trigger}
         <Show when={portal()}>
-          <PortalComponent
-            key="portal"
-            getContainer={getContainer}
-            didUpdate={handlePortalUpdate}
+          <Popup
+            prefixCls={props.prefixCls}
+            destroyPopupOnHide={props.destroyPopupOnHide}
+            visible={popupVisible()}
+            point={props.alignPoint && point()}
+            class={props.popupClassName}
+            align={getPopupAlign()}
+            onAlign={props.onPopupAlign}
+            animation={props.popupAnimation}
+            getClassNameFromAlign={getPopupClassNameFromAlign}
+            {...mouseProps()}
+            stretch={props.stretch}
+            getRootDomNode={getRootDomNode}
+            style={props.popupStyle}
+            mask={props.mask}
+            zIndex={props.zIndex}
+            transitionName={props.popupTransitionName}
+            maskAnimation={props.maskAnimation}
+            maskTransitionName={props.maskTransitionName}
+            maskMotion={props.maskMotion}
+            ref={popupRef}
+            motion={props.popupMotion}
+            mobile={props.mobile}
+            forceRender={props.forceRender}
+            onClick={props.onPopupClick}
           >
-            {getComponent}
-          </PortalComponent>
+            {props.popup}
+          </Popup>
         </Show>
       </TriggerContext.Provider>
     );

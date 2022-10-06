@@ -86,7 +86,7 @@ export const resolvePkg = async (rc: string) => {
         "ts-node": "^10.9.1",
         vite: "^3.0.9",
         "vite-plugin-solid": "^2.3.0",
-        ...(rc === 'trigger' ? {"dom-align": "^1.7.0"} : {})
+        // "dom-align": "^1.7.0"
     });
     // sort object by key
     pkg.devDependencies = Object.fromEntries(
@@ -136,6 +136,7 @@ export const react2Solid = async (rc: string) => {
         let s1 = await $`cat ${file}`;
         $.verbose = true;
         let s2 = reactToSolid(s1.stdout);
+        s2 = rcLib(s2);
         if (file.endsWith(".spec.tsx") || file.endsWith(".test.tsx")) {
             s2 = reactToSolidTest(s2);
             s2 = s2.replace(/\bact\(\(\) => {([^}]+)}\);/g, "$1");
@@ -144,3 +145,7 @@ export const react2Solid = async (rc: string) => {
         await nodeFs.writeFile(file, s2);
     }
 };
+
+export const rcLib = (source: string): string => {
+    return source.replace(/from 'rc-([a-z-]+)+/g, "from 'rc-$1-solid")
+}

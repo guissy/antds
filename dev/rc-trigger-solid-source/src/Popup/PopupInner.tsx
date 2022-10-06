@@ -256,6 +256,7 @@ const PopupInner: Component<PopupInnerProps> = (props) => {
           >
             <div
               data-key="popup-inner"
+              // data-date={new Date().toTimeString()}
               class={classNames(
                 props.prefixCls,
                 props.className,
