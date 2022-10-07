@@ -1,4 +1,5 @@
 // import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children} from "solid-js";
+import { Accessor, createMemo } from 'solid-js';
 import useEvent from './useEvent';
 import useLayoutEffect, { useLayoutUpdateEffect } from './useLayoutEffect';
 import createSignal from './useState';
@@ -32,11 +33,11 @@ export default function useMergedState<T, R = T>(
     onChange?: (value: T, prevValue: T) => void;
     postState?: (value: T) => T;
   },
-): [R, Updater<T>] {
+): [Accessor<R>, Updater<T>] {
   const { defaultValue, value, onChange, postState } = option || {};
 
   // ======================= Init =======================
-  const [mergedValue, setMergedValue] = createSignal<ValueRecord<T>>(() => {
+  const [mergedValue, setMergedValue] = createSignal<ValueRecord<T>>((() => {
     let finalValue: T = undefined;
     let source: Source;
 
@@ -58,10 +59,14 @@ export default function useMergedState<T, R = T>(
     }
 
     return [finalValue, source, finalValue];
-  });
+  })());
 
-  const chosenValue = hasValue(value) ? value : mergedValue[0];
-  const postMergedValue = postState ? postState(chosenValue) : chosenValue;
+  const postMergedValue = createMemo(() => {
+    const chosenValue = hasValue(value) ? value : mergedValue()[0];
+    return postState ? postState(chosenValue) : chosenValue;
+  });
+  // const chosenValue = hasValue(value) ? value : mergedValue()[0];
+  // const postMergedValue = postState ? postState(chosenValue) : chosenValue;
 
   // ======================= Sync =======================
   useLayoutUpdateEffect(() => {
@@ -73,7 +78,7 @@ export default function useMergedState<T, R = T>(
 
   const triggerChange: Updater<T> = useEvent((updater, ignoreDestroy) => {
     setMergedValue(prev => {
-      const [prevValue, prevSource, prevPrevValue] = prev;
+      const [prevValue, prevSource, prevPrevValue] = prev || [];
 
       const nextValue: T =
         typeof updater === 'function' ? (updater as any)(prevValue) : updater;
@@ -98,12 +103,12 @@ export default function useMergedState<T, R = T>(
   const onChangeFn = useEvent(onChange);
 
   useLayoutEffect(() => {
-    const [current, source, prev] = mergedValue;
+    const [current, source, prev] = mergedValue();
     if (current !== prev && source === Source.INNER) {
-      onChangeFn(current, prev);
+      onChangeFn?.(current, prev);
       changeEventPrevRef = prev;
     }
   }, [mergedValue]);
 
-  return [postMergedValue as unknown as R, triggerChange];
+  return [postMergedValue as unknown as Accessor<R>, triggerChange];
 }
