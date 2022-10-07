@@ -4,7 +4,7 @@
 // "import { [^}]+ } from 'react';": "",
 export const importResolve = (react: string): string => {
   const solidImport =
-    'import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children} from "solid-js";';
+    'import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children} from "solid-js";\n';
   return react
   .replace(/import type \* as React from 'react';/g, "")
   .replace(/(import (.*)from 'react';?\n?)+/g, solidImport);

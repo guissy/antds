@@ -20,6 +20,7 @@ export const checkPkgInstall = async (rc: string) => {
             await $`cp dev/rc-trigger-solid-source/jest.setup.ts dev/rc-${rc}-solid-source/jest.setup.ts`
             await $`cp dev/rc-trigger-solid-source/tsconfig.json dev/rc-${rc}-solid-source/tsconfig.json`
             await $`cp dev/rc-trigger-solid-source/vite.config.ts dev/rc-${rc}-solid-source/vite.config.ts`
+            await $`cp dev/rc-trigger-solid-source/src/main.tsx dev/rc-${rc}-solid-source/src/main.tsx`
         })
         .catch(() => 1);
     }
