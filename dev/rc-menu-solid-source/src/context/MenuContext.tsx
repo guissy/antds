@@ -87,8 +87,7 @@ export default function MenuContextProvider(props: InheritableContextProps) {
   createMemo(
     () => {
       setState(mergeProps(context, restProps));
-console.log(mergeProps(context, restProps))
-
+      // console.log(mergeProps(context, restProps))
     },
     () => [context, restProps],
     (prev, next) =>

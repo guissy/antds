@@ -85,7 +85,10 @@ const InternalMenuItem = (props: MenuItemProps) => {
   //   ...restProps
   // } = props;
 
-  const domDataId = useMenuId(props.eventKey);
+  const domDataId = createMemo(() => {
+    console.log("eventKey", props.eventKey)
+    return useMenuId(props.eventKey);
+  });
   const [_, restProps] = splitProps(props, [ 'style', 'className', 'eventKey', 'warnKey', 'disabled', 'itemIcon', 'children', 'role', 'onMouseEnter',
   'onMouseLeave','onClick','onKeyDown','onFocus' ]);
   // const {
@@ -197,7 +200,7 @@ const InternalMenuItem = (props: MenuItemProps) => {
       elementRef={elementRef}
       role={props.role === null ? 'none' : props.role || 'menuitem'}
       tabIndex={props.disabled ? null : -1}
-      data-menu-id={context.overflowDisabled && domDataId ? null : domDataId}
+      data-menu-id={context.overflowDisabled && domDataId() ? null : domDataId()}
       {...restProps}
       {...activeProps}
       {...optionRoleProps}
@@ -243,15 +246,17 @@ function MenuItem(props: MenuItemProps): JSX.Element {
 
   // ==================== Record KeyPath ====================
   const measure = useMeasure();
-  const connectedKeyPath = useFullPath(props.eventKey);
+  const context = useContext(MenuContext) ?? {} as MenuContextProps;
+  const connectedKeyPath = useFullPath(props.eventKey || context.key);
 
   // eslint-disable-next-line consistent-return
   createEffect(() => {
+    // console.log("props.eventKey", props.eventKey)
     if (measure) {
-      measure.registerPath(props.eventKey, connectedKeyPath());
+      measure.registerPath(props.eventKey || context.key, connectedKeyPath());
 
       return () => {
-        measure.unregisterPath(props.eventKey, connectedKeyPath());
+        measure.unregisterPath(props.eventKey || context.key, connectedKeyPath());
       };
     }
   }, [connectedKeyPath]);
@@ -261,7 +266,7 @@ function MenuItem(props: MenuItemProps): JSX.Element {
   }
 
   // ======================== Render ========================
-  return <InternalMenuItem {...props} />;
+  return <InternalMenuItem {...props} eventKey={props.eventKey || context.key} />;
 }
 
 export default MenuItem;

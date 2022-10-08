@@ -62,7 +62,7 @@ export default function useKeyRecords() {
       const fullPath = key2pathRef.get(eventKey) || '';
       const keys = getPathKeys(fullPath);
 
-      if (includeOverflow && overflowKeys.includes(keys[0])) {
+      if (includeOverflow && overflowKeys().includes(keys[0])) {
         keys.unshift(OVERFLOW_KEY);
       }
 
@@ -84,7 +84,7 @@ export default function useKeyRecords() {
   const getKeys = () => {
     const keys = [...key2pathRef.keys()];
 
-    if (overflowKeys.length) {
+    if (overflowKeys().length) {
       keys.push(OVERFLOW_KEY);
     }
 

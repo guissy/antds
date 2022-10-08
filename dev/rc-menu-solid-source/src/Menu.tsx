@@ -177,9 +177,6 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
   const childList: Accessor<JSX.Element[]> = createMemo(
     () => {
       if (!mounted) return [];
-      if (props.mode) {
-        
-      }
       return parseItems(props.children, props.items, EMPTY_LIST)
     },
     [props.children, props.items],
@@ -228,16 +225,16 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
 
   // >>>>> Cache & Reset open keys when inlineCollapsed changed
   const [inlineCacheOpenKeys, setInlineCacheOpenKeys] =
-    createSignal(mergedOpenKeys);
+    createSignal(mergedOpenKeys());
 
-  const isInlineMode = menuMode().mergedMode === 'inline';
+  const isInlineMode = () => menuMode().mergedMode === 'inline';
 
   let mountRef = false;
 
   // Cache
   createEffect(() => {
-    if (isInlineMode) {
-      setInlineCacheOpenKeys(mergedOpenKeys);
+    if (isInlineMode()) {
+      setInlineCacheOpenKeys(mergedOpenKeys());
     }
   }, [mergedOpenKeys]);
 
@@ -247,13 +244,13 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
       return;
     }
 
-    if (isInlineMode) {
-      setMergedOpenKeys(inlineCacheOpenKeys);
+    if (isInlineMode()) {
+      setMergedOpenKeys(inlineCacheOpenKeys());
     } else {
       // Trigger open event in case its in control
       triggerOpenKeys(EMPTY_LIST);
     }
-  }, [isInlineMode]);
+  }, [isInlineMode()]);
 
   createEffect(() => {
     mountRef = true;
@@ -315,11 +312,11 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
     list: containerRef,
     focus: options => {
       const shouldFocusKey =
-        mergedActiveKey ?? childList().find(node => !node.props.disabled)?.key;
+        mergedActiveKey ?? childList().find(node => !node.disabled)?.key;
       if (shouldFocusKey) {
         const elm = containerRef
           ?.querySelector<HTMLLIElement>(
-            `li[data-menu-id='${getMenuId(uuid, shouldFocusKey as string)}']`
+            `li[data-menu-id='${getMenuId(uuid(), shouldFocusKey as string)}']`
           );
         elm?.focus?.(options);
       }
@@ -353,14 +350,14 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
     if (props.selectable) {
       // Insert or Remove
       const { key: targetKey } = info;
-      const exist = mergedSelectKeys.includes(targetKey);
+      const exist = mergedSelectKeys().includes(targetKey);
       let newSelectKeys: string[];
 
       if (props.multiple) {
         if (exist) {
-          newSelectKeys = mergedSelectKeys.filter(key => key !== targetKey);
+          newSelectKeys = mergedSelectKeys().filter(key => key !== targetKey);
         } else {
-          newSelectKeys = [...mergedSelectKeys, targetKey];
+          newSelectKeys = [...mergedSelectKeys(), targetKey];
         }
       } else {
         newSelectKeys = [targetKey];
@@ -382,7 +379,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
     }
 
     // Whatever selectable, always close it
-    if (!props.multiple && mergedOpenKeys.length && menuMode().mergedMode !== 'inline') {
+    if (!props.multiple && mergedOpenKeys().length && menuMode().mergedMode !== 'inline') {
       triggerOpenKeys(EMPTY_LIST);
     }
   };
@@ -397,7 +394,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
   });
 
   const onInternalOpenChange = createMemoCallback((key: string, open: boolean) => {
-    let newOpenKeys = mergedOpenKeys.filter(k => k !== key);
+    let newOpenKeys = mergedOpenKeys().filter(k => k !== key);
 
     if (open) {
       newOpenKeys.push(key);
@@ -407,7 +404,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
       newOpenKeys = newOpenKeys.filter(k => !subPathKeys.has(k));
     }
 
-    if (!shallowEqual(mergedOpenKeys, newOpenKeys)) {
+    if (!shallowEqual(mergedOpenKeys(), newOpenKeys)) {
       triggerOpenKeys(newOpenKeys);
     }
   });
@@ -416,16 +413,16 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
 
   // ==================== Accessibility =====================
   const triggerAccessibilityOpen = (key: string, open?: boolean) => {
-    const nextOpen = open ?? !mergedOpenKeys.includes(key);
+    const nextOpen = open ?? !mergedOpenKeys().includes(key);
 
     onInternalOpenChange(key, nextOpen);
   };
 
   const onInternalKeyDown = useAccessibility(
     menuMode().mergedMode,
-    mergedActiveKey,
+    mergedActiveKey(),
     isRtl,
-    uuid,
+    uuid(),
 
     containerRef,
     getKeys,
@@ -496,7 +493,17 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
       style={props.style}
       role="menu"
       tabIndex={props.tabIndex}
-      data={props.children} // wrappedChildList
+      // data={props.children} // wrappedChildList
+      data={parseItems(props.children, props.items, EMPTY_LIST).map((child, index) => (
+          // Always wrap provider to avoid sub node re-mount
+          <MenuContextProvider
+            key={child.key}
+            overflowDisabled={(menuMode().mergedMode !== 'horizontal' || props.disabledOverflow) ? undefined : index > lastVisibleIndex()}
+          >
+            {parseItems(props.children, props.items, EMPTY_LIST)[index]}
+          </MenuContextProvider>
+        ))
+      } // wrappedChildList
       renderRawItem={node => node}
       renderRawRest={omitItems => {
         // We use origin list since wrapped list use context to prevent open
@@ -561,7 +568,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
           forceSubMenuRender={props.forceSubMenuRender}
           builtinPlacements={props.builtinPlacements}
           triggerSubMenuAction={props.triggerSubMenuAction}
-          getPopupContainer={getInternalPopupContainer}
+          getPopupContainer={props.getPopupContainer}
           // Icon
           itemIcon={props.itemIcon}
           expandIcon={props.expandIcon}
@@ -578,7 +585,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
           {/* Measure menu keys. Add `display: none` to avoid some developer miss use the Menu */}
           <div style={{ display: 'none' }} aria-hidden>
             <PathRegisterContext.Provider value={registerPathContext()}>
-              {/* {props.children} */}
+              {/* {props.children.clone()} */}
               {/* {console.log(childList())} */}
             </PathRegisterContext.Provider>
           </div>
