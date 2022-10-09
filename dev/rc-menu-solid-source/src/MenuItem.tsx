@@ -1,4 +1,4 @@
-import { type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, splitProps, Ref } from "solid-js";
+import { type ParentComponent, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, splitProps, Ref } from "solid-js";
 import classNames from 'classnames';
 import Overflow from 'rc-overflow-solid';
 import warning from 'rc-util-solid/lib/warning';
@@ -35,7 +35,7 @@ export interface MenuItemProps
 // Since Menu event provide the `info.item` which point to the MenuItem node instance.
 // We have to use class component here.
 // This should be removed from doc & api in future.
-const LegacyMenuItem: Component<{title: string, attribute: {}, elementRef: Ref<HTMLElement>, eventKey: string }> = (props) => {
+const LegacyMenuItem: ParentComponent<{title: string, attribute: {}, elementRef: Ref<HTMLElement>, eventKey: string }> = (props) => {
 
   // const { title, attribute, elementRef, ...restProps } = this.props;
   const [_, passedProps] = splitProps(props, ['title', 'attribute', 'elementRef', 'eventKey']);
@@ -140,15 +140,15 @@ const InternalMenuItem = (props: MenuItemProps) => {
   // const mergedItemIcon = props.itemIcon || context.itemIcon;
 
   // ============================ Active ============================
-  const { active, ...activeProps } = useActive(
+  const actived = createMemo(() => useActive(
     props.eventKey,
     mergedDisabled(),
     props.onMouseEnter,
     props.onMouseLeave,
-  );
+  ));
 
   // ============================ Select ============================
-  const selected = Array.isArray(context.selectedKeys) ? context.selectedKeys.includes(props.eventKey) : false;
+  const selected = createMemo(() => Array.isArray(context.selectedKeys) ? context.selectedKeys.includes(props.eventKey) : false);
 
   // ======================== DirectionStyle ========================
   const directionStyle = useDirectionStyle(connectedKeys.length);
@@ -187,11 +187,11 @@ const InternalMenuItem = (props: MenuItemProps) => {
   };
 
   // ============================ Render ============================
-  const optionRoleProps: JSX.HTMLAttributes<HTMLDivElement> = {};
+  // const optionRoleProps: JSX.HTMLAttributes<HTMLDivElement> = {};
 
-  if (props.role === 'option') {
-    optionRoleProps['aria-selected'] = selected;
-  }
+  // if (props.role === 'option') {
+  //   optionRoleProps['aria-selected'] = selected;
+  // }
 
   let renderNode = (
     <LegacyMenuItem
@@ -201,8 +201,9 @@ const InternalMenuItem = (props: MenuItemProps) => {
       tabIndex={props.disabled ? null : -1}
       data-menu-id={context.overflowDisabled && domDataId() ? null : domDataId()}
       {...restProps}
-      {...activeProps}
-      {...optionRoleProps}
+      onMouseEnter = {actived().onMouseEnter}
+      onMouseLeave = {actived().onMouseLeave}
+      {...(props.role === 'option' ? {'aria-selected': selected()} : {})}
       component="li"
       aria-disabled={props.disabled}
       style={{
@@ -212,8 +213,8 @@ const InternalMenuItem = (props: MenuItemProps) => {
       class={classNames(
         `${context.prefixCls}-item`,
         {
-          [`${context.prefixCls}-item-active`]: active,
-          [`${context.prefixCls}-item-selected`]: selected,
+          [`${context.prefixCls}-item-active`]: actived().active,
+          [`${context.prefixCls}-item-selected`]: selected(),
           [`${context.prefixCls}-item-disabled`]: mergedDisabled(),
         },
         props.className,
@@ -226,7 +227,7 @@ const InternalMenuItem = (props: MenuItemProps) => {
       <Icon
         props={{
           ...props,
-          isSelected: selected,
+          isSelected: selected(),
         }}
         icon={props.itemIcon || context.itemIcon}
       />
@@ -234,7 +235,7 @@ const InternalMenuItem = (props: MenuItemProps) => {
   );
 
   if (_internalRenderMenuItem) {
-    renderNode = _internalRenderMenuItem(renderNode, props, { selected });
+    renderNode = _internalRenderMenuItem(renderNode, props, { selected: selected() });
   }
 
   return renderNode;
@@ -250,7 +251,6 @@ function MenuItem(props: MenuItemProps): JSX.Element {
 
   // eslint-disable-next-line consistent-return
   createEffect(() => {
-    // console.log("props.eventKey", props.eventKey)
     if (measure) {
       measure.registerPath(props.eventKey || context.key, connectedKeyPath());
 

@@ -312,7 +312,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
     list: containerRef,
     focus: options => {
       const shouldFocusKey =
-        mergedActiveKey ?? childList().find(node => !node.disabled)?.key;
+        mergedActiveKey() ?? childList().find(node => !node.disabled)?.key;
       if (shouldFocusKey) {
         const elm = containerRef
           ?.querySelector<HTMLLIElement>(
@@ -454,7 +454,6 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
 
   // >>>>> Children
   const wrappedChildList = createMemo(() => {
-    // console.log("wrappedChildList", mounted(), menuMode().mergedMode !== 'horizontal' || props.disabledOverflow)
     if (!mounted) return [];
     return menuMode().mergedMode !== 'horizontal' || props.disabledOverflow
       ? childList()

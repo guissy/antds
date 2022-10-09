@@ -1,4 +1,4 @@
-import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, splitProps} from "solid-js";
+import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, splitProps, Show} from "solid-js";
 import classNames from 'classnames';
 import Overflow from 'rc-overflow-solid';
 import warning from 'rc-util-solid/lib/warning';
@@ -111,7 +111,7 @@ const InternalSubMenu = (props: SubMenuProps) => {
 
   const { _internalRenderSubMenuItem } = useContext(PrivateContext);
 
-  const { isSubPathKey } = useContext(PathUserContext) ?? {} as PathUserContextProps;
+  const pathContext = useContext(PathUserContext) ?? {} as PathUserContextProps;
   const connectedPath = useFullPath();
 
   const subMenuPrefixCls = `${context.prefixCls}-submenu`;
@@ -129,19 +129,19 @@ const InternalSubMenu = (props: SubMenuProps) => {
   const mergedExpandIcon = props.expandIcon || context.expandIcon;
 
   // ================================ Open ================================
-  const originOpen = Array.isArray(context.openKeys) ? context.openKeys.includes(props.eventKey) : false;
-  const open = !context.overflowDisabled && originOpen;
+  const originOpen = createMemo(() => Array.isArray(context.openKeys) ? context.openKeys.includes(props.eventKey) : false);
+  const open = createMemo(() => !context.overflowDisabled && originOpen());
 
   // =============================== Select ===============================
-  const childrenSelected = isSubPathKey?.(context.selectedKeys, props.eventKey);
+  const childrenSelected = pathContext.isSubPathKey?.(context.selectedKeys, props.eventKey);
 
   // =============================== Active ===============================
-  const { active, ...activeProps } = useActive(
+  const actived = createMemo(() => useActive(
     props.eventKey,
     mergedDisabled,
     props.onTitleMouseEnter,
     props.onTitleMouseLeave,
-  );
+  ));
 
   // Fallback of active check to avoid hover on menu title or disabled item
   const [childrenActive, setChildrenActive] = createSignal(false);
@@ -171,16 +171,17 @@ const InternalSubMenu = (props: SubMenuProps) => {
   };
 
   const mergedActive = createMemo(() => {
-    if (active) {
-      return active;
+    
+    if (actived().active) {
+      return actived().active;
     }
 
     if (context.mode !== 'inline') {
-      return childrenActive || isSubPathKey([context.activeKey], props.eventKey);
+      return childrenActive() || pathContext.isSubPathKey?.([context.activeKey], props.eventKey);
     }
 
     return false;
-  }, [context.mode, active, context.activeKey, childrenActive, props.eventKey, isSubPathKey]);
+  }, [context.mode, actived().active, context.activeKey, childrenActive(), props.eventKey, pathContext.isSubPathKey]);
 
   // ========================== DirectionStyle ==========================
   const directionStyle = useDirectionStyle(connectedPath.length);
@@ -200,7 +201,7 @@ const InternalSubMenu = (props: SubMenuProps) => {
 
     // Trigger open by click when mode is `inline`
     if (context.mode === 'inline') {
-      context.onOpenChange(props.eventKey, !originOpen);
+      context.onOpenChange(props.eventKey, !originOpen());
     }
   };
 
@@ -238,13 +239,14 @@ const InternalSubMenu = (props: SubMenuProps) => {
       ref={elementRef}
       title={typeof props.title === 'string' ? props.title : null}
       data-menu-id={context.overflowDisabled && domDataId() ? null : domDataId()}
-      aria-expanded={open}
+      aria-expanded={open()}
       aria-haspopup
       aria-controls={popupId()}
       aria-disabled={mergedDisabled}
       onClick={onInternalTitleClick}
       onFocus={onInternalFocus}
-      {...activeProps}
+      onMouseEnter = {actived().onMouseEnter}
+      onMouseLeave = {actived().onMouseLeave}
     >
       {props.title}
 
@@ -253,7 +255,7 @@ const InternalSubMenu = (props: SubMenuProps) => {
         icon={context.mode !== 'horizontal' ? mergedExpandIcon : null}
         props={{
           ...props,
-          isOpen: open,
+          isOpen: open(),
           // [Legacy] Not sure why need this mark
           isSubMenu: true,
         }}
@@ -269,39 +271,15 @@ const InternalSubMenu = (props: SubMenuProps) => {
     triggerModeRef = connectedPath.length > 1 ? 'vertical' : context.mode;
   }
 
-  if (!context.overflowDisabled) {
-    const triggerMode = triggerModeRef;
-
-    // Still wrap with Trigger here since we need avoid react re-mount dom node
-    // Which makes motion failed
-    titleNode = (
-      <PopupTrigger
-        mode={triggerMode}
-        prefixCls={subMenuPrefixCls}
-        visible={!props.internalPopupClose && open && context.mode !== 'inline'}
-        popupClassName={props.popupClassName}
-        popupOffset={props.popupOffset}
-        popup={
-          <MenuContextProvider
-            // Special handle of horizontal mode
-            mode={triggerMode === 'horizontal' ? 'vertical' : triggerMode}
-          >
-            <SubMenuList id={popupId()} ref={popupRef}>
-              {props.children}
-            </SubMenuList>
-          </MenuContextProvider>
-        }
-        disabled={mergedDisabled}
-        onVisibleChange={onPopupVisibleChange}
-      >
-        {titleNode}
-      </PopupTrigger>
-    );
-  }
-
-  // >>>>> List node
-  let listNode = (
-    <Overflow.Item
+  // >>>>> Render
+  return (
+    <MenuContextProvider
+      onItemClick={onMergedItemClick}
+      mode={context.mode === 'horizontal' ? 'vertical' : context.mode}
+      itemIcon={mergedItemIcon}
+      expandIcon={mergedExpandIcon}
+    >
+      <Overflow.Item
       role="none"
       {...restProps}
       component="li"
@@ -311,7 +289,7 @@ const InternalSubMenu = (props: SubMenuProps) => {
         `${subMenuPrefixCls}-${context.mode}`,
         props.className,
         {
-          [`${subMenuPrefixCls}-open`]: open,
+          [`${subMenuPrefixCls}-open`]: open(),
           [`${subMenuPrefixCls}-active`]: mergedActive(),
           [`${subMenuPrefixCls}-selected`]: childrenSelected,
           [`${subMenuPrefixCls}-disabled`]: mergedDisabled,
@@ -320,35 +298,38 @@ const InternalSubMenu = (props: SubMenuProps) => {
       onMouseEnter={onInternalMouseEnter}
       onMouseLeave={onInternalMouseLeave}
     >
-      {titleNode}
+      {/* {titleNode} */}
+      <Show when={!context.overflowDisabled} fallback={titleNode}>
+          <PopupTrigger
+          mode={triggerModeRef}
+          prefixCls={subMenuPrefixCls}
+          visible={!props.internalPopupClose && open() && context.mode !== 'inline'}
+          popupClassName={props.popupClassName}
+          popupOffset={props.popupOffset}
+          popup={
+            <MenuContextProvider
+              // Special handle of horizontal mode
+              mode={triggerModeRef === 'horizontal' ? 'vertical' : triggerModeRef}
+            >
+              <SubMenuList id={popupId()} ref={popupRef}>
+                {props.children}
+              </SubMenuList>
+            </MenuContextProvider>
+          }
+          disabled={mergedDisabled}
+          onVisibleChange={onPopupVisibleChange}
+        >
+          {titleNode}
+        </PopupTrigger>
+      </Show>
 
       {/* Inline mode */}
       {!context.overflowDisabled && (
-        <InlineSubMenuList id={popupId} open={open} keyPath={connectedPath()}>
+        <InlineSubMenuList id={popupId()} open={open()} keyPath={connectedPath()}>
           {props.children}
         </InlineSubMenuList>
       )}
     </Overflow.Item>
-  );
-
-  if (_internalRenderSubMenuItem) {
-    listNode = _internalRenderSubMenuItem(listNode, props, {
-      selected: childrenSelected,
-      active: mergedActive(),
-      open,
-      disabled: mergedDisabled,
-    });
-  }
-
-  // >>>>> Render
-  return (
-    <MenuContextProvider
-      onItemClick={onMergedItemClick}
-      mode={context.mode === 'horizontal' ? 'vertical' : context.mode}
-      itemIcon={mergedItemIcon}
-      expandIcon={mergedExpandIcon}
-    >
-      {listNode}
     </MenuContextProvider>
   );
 };

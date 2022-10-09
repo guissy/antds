@@ -77,7 +77,7 @@ export default () => {
         {/* Narrow */}
         <button
           onClick={() => {
-            setNarrow(!narrow());
+            setNarrow(p => !p);
           }}
         >
           Narrow: {String(narrow())}
@@ -102,7 +102,7 @@ export default () => {
         </button>
       </div>
 
-      <div style={{ width: narrow ? '350px' : undefined }}>
+      <div style={{ width: narrow() ? '350px' : '' }}>
         <Menu
           // direction="rtl"
           defaultOpenKeys={['sub', 'nest']}
