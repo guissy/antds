@@ -1,5 +1,5 @@
 // import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children} from "solid-js";
-import { Accessor, createMemo } from 'solid-js';
+import { Accessor, createMemo, on } from 'solid-js';
 import useEvent from './useEvent';
 import useLayoutEffect, { useLayoutUpdateEffect } from './useLayoutEffect';
 import createSignal from './useState';
@@ -61,17 +61,15 @@ export default function useMergedState<T, R = T>(
     return [finalValue, source, finalValue];
   })());
 
-  const postMergedValue = createMemo(() => {
+  const postMergedValue = () => {
     const chosenValue = hasValue(value) ? value : mergedValue()[0];
     return postState ? postState(chosenValue) : chosenValue;
-  });
-  // const chosenValue = hasValue(value) ? value : mergedValue()[0];
-  // const postMergedValue = postState ? postState(chosenValue) : chosenValue;
+  };
 
   // ======================= Sync =======================
-  useLayoutUpdateEffect(() => {
+  useLayoutUpdateEffect(on(() => value, () => {
     setMergedValue(([prevValue]) => [value, Source.PROP, prevValue]);
-  }, [value]);
+  }));
 
   // ====================== Update ======================
   let changeEventPrevRef  = null as (T | null);
