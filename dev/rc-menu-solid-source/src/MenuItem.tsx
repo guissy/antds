@@ -86,7 +86,6 @@ const InternalMenuItem = (props: MenuItemProps) => {
   // } = props;
 
   const domDataId = createMemo(() => {
-    console.log("eventKey", props.eventKey)
     return useMenuId(props.eventKey);
   });
   const [_, restProps] = splitProps(props, [ 'style', 'className', 'eventKey', 'warnKey', 'disabled', 'itemIcon', 'children', 'role', 'onMouseEnter',
@@ -266,7 +265,7 @@ function MenuItem(props: MenuItemProps): JSX.Element {
   }
 
   // ======================== Render ========================
-  return <InternalMenuItem {...props} eventKey={props.eventKey || context.key} />;
+  return <InternalMenuItem {...props} eventKey={props.eventKey || context.key || props.key} />;
 }
 
 export default MenuItem;

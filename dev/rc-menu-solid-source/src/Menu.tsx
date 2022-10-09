@@ -184,7 +184,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
 
   let containerRef = null as (HTMLUListElement | null);
 
-  const uuid = useUUID(props.id);
+  const uuid = () => useUUID(props.id)();
 
   const isRtl = props.direction === 'rtl';
 
@@ -500,7 +500,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
             key={child.key}
             overflowDisabled={(menuMode().mergedMode !== 'horizontal' || props.disabledOverflow) ? undefined : index > lastVisibleIndex()}
           >
-            {parseItems(props.children, props.items, EMPTY_LIST)[index]}
+            {child}
           </MenuContextProvider>
         ))
       } // wrappedChildList

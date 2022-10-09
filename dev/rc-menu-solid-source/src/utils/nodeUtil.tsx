@@ -2,7 +2,6 @@ import {type Component, type JSX, createEffect, createSignal, createContext, cre
 import toArray from 'rc-util-solid/lib/Children/toArray';
 import type { ItemType } from '../interface';
 import { Divider, MenuItem, MenuItemGroup, SubMenu } from '..';
-import { spread } from "solid-js/web";
 
 export function parseChildren(
   children: JSX.Element | undefined,
@@ -35,7 +34,7 @@ export function parseChildren(
       
       // const child = 
       // return React.cloneElement(child, cloneProps);
-      // console.log("➑➑➑", typeof child)
+      // console.log("➑➑➑", child()?.name)
       // spread(child as HTMLElement, cloneProps);
       return child
     }

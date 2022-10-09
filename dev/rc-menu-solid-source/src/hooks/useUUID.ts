@@ -8,6 +8,14 @@ let internalId = 0;
 
 export default function useUUID(id?: string): Accessor<string> {
   const [uuid, setUUID] = useMergedState(id, {
+    defaultValue: (() => {
+      internalId += 1;
+      const newId =
+        process.env.NODE_ENV === 'test'
+          ? 'test'
+          : `${uniquePrefix}-${internalId}`;
+      return (`rc-menu-uuid-${newId}`);
+    })(),
     value: id,
   });
 
@@ -18,7 +26,7 @@ export default function useUUID(id?: string): Accessor<string> {
         ? 'test'
         : `${uniquePrefix}-${internalId}`;
     setUUID(`rc-menu-uuid-${newId}`);
-  }, []);
+  });
 
   return uuid;
 }

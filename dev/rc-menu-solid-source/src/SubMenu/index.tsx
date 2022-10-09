@@ -80,7 +80,7 @@ const InternalSubMenu = (props: SubMenuProps) => {
   "popupClassName","popupOffset","onClick","onMouseEnter","onMouseLeave","onTitleClick",
   "onTitleMouseEnter","onTitleMouseLeave"]);
 
-  const domDataId = useMenuId(props.eventKey);
+  const domDataId = createMemo(() => useMenuId(props.eventKey));
 
   // const {
   //   prefixCls,
@@ -226,7 +226,7 @@ const InternalSubMenu = (props: SubMenuProps) => {
   };
 
   // =============================== Render ===============================
-  const popupId = domDataId && `${domDataId}-popup`;
+  const popupId = createMemo(() => domDataId() && `${domDataId()}-popup`);
 
   // >>>>> Title
   let titleNode: JSX.Element = (
@@ -237,10 +237,10 @@ const InternalSubMenu = (props: SubMenuProps) => {
       tabIndex={mergedDisabled ? null : -1}
       ref={elementRef}
       title={typeof props.title === 'string' ? props.title : null}
-      data-menu-id={context.overflowDisabled && domDataId ? null : domDataId}
+      data-menu-id={context.overflowDisabled && domDataId() ? null : domDataId()}
       aria-expanded={open}
       aria-haspopup
-      aria-controls={popupId}
+      aria-controls={popupId()}
       aria-disabled={mergedDisabled}
       onClick={onInternalTitleClick}
       onFocus={onInternalFocus}
@@ -286,7 +286,7 @@ const InternalSubMenu = (props: SubMenuProps) => {
             // Special handle of horizontal mode
             mode={triggerMode === 'horizontal' ? 'vertical' : triggerMode}
           >
-            <SubMenuList id={popupId} ref={popupRef}>
+            <SubMenuList id={popupId()} ref={popupRef}>
               {props.children}
             </SubMenuList>
           </MenuContextProvider>
@@ -355,18 +355,20 @@ const InternalSubMenu = (props: SubMenuProps) => {
 
 export default function SubMenu(props: SubMenuProps) {
   // const { eventKey, children } = props;
-
+  const context = useContext(MenuContext) ?? {} as MenuContextProps;
+  // console.log("submenu props.eventKey", context.key, props.eventKey)
   const connectedKeyPath = useFullPath(props.eventKey);
-  const childList: JSX.Element[] = parseChildren(
-    props.children,
-    connectedKeyPath(),
-  );
+  // const childList: JSX.Element[] = parseChildren(
+  //   props.children,
+  //   connectedKeyPath(),
+  // );
 
   // ==================== Record KeyPath ====================
-  const measure = useMeasure();
+  // const measure = useMeasure();
 
   // eslint-disable-next-line consistent-return
   createEffect(() => {
+    const measure = useMeasure();
     if (measure) {
       measure.registerPath(props.eventKey, connectedKeyPath());
 
@@ -379,15 +381,22 @@ export default function SubMenu(props: SubMenuProps) {
   let renderNode: JSX.Element;
 
   // ======================== Render ========================
-  if (measure) {
-    renderNode = childList;
-  } else {
-    renderNode = <InternalSubMenu {...props}>{childList}</InternalSubMenu>;
-  }
 
   return (
     <PathTrackerContext.Provider value={connectedKeyPath()}>
-      {renderNode}
+      {  
+      (useMeasure()) 
+        ? 
+        parseChildren(
+          props.children,
+          connectedKeyPath(),
+        )
+        : 
+        <InternalSubMenu {...props} eventKey={props.eventKey || context.key || props.key}>{parseChildren(
+          props.children,
+          connectedKeyPath(),
+        )}</InternalSubMenu>
+      }
     </PathTrackerContext.Provider>
   );
 }
