@@ -1,9 +1,12 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
+import Menu from './index';
 import Simple from '../docs/examples/debug.tsx';
 
 render(() => <>
-<Simple />
+<Menu mode="vertical" openKeys={['bamboo']}>
+        <Menu.Item key="little">Little</Menu.Item>
+      </Menu>
 </>, document.getElementById('root') as HTMLElement);
 
 import toArray from 'rc-util-solid/lib/Children/toArray';
@@ -81,7 +84,7 @@ const Item = props => {
     return <div>item {props.label} {JSON.stringify(context)} </div>;
 };
 
-const Menu = props => {
+const Menu1 = props => {
     // const resolved = Children(() => props.children);
     // console.log(props.children?.length)
     // const childList = toArray(props.children);
@@ -119,11 +122,11 @@ function Counter() {
     const data = () => Array.from(Array(count()).keys())
     return (
         <div>
-            <Menu>
+            <Menu1>
             <For each={data()}>{it => (
                     <Item label={'init' + (it + 1)}>{it}</Item>
                 )}</For>
-            </Menu>
+            </Menu1>
             <button type="button" onClick={increment}>
                 {count()}
             </button>

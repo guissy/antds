@@ -1,4 +1,4 @@
-import { type ParentComponent, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, splitProps, Ref } from "solid-js";
+import { type ParentComponent, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, splitProps, Ref, on } from "solid-js";
 import classNames from 'classnames';
 import Overflow from 'rc-overflow-solid';
 import warning from 'rc-util-solid/lib/warning';
@@ -20,6 +20,7 @@ export interface MenuItemProps
     JSX.HTMLAttributes<HTMLLIElement>,
     'onClick' | 'onMouseEnter' | 'onMouseLeave' | 'onSelect'
   > {
+  key?: string | number;
   children?: JSX.Element;
 
   /** @private Internal filled key. Do not set it directly */
@@ -248,9 +249,11 @@ function MenuItem(props: MenuItemProps): JSX.Element {
   const measure = useMeasure();
   const context = useContext(MenuContext) ?? {} as MenuContextProps;
   const connectedKeyPath = useFullPath(props.eventKey || context.key);
-
+createEffect(() => {
+console.log("ο▬▬▬▬▬▬▬▬◙▅▅▆▆▇▇◤",  props.eventKey, context.key )
+})
   // eslint-disable-next-line consistent-return
-  createEffect(() => {
+  createEffect(on(connectedKeyPath, () => {
     if (measure) {
       measure.registerPath(props.eventKey || context.key, connectedKeyPath());
 
@@ -258,7 +261,7 @@ function MenuItem(props: MenuItemProps): JSX.Element {
         measure.unregisterPath(props.eventKey || context.key, connectedKeyPath());
       };
     }
-  }, [connectedKeyPath]);
+  }));
 
   if (measure) {
     return null;

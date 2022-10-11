@@ -351,10 +351,10 @@ export default function SubMenu(props: SubMenuProps) {
   createEffect(() => {
     const measure = useMeasure();
     if (measure) {
-      measure.registerPath(props.eventKey, connectedKeyPath());
+      measure.registerPath(props.eventKey || context.key, connectedKeyPath());
 
       return () => {
-        measure.unregisterPath(props.eventKey, connectedKeyPath());
+        measure.unregisterPath(props.eventKey || context.key, connectedKeyPath());
       };
     }
   }, [connectedKeyPath]);

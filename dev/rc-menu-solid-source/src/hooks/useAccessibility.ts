@@ -1,4 +1,4 @@
-import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children} from "solid-js";
+import {type Component, type JSX, type Ref, onCleanup} from "solid-js";
 import KeyCode from 'rc-util-solid/lib/KeyCode';
 import raf from 'rc-util-solid/lib/raf';
 import { getFocusNodeList } from 'rc-util-solid/lib/Dom/focus';
@@ -135,10 +135,10 @@ function getFocusElement(
  * Get focusable elements from the element set under provided container
  */
 function getFocusableElements(
-  container: HTMLElement,
+  container: Ref<HTMLElement>,
   elements: Set<HTMLElement>,
 ) {
-  const list = getFocusNodeList(container, true);
+  const list = getFocusNodeList(container as HTMLElement, true);
   return list.filter(ele => elements.has(ele));
 }
 
@@ -187,7 +187,7 @@ export default function useAccessibility<T extends HTMLElement>(
   isRtl: boolean,
   id: string,
 
-  containerRef: React.RefObject<HTMLUListElement>,
+  containerRef: Ref<HTMLUListElement>,
   getKeys: () => string[],
   getKeyPath: (key: string, includeOverflow?: boolean) => string[],
 
@@ -195,7 +195,7 @@ export default function useAccessibility<T extends HTMLElement>(
   triggerAccessibilityOpen: (key: string, open?: boolean) => void,
 
   originOnKeyDown?: JSX.EventHandlerUnion<T, KeyboardEvent>,
-): JSX.EventHandlerUnion<T, KeyboardEvent> {
+): JSX.EventHandler<T, KeyboardEvent> {
   let rafRef  = null as (number | null);
 
   let activeRef  = null as (string | null);
@@ -205,17 +205,17 @@ export default function useAccessibility<T extends HTMLElement>(
     raf.cancel(rafRef);
   };
 
-  createEffect(
-    () => () => {
+  onCleanup(() => {
       cleanRaf();
-    },
-    [],
-  );
+  });
 
   return e => {
-    const { which } = e;
+    // const { which, code } = e;
+    const codes = [...ArrowKeys, ENTER, ESC, HOME, END];
+    const keys = {'ArrorUp': UP, 'ArrorDown': DOWN, 'ArrorLeft': LEFT, 'ArrorRight': RIGHT, 'Enter': ENTER, 'Esc': ESC, 'Home': HOME, 'End': END};
+    const which = e.which || keys[e.code];
+    if (codes.includes(which)) {
 
-    if ([...ArrowKeys, ENTER, ESC, HOME, END].includes(which)) {
       // Convert key to elements
       let elements: Set<HTMLElement>;
       let key2element: Map<string, HTMLElement>;
@@ -228,12 +228,12 @@ export default function useAccessibility<T extends HTMLElement>(
         element2key = new Map();
 
         const keys = getKeys();
-
+console.log('☞☞☞ 9527 useAccessibility.ts:232 🌸🌸🌸', keys);
         keys.forEach(key => {
           const element = document.querySelector(
             `[data-menu-id='${getMenuId(id, key)}']`,
           ) as HTMLElement;
-
+console.log('☞☞☞ 9527 useAccessibility.ts:237 🌸🌸🌸', getMenuId(id, key));
           if (element) {
             elements.add(element);
             element2key.set(element, key);
@@ -302,7 +302,7 @@ export default function useAccessibility<T extends HTMLElement>(
       ) {
         // ========================== Sibling ==========================
         // Find walkable focus menu element container
-        let parentQueryContainer: HTMLElement;
+        let parentQueryContainer: Ref<HTMLElement>;
         if (!focusMenuElement || mode === 'inline') {
           parentQueryContainer = containerRef;
         } else {

@@ -1,11 +1,11 @@
 /* eslint-disable no-undef, react/no-multi-comp, react/jsx-curly-brace-presence, max-classes-per-file */
-import { render, fireEvent } from "solid-testing-library";
+import { render, fireEvent, screen, createEvent } from "solid-testing-library";
 import KeyCode from 'rc-util-solid/lib/KeyCode';
 import { spyElementPrototypes } from 'rc-util-solid/lib/test/domHook';
 import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children} from "solid-js";
-import { act } from 'react-dom/test-utils';
 import Menu, { MenuItem, SubMenu } from '../src';
 import { isActive, last } from './util';
+import userEvent from "@testing-library/user-event"
 
 describe('Menu.Keyboard', () => {
   beforeAll(() => {
@@ -28,11 +28,27 @@ describe('Menu.Keyboard', () => {
   });
 
   function keyDown(container: HTMLElement, keyCode: number) {
+    let key = ""
+    fireEvent.focus(container.querySelector('ul.rc-menu-root'))
+
+    const user = userEvent.setup()
+    container.focus()
+    if (keyCode === KeyCode.DOWN)
+      key = ('ArrorDown');
+    if (keyCode === KeyCode.LEFT)
+      key = ('ArrorLeft');
+      if (keyCode === KeyCode.RIGHT)
+      key = ('ArrorRight');  
     fireEvent.keyDown(container.querySelector('ul.rc-menu-root'), {
-      which: keyCode,
-      keyCode,
       charCode: keyCode,
-    });
+      key,
+      which: keyCode,
+      code: key,
+    })      
+    fireEvent.click(container.firstChild)
+    fireEvent.mouseEnter(container.firstChild)
+    fireEvent.mouseOver(container.firstChild)
+    user.keyboard(key)    
 
     // SubMenu raf need slow than accessibility
     for (let i = 0; i < 20; i += 1) {
@@ -270,16 +286,18 @@ describe('Menu.Keyboard', () => {
     expect(focusSpy).toHaveBeenCalled();
   });
 
-  it('no dead loop', async () => {
+  it.only('no dead loop', async () => {
     const { container } = render(() => 
-      <Menu mode="vertical" openKeys={['bamboo']}>
+      // <Menu mode="vertical" openKeys={['little']} tabIndex={1}>
+      <Menu mode="vertical" openKeys={['bamboo']} onKeyDown={() => console.log("ο▬▬▬▬▬▬▬▬◙▅▅▆▆▇▇◤")}>
         <MenuItem key="little">Little</MenuItem>
       </Menu>,
     );
 
     keyDown(container, KeyCode.DOWN);
-    keyDown(container, KeyCode.LEFT);
-    keyDown(container, KeyCode.RIGHT);
+    // keyDown(container.firstChild, KeyCode.LEFT);
+    keyDown(container, KeyCode.DOWN);
+    screen.debug();
     isActive(container, 0);
   });
 });

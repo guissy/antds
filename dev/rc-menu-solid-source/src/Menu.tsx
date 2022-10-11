@@ -1,4 +1,4 @@
-import { type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, mergeProps, Accessor, splitProps, Show, onMount } from "solid-js";
+import { type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, mergeProps, Accessor, splitProps, Show, onMount, Ref } from "solid-js";
 import type { CSSMotionProps } from 'rc-motion-solid';
 import classNames from 'classnames';
 import shallowEqual from 'shallowequal';
@@ -182,9 +182,9 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
     [props.children, props.items],
   );
 
-  let containerRef = null as (HTMLUListElement | null);
+  let containerRef: HTMLUListElement = null;
 
-  const uuid = () => useUUID(props.id)();
+  const uuid = useUUID(props.id);
 
   const isRtl = props.direction === 'rtl';
 
@@ -418,7 +418,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
     onInternalOpenChange(key, nextOpen);
   };
 
-  const onInternalKeyDown = useAccessibility(
+  const onInternalKeyDown = (e) => useAccessibility(
     menuMode().mergedMode,
     mergedActiveKey(),
     isRtl,
@@ -432,7 +432,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
     triggerAccessibilityOpen,
 
     props.onKeyDown,
-  );
+  )(e);
 
   // ======================== Effect ========================
   onMount(() => {
@@ -493,16 +493,17 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
       role="menu"
       tabIndex={props.tabIndex}
       // data={props.children} // wrappedChildList
-      data={parseItems(props.children, props.items, EMPTY_LIST).map((child, index) => (
+      data={(
+        parseItems(props.children, props.items, EMPTY_LIST).map((child, index) => (
           // Always wrap provider to avoid sub node re-mount
           <MenuContextProvider
-            key={child.key}
+            key={child?.key}
             overflowDisabled={(menuMode().mergedMode !== 'horizontal' || props.disabledOverflow) ? undefined : index > lastVisibleIndex()}
           >
             {child}
           </MenuContextProvider>
         ))
-      } // wrappedChildList
+      )} // wrappedChildList
       renderRawItem={node => node}
       renderRawRest={omitItems => {
         // We use origin list since wrapped list use context to prevent open
@@ -584,7 +585,17 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
           {/* Measure menu keys. Add `display: none` to avoid some developer miss use the Menu */}
           <div style={{ display: 'none' }} aria-hidden>
             <PathRegisterContext.Provider value={registerPathContext()}>
-              {/* {props.children.clone()} */}
+              {(
+                parseItems(props.children, props.items, EMPTY_LIST).map((child, index) => (
+                  // Always wrap provider to avoid sub node re-mount
+                  <MenuContextProvider
+                    key={child?.key}
+                    overflowDisabled={(menuMode().mergedMode !== 'horizontal' || props.disabledOverflow) ? undefined : index > lastVisibleIndex()}
+                  >
+                    {child}
+                  </MenuContextProvider>
+                ))
+              )}
               {/* {console.log(childList())} */}
             </PathRegisterContext.Provider>
           </div>
