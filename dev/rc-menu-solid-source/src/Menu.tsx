@@ -29,6 +29,7 @@ import { PathRegisterContext, PathUserContext } from './context/PathContext';
 import useKeyRecords, { OVERFLOW_KEY } from './hooks/useKeyRecords';
 import { getMenuId, IdContext } from './context/IdContext';
 import PrivateContext from './context/PrivateContext';
+import { untrack } from "solid-js/web";
 
 /**
  * Menu modify after refactor:
@@ -274,7 +275,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
 
   const registerPathContext = createMemo(
     () => ({ registerPath, unregisterPath }),
-    [registerPath, unregisterPath],
+    {registerPath, unregisterPath},
   );
 
   const pathUserContext = createMemo(
@@ -418,21 +419,26 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
     onInternalOpenChange(key, nextOpen);
   };
 
-  const onInternalKeyDown = (e) => useAccessibility(
-    menuMode().mergedMode,
-    mergedActiveKey(),
-    isRtl,
-    uuid(),
-
-    containerRef,
-    getKeys,
-    getKeyPath,
-
-    setMergedActiveKey,
-    triggerAccessibilityOpen,
-
-    props.onKeyDown,
-  )(e);
+  const onInternalKeyDown = (e) => {
+    // let uuid_ = 'no_uuid';
+    // untrack(() => uuid_ = uuid())
+    console.log(uuid(), mergedActiveKey());
+    return useAccessibility(
+      menuMode().mergedMode,
+      mergedActiveKey,
+      isRtl,
+      uuid(),
+  
+      containerRef,
+      getKeys,
+      getKeyPath,
+  
+      setMergedActiveKey,
+      triggerAccessibilityOpen,
+  
+      props.onKeyDown,
+    )(e)
+  };
 
   // ======================== Effect ========================
   onMount(() => {
@@ -468,7 +474,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
         </MenuContextProvider>
       ));
   })
-
+  let childRef = []
   // >>>>> Container
   const container = () =>(
     <Overflow
@@ -493,7 +499,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
       role="menu"
       tabIndex={props.tabIndex}
       // data={props.children} // wrappedChildList
-      data={(
+      data={childRef = (
         parseItems(props.children, props.items, EMPTY_LIST).map((child, index) => (
           // Always wrap provider to avoid sub node re-mount
           <MenuContextProvider
@@ -585,17 +591,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
           {/* Measure menu keys. Add `display: none` to avoid some developer miss use the Menu */}
           <div style={{ display: 'none' }} aria-hidden>
             <PathRegisterContext.Provider value={registerPathContext()}>
-              {(
-                parseItems(props.children, props.items, EMPTY_LIST).map((child, index) => (
-                  // Always wrap provider to avoid sub node re-mount
-                  <MenuContextProvider
-                    key={child?.key}
-                    overflowDisabled={(menuMode().mergedMode !== 'horizontal' || props.disabledOverflow) ? undefined : index > lastVisibleIndex()}
-                  >
-                    {child}
-                  </MenuContextProvider>
-                ))
-              )}
+              {props.children}
               {/* {console.log(childList())} */}
             </PathRegisterContext.Provider>
           </div>

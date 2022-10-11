@@ -2,12 +2,22 @@
 import { render } from 'solid-js/web';
 import Menu from './index';
 import Simple from '../docs/examples/debug.tsx';
+import "../assets/menu.less"
+import "../assets/index.less"
 
-render(() => <>
-<Menu mode="vertical" openKeys={['bamboo']}>
-        <Menu.Item key="little">Little</Menu.Item>
+const App = () => {
+    const [active, setAcitve] = createSignal(false);
+    return <>
+<Menu mode="inline">
+        <Menu.Item key="light">Light</Menu.Item>
+        <Menu.SubMenu key="bamboo" title="Bamboo">
+          <Menu.Item key="little">Little</Menu.Item>
+        </Menu.SubMenu>
       </Menu>
-</>, document.getElementById('root') as HTMLElement);
+        {String(active())}
+    </>
+}
+render(() => App, document.getElementById('root') as HTMLElement);
 
 import toArray from 'rc-util-solid/lib/Children/toArray';
 
@@ -34,18 +44,18 @@ import MenuContextProvider, { MenuContext } from './context/MenuContext';
 function mergeProps2(
     origin,
     target,
-  ) {
+) {
     const clone = { ...origin };
-  
+
     Object.keys(target).forEach(key => {
-      const value = target[key];
-      if (value !== undefined) {
-        clone[key] = value;
-      }
+        const value = target[key];
+        if (value !== undefined) {
+            clone[key] = value;
+        }
     });
-  
+
     return clone;
-  }
+}
 
 // function MenuContextProvider(props) {
 //     const context = useContext(MenuContext);
@@ -96,18 +106,18 @@ const Menu1 = props => {
     let index = 1;
     return (
         <>
-            <MenuContextProvider name={ "menu ha"}>
+            <MenuContextProvider name={"menu ha"}>
                 <For each={toArray(props.children)}>
                     {((it, index) => (
-                    <Parent>
-                        <MenuContextProvider
-                            key={'menu' + index}
-                            overflowDisabled={index > 3}
-                        >
-                            {/* <Item /> */}
-                            {toArray(props.children)[index]}
-                        </MenuContextProvider>
-                    </Parent>
+                        <Parent>
+                            <MenuContextProvider
+                                key={'menu' + index}
+                                overflowDisabled={index > 3}
+                            >
+                                {/* <Item /> */}
+                                {toArray(props.children)[index]}
+                            </MenuContextProvider>
+                        </Parent>
                     ))}
                 </For>
             </MenuContextProvider>
@@ -123,7 +133,7 @@ function Counter() {
     return (
         <div>
             <Menu1>
-            <For each={data()}>{it => (
+                <For each={data()}>{it => (
                     <Item label={'init' + (it + 1)}>{it}</Item>
                 )}</For>
             </Menu1>

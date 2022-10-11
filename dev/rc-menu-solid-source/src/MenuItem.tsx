@@ -249,16 +249,15 @@ function MenuItem(props: MenuItemProps): JSX.Element {
   const measure = useMeasure();
   const context = useContext(MenuContext) ?? {} as MenuContextProps;
   const connectedKeyPath = useFullPath(props.eventKey || context.key);
-createEffect(() => {
-console.log("ο▬▬▬▬▬▬▬▬◙▅▅▆▆▇▇◤",  props.eventKey, context.key )
-})
+
   // eslint-disable-next-line consistent-return
   createEffect(on(connectedKeyPath, () => {
+    const measure = useMeasure();
     if (measure) {
-      measure.registerPath(props.eventKey || context.key, connectedKeyPath());
+      measure.registerPath(props.eventKey || context.key || props.key, connectedKeyPath());
 
       return () => {
-        measure.unregisterPath(props.eventKey || context.key, connectedKeyPath());
+        measure.unregisterPath(props.eventKey || context.key || props.key, connectedKeyPath());
       };
     }
   }));

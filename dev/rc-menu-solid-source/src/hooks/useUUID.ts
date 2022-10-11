@@ -16,12 +16,12 @@ const genId = () => {
 }
 
 export default function useUUID(id?: string): Accessor<string> {
-  const [uuid, setUUID] = useMergedState(id || genId(), {
-    value: id,
+  const [uuid, setUUID] = useMergedState(id, {
+    value: id || genId(),
   });
 
   createEffect(() => {
-    setUUID(genId());
+    // setUUID(genId());
   });
 
   return uuid;

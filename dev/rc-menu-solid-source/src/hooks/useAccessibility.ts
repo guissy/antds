@@ -1,4 +1,4 @@
-import {type Component, type JSX, type Ref, onCleanup} from "solid-js";
+import {type Component, type JSX, type Ref, onCleanup, Accessor} from "solid-js";
 import KeyCode from 'rc-util-solid/lib/KeyCode';
 import raf from 'rc-util-solid/lib/raf';
 import { getFocusNodeList } from 'rc-util-solid/lib/Dom/focus';
@@ -183,7 +183,7 @@ function getNextFocusElement(
 
 export default function useAccessibility<T extends HTMLElement>(
   mode: MenuMode,
-  activeKey: string,
+  activeKey: Accessor<string>,
   isRtl: boolean,
   id: string,
 
@@ -198,8 +198,8 @@ export default function useAccessibility<T extends HTMLElement>(
 ): JSX.EventHandler<T, KeyboardEvent> {
   let rafRef  = null as (number | null);
 
-  let activeRef  = null as (string | null);
-  activeRef = activeKey;
+  let activeRef = activeKey;
+  // activeRef = activeKey;
 
   const cleanRaf = () => {
     raf.cancel(rafRef);
@@ -228,12 +228,10 @@ export default function useAccessibility<T extends HTMLElement>(
         element2key = new Map();
 
         const keys = getKeys();
-console.log('☞☞☞ 9527 useAccessibility.ts:232 🌸🌸🌸', keys);
         keys.forEach(key => {
           const element = document.querySelector(
             `[data-menu-id='${getMenuId(id, key)}']`,
           ) as HTMLElement;
-console.log('☞☞☞ 9527 useAccessibility.ts:237 🌸🌸🌸', getMenuId(id, key));
           if (element) {
             elements.add(element);
             element2key.set(element, key);
@@ -288,7 +286,7 @@ console.log('☞☞☞ 9527 useAccessibility.ts:237 🌸🌸🌸', getMenuId(id,
            */
           cleanRaf();
           rafRef = raf(() => {
-            if (activeRef === targetKey) {
+            if (activeRef() === targetKey) {
               focusTargetElement.focus();
             }
           });

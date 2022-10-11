@@ -34,6 +34,7 @@ export default function useKeyRecords() {
 
     // Fill map
     const connectedPath = getPathStr(keyPath);
+    
     path2keyRef.set(connectedPath, key);
     key2pathRef.set(key, connectedPath);
 

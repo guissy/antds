@@ -2,10 +2,9 @@
 import { render, fireEvent, screen, createEvent } from "solid-testing-library";
 import KeyCode from 'rc-util-solid/lib/KeyCode';
 import { spyElementPrototypes } from 'rc-util-solid/lib/test/domHook';
-import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children} from "solid-js";
+import { type Component, type JSX, createEffect, createSignal } from "solid-js";
 import Menu, { MenuItem, SubMenu } from '../src';
 import { isActive, last } from './util';
-import userEvent from "@testing-library/user-event"
 
 describe('Menu.Keyboard', () => {
   beforeAll(() => {
@@ -28,41 +27,26 @@ describe('Menu.Keyboard', () => {
   });
 
   function keyDown(container: HTMLElement, keyCode: number) {
-    let key = ""
     fireEvent.focus(container.querySelector('ul.rc-menu-root'))
-
-    const user = userEvent.setup()
-    container.focus()
-    if (keyCode === KeyCode.DOWN)
-      key = ('ArrorDown');
-    if (keyCode === KeyCode.LEFT)
-      key = ('ArrorLeft');
-      if (keyCode === KeyCode.RIGHT)
-      key = ('ArrorRight');  
     fireEvent.keyDown(container.querySelector('ul.rc-menu-root'), {
       charCode: keyCode,
-      key,
+      keyCode,
       which: keyCode,
-      code: key,
-    })      
-    fireEvent.click(container.firstChild)
-    fireEvent.mouseEnter(container.firstChild)
-    fireEvent.mouseOver(container.firstChild)
-    user.keyboard(key)    
+    });
 
     // SubMenu raf need slow than accessibility
     for (let i = 0; i < 20; i += 1) {
-      
-        jest.advanceTimersByTime(10);
-      
+
+      jest.advanceTimersByTime(10);
+
     }
-    
-      jest.runAllTimers();
-    
+
+    jest.runAllTimers();
+
   }
 
   it('no data-menu-id by init', () => {
-    const { container } = render(() => 
+    const { container } = render(() =>
       <Menu mode="inline" openKeys={['light']}>
         <Menu.SubMenu key="light" title="Light">
           <Menu.Item key="bamboo">Bamboo</Menu.Item>
@@ -81,13 +65,13 @@ describe('Menu.Keyboard', () => {
       const [items, setItems] = createSignal([1, 2, 3]);
 
       // render(() => {
-        return (
-          <Menu>
-            {items().map(i => (
-              <MenuItem key={i}>{i}</MenuItem>
-            ))}
-          </Menu>
-        );
+      return (
+        <Menu>
+          {items().map(i => (
+            <MenuItem key={i}>{i}</MenuItem>
+          ))}
+        </Menu>
+      );
       // }
     };
 
@@ -111,7 +95,7 @@ describe('Menu.Keyboard', () => {
   });
 
   it('Skip disabled item', () => {
-    const { container } = render(() => 
+    const { container } = render(() =>
       <Menu defaultActiveFirst>
         <MenuItem disabled />
         <MenuItem key="1">1</MenuItem>
@@ -140,7 +124,7 @@ describe('Menu.Keyboard', () => {
   });
 
   it('Enter to open menu and active first item', () => {
-    const { container } = render(() => 
+    const { container } = render(() =>
       <Menu>
         <SubMenu key="s1" title="submenu1">
           <MenuItem key="s1-1">1</MenuItem>
@@ -153,9 +137,9 @@ describe('Menu.Keyboard', () => {
 
     // Open it
     keyDown(container, KeyCode.ENTER);
-    
-      jest.runAllTimers();
-    
+
+    jest.runAllTimers();
+
     expect(container.querySelector('.rc-menu-submenu-open')).toBeTruthy();
   });
 
@@ -166,7 +150,7 @@ describe('Menu.Keyboard', () => {
       parentKey: number,
     ) {
       it(`direction ${direction}`, () => {
-        const { container, unmount } = render(() => 
+        const { container, unmount } = render(() =>
           <Menu mode="vertical" direction={direction}>
             <SubMenu key="bamboo" title="Bamboo">
               <SubMenu key="light" title="Light">
@@ -221,8 +205,8 @@ describe('Menu.Keyboard', () => {
     testDirection('rtl', KeyCode.LEFT, KeyCode.RIGHT);
   });
 
-  it('inline keyboard', () => {
-    const { container } = render(() => 
+  it.only('inline keyboard', () => {
+    const { container } = render(() =>
       <Menu mode="inline">
         <MenuItem key="light">Light</MenuItem>
         <SubMenu key="bamboo" title="Bamboo">
@@ -260,7 +244,7 @@ describe('Menu.Keyboard', () => {
   });
 
   it('Focus last one', () => {
-    const { container } = render(() => 
+    const { container } = render(() =>
       <Menu mode="inline">
         <MenuItem key="light">Light</MenuItem>
         <MenuItem key="bamboo">Bamboo</MenuItem>
@@ -272,30 +256,29 @@ describe('Menu.Keyboard', () => {
   });
 
   it('Focus to link direct', () => {
-    const { container } = render(() => 
+    const { container } = render(() =>
       <Menu mode="inline">
         <MenuItem key="light">
-          <a href="https://ant.design">Light</a>
+          <a tabIndex={99} href="https://ant.design">Light</a>
         </MenuItem>
       </Menu>,
     );
 
     const focusSpy = jest.spyOn(container.querySelector('a'), 'focus');
-
     keyDown(container, KeyCode.DOWN);
     expect(focusSpy).toHaveBeenCalled();
   });
 
-  it.only('no dead loop', async () => {
-    const { container } = render(() => 
+  it('no dead loop', async () => {
+    const { container } = render(() =>
       // <Menu mode="vertical" openKeys={['little']} tabIndex={1}>
-      <Menu mode="vertical" openKeys={['bamboo']} onKeyDown={() => console.log("ο▬▬▬▬▬▬▬▬◙▅▅▆▆▇▇◤")}>
+      <Menu mode="vertical" openKeys={['bamboo']}>
         <MenuItem key="little">Little</MenuItem>
       </Menu>,
     );
 
     keyDown(container, KeyCode.DOWN);
-    // keyDown(container.firstChild, KeyCode.LEFT);
+    keyDown(container, KeyCode.LEFT);
     keyDown(container, KeyCode.DOWN);
     screen.debug();
     isActive(container, 0);
