@@ -1,4 +1,4 @@
-import { type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, Accessor, Ref } from "solid-js";
+import { type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, Accessor, Ref, on } from "solid-js";
 import Align from 'rc-align-solid';
 import useLayoutEffect from 'rc-util-solid/lib/hooks/useLayoutEffect';
 import type { RefAlign } from 'rc-align/lib/Align';
@@ -149,12 +149,18 @@ const PopupInner: Component<PopupInnerProps> = (props) => {
   }
 
   // Delay to go to next status
-  useLayoutEffect(() => {
+  useLayoutEffect(on([alignTimes, status], () => {
     if (status() === 'align') {
       // Repeat until not more align needed
       if (alignTimes() < 2) {
         forceAlign();
         // TODO: solid
+        // console.log("alignTimes()", alignTimes(), motion())
+        if (alignTimes() === 0 && motion().motionName == null) {
+          goNextStatus(function () {
+            prepareResolveRef?.(undefined);
+          });
+        }
         if (alignTimes() === 1) {
           goNextStatus(function () {
             prepareResolveRef?.(undefined);
@@ -166,7 +172,7 @@ const PopupInner: Component<PopupInnerProps> = (props) => {
         });
       }
     }
-  }, [alignTimes]);
+  }));
 
   // ======================== Motion ========================
   const motion = createMemo(() => {
@@ -203,6 +209,7 @@ const PopupInner: Component<PopupInnerProps> = (props) => {
 
   // ======================== Render ========================
   const mergedStyle: Accessor<JSX.CSSProperties> = createMemo(() => {    
+    // console.log("mergedStyle:", status(), props.visible)
     return ({
       ...stretchStyle,
       'z-index': props.zIndex,

@@ -259,12 +259,12 @@ export function generateTrigger(
     })
 
     const onMouseEnter = (e) => {
-      const { mouseEnterDelay } = props;
+      // const { mouseEnterDelay } = props;
       fireEvents('onMouseEnter', e);
       delaySetPopupVisible(
         true,
-        mouseEnterDelay,
-        mouseEnterDelay ? null : e,
+        props.mouseEnterDelay,
+        props.mouseEnterDelay ? null : e,
       );
     };
 
@@ -567,13 +567,14 @@ export function generateTrigger(
       setPopupVisibleRaw((prevPopupVisible) => {
         let visible = prevPopupVisible;
         if (prevPopupVisible !== popupVisible) {
-          if (props.popupVisible === undefined) {
+          // if (props.popupVisible === undefined) {
             // setState({ popupVisible, prevPopupVisible });
             setPrevPopupVisible(prevPopupVisible);
             visible = popupVisible;
-          }
+          // }
           props.onPopupVisibleChange(popupVisible);
         }
+
         return visible;
       })
 
@@ -749,83 +750,6 @@ export function generateTrigger(
     // const { children, forceRender, alignPoint, className, autoDestroy } =
     //   props;
     // const child = React.Children.only(children) as JSX.Element;
-    const trigger = createMemo(() => {
-      const newChildProps: JSX.HTMLAttributes<HTMLElement> & { key?: string } = {
-        // key: 'trigger',
-      };
-
-      // ============================== Visible Handlers ==============================
-      // >>> ContextMenu
-      if (isContextMenuToShow()) {
-        newChildProps.onContextMenu = onContextMenu;
-      } else {
-        newChildProps.onContextMenu = createTwoChains('onContextMenu');
-      }
-
-      // >>> Click
-      if (isClickToHide() || isClickToShow()) {
-        newChildProps.onClick = onClick;
-        newChildProps.onMouseDown = onMouseDown;
-        newChildProps.onTouchStart = onTouchStart;
-      } else {
-        newChildProps.onClick = createTwoChains('onClick');
-        newChildProps.onMouseDown = createTwoChains('onMouseDown');
-        newChildProps.onTouchStart = createTwoChains('onTouchStart');
-      }
-
-      // >>> Hover(enter)
-      if (isMouseEnterToShow()) {
-        newChildProps.onMouseEnter = onMouseEnter;
-
-        // Point align
-        if (props.alignPoint) {
-          newChildProps.onMouseMove = onMouseMove;
-        }
-      } else {
-        newChildProps.onMouseEnter = createTwoChains('onMouseEnter');
-      }
-
-      // >>> Hover(leave)
-      if (isMouseLeaveToHide()) {
-        newChildProps.onMouseLeave = onMouseLeave;
-      } else {
-        newChildProps.onMouseLeave = createTwoChains('onMouseLeave');
-      }
-
-      // >>> Focus
-      if (isFocusToShow() || isBlurToHide()) {
-        newChildProps.onFocus = onFocus;
-        newChildProps.onBlur = onBlur;
-      } else {
-        newChildProps.onFocus = createTwoChains('onFocus');
-        newChildProps.onBlur = createTwoChains('onBlur');
-      }
-
-      // =================================== Render ===================================
-      const trigger: HTMLElement = Children(() => props.children)() as HTMLElement;
-      const childrenClassName = classNames(
-        trigger.className,
-        props.className,
-      );
-      if (childrenClassName) {
-        newChildProps['class'] = childrenClassName;
-      }
-
-      // const clonedProps: any = {
-      //   ...newChildProps,
-      // };
-      // if (supportRef(props.children)) {
-      //   cloneProps.ref = composeRef(triggerRef, (child as any).ref);
-      // }
-      triggerRef = trigger;
-      if (Array.isArray(trigger)) {
-        // TODO: solid
-        spread(trigger.filter(Boolean)[0], newChildProps);
-      } else {
-        spread(trigger, newChildProps);
-      }
-      return trigger;
-    });
 
     // const trigger = child; //React.cloneElement(child, cloneProps);
     let portal = createMemo((lastPortal: boolean) => {
@@ -856,7 +780,77 @@ export function generateTrigger(
     }
     return (
       <TriggerContext.Provider value={triggerContextValue}>
-        {trigger}
+        {() => {
+          const newChildProps: JSX.HTMLAttributes<HTMLElement> & { key?: string } = {
+            // key: 'trigger',
+          };
+
+          // ============================== Visible Handlers ==============================
+          // >>> ContextMenu
+          if (isContextMenuToShow()) {
+            newChildProps.onContextMenu = onContextMenu;
+          } else {
+            newChildProps.onContextMenu = createTwoChains('onContextMenu');
+          }
+
+          // >>> Click
+          if (isClickToHide() || isClickToShow()) {
+            newChildProps.onClick = onClick;
+            newChildProps.onMouseDown = onMouseDown;
+            newChildProps.onTouchStart = onTouchStart;
+          } else {
+            newChildProps.onClick = createTwoChains('onClick');
+            newChildProps.onMouseDown = createTwoChains('onMouseDown');
+            newChildProps.onTouchStart = createTwoChains('onTouchStart');
+          }
+
+          // >>> Hover(enter)
+          if (isMouseEnterToShow()) {
+            newChildProps.onMouseEnter = onMouseEnter;
+
+            // Point align
+            if (props.alignPoint) {
+              newChildProps.onMouseMove = onMouseMove;
+            }
+          } else {
+            newChildProps.onMouseEnter = createTwoChains('onMouseEnter');
+          }
+
+          // >>> Hover(leave)
+          if (isMouseLeaveToHide()) {
+            newChildProps.onMouseLeave = onMouseLeave;
+          } else {
+            newChildProps.onMouseLeave = createTwoChains('onMouseLeave');
+          }
+
+          // >>> Focus
+          if (isFocusToShow() || isBlurToHide()) {
+            newChildProps.onFocus = onFocus;
+            newChildProps.onBlur = onBlur;
+          } else {
+            newChildProps.onFocus = createTwoChains('onFocus');
+            newChildProps.onBlur = createTwoChains('onBlur');
+          }
+
+          // =================================== Render ===================================
+          const trigger: HTMLElement = Children(() => props.children)() as HTMLElement;
+          const childrenClassName = classNames(
+            trigger.className,
+            props.className,
+          );
+          if (childrenClassName) {
+            newChildProps['class'] = childrenClassName;
+          }
+
+          triggerRef = trigger;
+          if (Array.isArray(trigger)) {
+            // TODO: solid
+            spread(trigger.filter(Boolean)[0], newChildProps);
+          } else {
+            spread(trigger, newChildProps);
+          }
+          return trigger;
+        }}
         <Show when={portal()}>
           <Popup
             prefixCls={props.prefixCls}

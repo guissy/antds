@@ -1,4 +1,4 @@
-import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children} from "solid-js";
+import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, onCleanup, on} from "solid-js";
 import Trigger from 'rc-trigger-solid';
 import classNames from 'classnames';
 import raf from 'rc-util-solid/lib/raf';
@@ -27,17 +27,7 @@ export interface PopupTriggerProps {
   onVisibleChange: (visible: boolean) => void;
 }
 
-export default function PopupTrigger({
-  prefixCls,
-  visible,
-  children,
-  popup,
-  popupClassName,
-  popupOffset,
-  disabled,
-  mode,
-  onVisibleChange,
-}: PopupTriggerProps) {
+export default function PopupTrigger(props: PopupTriggerProps) {
   // const {
   //   getPopupContainer,
   //   rtl,
@@ -52,6 +42,17 @@ export default function PopupTrigger({
   //   motion,
   //   defaultMotions,
   // }
+  // {
+  //   prefixCls,
+  //   visible,
+  //   children,
+  //   popup,
+  //   popupClassName,
+  //   popupOffset,
+  //   disabled,
+  //   mode,
+  //   onVisibleChange,
+  // }
   const context = useContext(MenuContext) ?? {} as MenuContextProps;
 
   const [innerVisible, setInnerVisible] = createSignal(false);
@@ -60,55 +61,59 @@ export default function PopupTrigger({
     ? { ...placementsRtl, ...context.builtinPlacements }
     : { ...placements, ...context.builtinPlacements };
 
-  const popupPlacement = popupPlacementMap[mode];
+  // const popupPlacement = popupPlacementMap[props.mode];
 
-  const targetMotion = getMotion(mode, context.motion, context.defaultMotions);
+  // const targetMotion = getMotion(props.mode, context.motion, context.defaultMotions);
 
-  const mergedMotion: CSSMotionProps = {
-    ...targetMotion,
-    leavedClassName: `${prefixCls}-hidden`,
-    removeOnLeave: false,
-    motionAppear: true,
-  };
+  // const mergedMotion: CSSMotionProps = {
+  //   ...getMotion(props.mode, context.motion, context.defaultMotions),
+  //   leavedClassName: `${props.prefixCls}-hidden`,
+  //   removeOnLeave: false,
+  //   motionAppear: true,
+  // };
 
   // Delay to change visible
-  let visibleRef  = null as (number | null);
-  createEffect(() => {
+  let visibleRef = null as (number | null);
+  createEffect(on(() => props.visible, () => {
     visibleRef = raf(() => {
-      setInnerVisible(visible);
+      setInnerVisible(props.visible);
     });
-
-    return () => {
+    onCleanup(() => {
       raf.cancel(visibleRef);
-    };
-  }, [visible]);
+    })
+  }));
 
   return (
     <Trigger
-      prefixCls={prefixCls}
+      prefixCls={props.prefixCls}
       popupClassName={classNames(
-        `${prefixCls}-popup`,
+        `${props.prefixCls}-popup`,
         {
-          [`${prefixCls}-rtl`]: context.rtl,
+          [`${props.prefixCls}-rtl`]: context.rtl,
         },
-        popupClassName,
+        props.popupClassName,
         context.rootClassName,
       )}
-      stretch={mode === 'horizontal' ? 'minWidth' : null}
+      stretch={props.mode === 'horizontal' ? 'minWidth' : null}
       getPopupContainer={context.getPopupContainer}
       builtinPlacements={placement}
-      popupPlacement={popupPlacement}
-      popupVisible={innerVisible}
-      popup={popup}
-      popupAlign={popupOffset && { offset: popupOffset }}
-      action={disabled ? [] : [context.triggerSubMenuAction]}
+      popupPlacement={popupPlacementMap[props.mode]}
+      popupVisible={innerVisible()}
+      popup={props.popup}
+      popupAlign={props.popupOffset && { offset: props.popupOffset }}
+      action={props.disabled ? [] : [context.triggerSubMenuAction]}
       mouseEnterDelay={context.subMenuOpenDelay}
       mouseLeaveDelay={context.subMenuCloseDelay}
-      onPopupVisibleChange={onVisibleChange}
+      onPopupVisibleChange={props.onVisibleChange}
       forceRender={context.forceSubMenuRender}
-      popupMotion={mergedMotion}
+      popupMotion={{
+        ...getMotion(props.mode, context.motion, context.defaultMotions),
+        leavedClassName: `${props.prefixCls}-hidden`,
+        removeOnLeave: false,
+        motionAppear: true,
+      }}
     >
-      {children}
+      {props.children}
     </Trigger>
   );
 }
