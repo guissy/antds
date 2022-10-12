@@ -1,14 +1,15 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
 import Menu from './index';
-import Simple from '../docs/examples/debug.tsx';
+// import Simple from '../docs/examples/debug.tsx';
+// import InlineCollapsed from '../docs/examples/inlineCollapsed.tsx';
 import "../assets/menu.less"
 import "../assets/index.less"
 
 const App = () => {
     const [active, setAcitve] = createSignal(false);
     return <>
-<Menu mode="inline">
+<Menu mode="inline" style={{width: '200px'}}>
         <Menu.Item key="light">Light</Menu.Item>
         <Menu.SubMenu key="bamboo" title="Bamboo">
           <Menu.Item key="little">Little</Menu.Item>

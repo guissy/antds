@@ -115,7 +115,7 @@ const InternalSubMenu = (props: SubMenuProps) => {
   const connectedPath = useFullPath();
 
   const subMenuPrefixCls = `${context.prefixCls}-submenu`;
-  const mergedDisabled = context.disabled || props.disabled;
+  const mergedDisabled = createMemo(() => context.disabled || props.disabled);
   let elementRef  = null as (HTMLDivElement | null);
   let popupRef  = null as (HTMLUListElement | null);
 
@@ -138,7 +138,7 @@ const InternalSubMenu = (props: SubMenuProps) => {
   // =============================== Active ===============================
   const actived = createMemo(() => useActive(
     props.eventKey,
-    mergedDisabled,
+    mergedDisabled(),
     props.onTitleMouseEnter,
     props.onTitleMouseLeave,
   ));
@@ -147,7 +147,7 @@ const InternalSubMenu = (props: SubMenuProps) => {
   const [childrenActive, setChildrenActive] = createSignal(false);
 
   const triggerChildrenActive = (newActive: boolean) => {
-    if (!mergedDisabled) {
+    if (!mergedDisabled()) {
       setChildrenActive(newActive);
     }
   };
@@ -235,14 +235,14 @@ const InternalSubMenu = (props: SubMenuProps) => {
       role="menuitem"
       style={directionStyle}
       class={`${subMenuPrefixCls}-title`}
-      tabIndex={mergedDisabled ? null : -1}
+      tabIndex={mergedDisabled() ? null : -1}
       ref={elementRef}
       title={typeof props.title === 'string' ? props.title : null}
       data-menu-id={context.overflowDisabled && domDataId() ? null : domDataId()}
       aria-expanded={open()}
       aria-haspopup
       aria-controls={popupId()}
-      aria-disabled={mergedDisabled}
+      aria-disabled={mergedDisabled()}
       onClick={onInternalTitleClick}
       onFocus={onInternalFocus}
       onMouseEnter = {actived().onMouseEnter}
@@ -292,7 +292,7 @@ const InternalSubMenu = (props: SubMenuProps) => {
           [`${subMenuPrefixCls}-open`]: open(),
           [`${subMenuPrefixCls}-active`]: mergedActive(),
           [`${subMenuPrefixCls}-selected`]: childrenSelected,
-          [`${subMenuPrefixCls}-disabled`]: mergedDisabled,
+          [`${subMenuPrefixCls}-disabled`]: mergedDisabled(),
         },
       )}
       onMouseEnter={onInternalMouseEnter}
@@ -316,7 +316,7 @@ const InternalSubMenu = (props: SubMenuProps) => {
               </SubMenuList>
             </MenuContextProvider>
           }
-          disabled={mergedDisabled}
+          disabled={mergedDisabled()}
           onVisibleChange={onPopupVisibleChange}
         >
           {titleNode}

@@ -95,7 +95,7 @@ export default function MenuContextProvider(props: InheritableContextProps) {
   );
   return (
     <MenuContext.Provider value={state}>
-      <Show when={state?.prefixCls}>
+      <Show when={state?.prefixCls || state?.mode}>
         {props.children}
       </Show>
     </MenuContext.Provider>

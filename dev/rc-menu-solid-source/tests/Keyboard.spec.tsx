@@ -205,7 +205,7 @@ describe('Menu.Keyboard', () => {
     testDirection('rtl', KeyCode.LEFT, KeyCode.RIGHT);
   });
 
-  it.only('inline keyboard', () => {
+  it('inline keyboard', () => {
     const { container } = render(() =>
       <Menu mode="inline">
         <MenuItem key="light">Light</MenuItem>

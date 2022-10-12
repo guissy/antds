@@ -1,4 +1,4 @@
-import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children} from "solid-js";
+import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, on} from "solid-js";
 import CSSMotion from 'rc-motion-solid';
 import { getMotion } from '../utils/motionUtil';
 import MenuContextProvider, { MenuContext, MenuContextProps } from '../context/MenuContext';
@@ -13,6 +13,8 @@ export interface InlineSubMenuListProps {
 }
 
 export default function InlineSubMenuList(props: InlineSubMenuListProps) {
+  console.log("原来是inline");
+  
   const fixedMode: MenuMode = 'inline';
   // {
   //   id,
@@ -36,15 +38,16 @@ export default function InlineSubMenuList(props: InlineSubMenuListProps) {
   // The inline list should remove when motion end.
   const [destroy, setDestroy] = createSignal(!sameModeRef());
 
-  const mergedOpen = () => sameModeRef() ? props.open : false;
+  // const mergedOpen = createMemo(() => sameModeRef() ? props.open : false);
 
   // ================================= Effect =================================
   // Reset destroy state when mode change back
-  createEffect(() => {
+  createEffect(on(() => context.mode, () => {
+    // context.mode; // changed
     if (sameModeRef()) {
       setDestroy(false);
     }
-  }, [context.mode]);
+  }));
 
   // ================================= Render =================================
   const mergedMotion = () => {
@@ -56,7 +59,7 @@ export default function InlineSubMenuList(props: InlineSubMenuListProps) {
       // Hide inline list when mode changed and motion end
     const originOnVisibleChanged = motion.onVisibleChanged;
     motion.onVisibleChanged = newVisible => {
-      if (!sameModeRef && !newVisible) {
+      if (!sameModeRef() && !newVisible) {
         setDestroy(true);
       }
 
@@ -66,13 +69,13 @@ export default function InlineSubMenuList(props: InlineSubMenuListProps) {
   };
 
   if (destroy) {
-    return null;
+    // return null;
   }
 
   return (
     <MenuContextProvider mode={fixedMode} locked={!sameModeRef()}>
       <CSSMotion
-        visible={mergedOpen()}
+        visible={sameModeRef() ? props.open : false}
         {...mergedMotion()}
         forceRender={context.forceSubMenuRender}
         removeOnLeave={false}
@@ -84,6 +87,7 @@ export default function InlineSubMenuList(props: InlineSubMenuListProps) {
               id={props.id}
               class={motionClassName}
               style={motionStyle}
+              ref={() => 1}
             >
               {props.children}
             </SubMenuList>
