@@ -13,7 +13,6 @@ export interface InlineSubMenuListProps {
 }
 
 export default function InlineSubMenuList(props: InlineSubMenuListProps) {
-  console.log("原来是inline");
   
   const fixedMode: MenuMode = 'inline';
   // {
@@ -68,8 +67,9 @@ export default function InlineSubMenuList(props: InlineSubMenuListProps) {
     return motion;
   };
 
-  if (destroy) {
-    // return null;
+  if (destroy()) {
+    // TODO: solid
+    return null;
   }
 
   return (

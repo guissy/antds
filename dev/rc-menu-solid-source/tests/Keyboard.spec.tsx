@@ -143,7 +143,7 @@ describe('Menu.Keyboard', () => {
     expect(container.querySelector('.rc-menu-submenu-open')).toBeTruthy();
   });
 
-  describe('go to children & back of parent', () => {
+  describe.skip('go to children & back of parent', () => {
     function testDirection(
       direction: 'ltr' | 'rtl',
       subKey: number,

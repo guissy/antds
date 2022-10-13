@@ -195,68 +195,6 @@ export function generateTrigger(
     const [popupVisible, setPopupVisibleRaw] = createSignal(popupVisibleInit);
     const [point, setPointRaw] = createSignal({ pageX: 0, pageY: 0 });
 
-    // componentDidUpdate
-    createEffect(() => {
-      // const { props } = this;
-      // const { state } = this;
-
-      // We must listen to `mousedown` or `touchstart`, edge case:
-      // https://github.com/ant-design/ant-design/issues/5804
-      // https://github.com/react-component/calendar/issues/250
-      // https://github.com/react-component/trigger/issues/50
-      if (popupVisible()) {
-        let currentDocument;
-        if (
-          !clickOutsideHandler &&
-          (isClickToHide() || isContextMenuToShow())
-        ) {
-          currentDocument = props.getDocument(getRootDomNode());
-          clickOutsideHandler = addEventListener(
-            currentDocument,
-            'mousedown',
-            onDocumentClick,
-          );
-        }
-        // always hide on mobile
-        if (!touchOutsideHandler) {
-          currentDocument =
-            currentDocument || props.getDocument(getRootDomNode());
-          touchOutsideHandler = addEventListener(
-            currentDocument,
-            'touchstart',
-            onDocumentClick,
-          );
-        }
-        // close popup when trigger type contains 'onContextMenu' and document is scrolling.
-        if (!contextMenuOutsideHandler1 && isContextMenuToShow()) {
-          currentDocument =
-            currentDocument || props.getDocument(getRootDomNode());
-          contextMenuOutsideHandler1 = addEventListener(
-            currentDocument,
-            'scroll',
-            onContextMenuClose,
-          );
-        }
-        // close popup when trigger type contains 'onContextMenu' and window is blur.
-        if (!contextMenuOutsideHandler2 && isContextMenuToShow()) {
-          contextMenuOutsideHandler2 = addEventListener(
-            window,
-            'blur',
-            onContextMenuClose,
-          );
-        }
-        return;
-      }
-
-      clearOutsideHandler();
-    });
-
-    onCleanup(() => {
-      clearDelayTimer();
-      clearOutsideHandler();
-      clearTimeout(mouseDownTimeout);
-      raf.cancel(attachId);
-    })
 
     const onMouseEnter = (e) => {
       // const { mouseEnterDelay } = props;
@@ -736,6 +674,69 @@ export function generateTrigger(
     const close = () => {
       setPopupVisible(false);
     }
+   
+    // componentDidUpdate
+    createEffect(() => {
+      // const { props } = this;
+      // const { state } = this;
+
+      // We must listen to `mousedown` or `touchstart`, edge case:
+      // https://github.com/ant-design/ant-design/issues/5804
+      // https://github.com/react-component/calendar/issues/250
+      // https://github.com/react-component/trigger/issues/50
+      if (popupVisible()) {
+        let currentDocument;
+        if (
+          !clickOutsideHandler &&
+          (isClickToHide() || isContextMenuToShow())
+        ) {
+          currentDocument = props.getDocument(getRootDomNode());
+          clickOutsideHandler = addEventListener(
+            currentDocument,
+            'mousedown',
+            onDocumentClick,
+          );
+        }
+        // always hide on mobile
+        if (!touchOutsideHandler) {
+          currentDocument =
+            currentDocument || props.getDocument(getRootDomNode());
+          touchOutsideHandler = addEventListener(
+            currentDocument,
+            'touchstart',
+            onDocumentClick,
+          );
+        }
+        // close popup when trigger type contains 'onContextMenu' and document is scrolling.
+        if (!contextMenuOutsideHandler1 && isContextMenuToShow()) {
+          currentDocument =
+            currentDocument || props.getDocument(getRootDomNode());
+          contextMenuOutsideHandler1 = addEventListener(
+            currentDocument,
+            'scroll',
+            onContextMenuClose,
+          );
+        }
+        // close popup when trigger type contains 'onContextMenu' and window is blur.
+        if (!contextMenuOutsideHandler2 && isContextMenuToShow()) {
+          contextMenuOutsideHandler2 = addEventListener(
+            window,
+            'blur',
+            onContextMenuClose,
+          );
+        }
+        return;
+      }
+
+      clearOutsideHandler();
+    });
+        
+    onCleanup(() => {
+      clearDelayTimer();
+      clearOutsideHandler();
+      clearTimeout(mouseDownTimeout);
+      raf.cancel(attachId);
+    })
 
     const triggerContextValue = { onPopupMouseDown };
     props.ref?.({
@@ -842,6 +843,12 @@ export function generateTrigger(
             newChildProps['class'] = childrenClassName;
           }
 
+          // const clonedProps: any = {
+          //   ...newChildProps,
+          // };
+          // if (supportRef(props.children)) {
+          //   cloneProps.ref = composeRef(triggerRef, (child as any).ref);
+          // }
           triggerRef = trigger;
           if (Array.isArray(trigger)) {
             // TODO: solid

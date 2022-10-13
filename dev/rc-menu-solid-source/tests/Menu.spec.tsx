@@ -13,7 +13,6 @@ const wrapFC = (Cmp) => {
 }
 import KeyCode from 'rc-util-solid/lib/KeyCode';
 import { resetWarned } from 'rc-util-solid/lib/warning';
-import { act } from 'react-dom/test-utils';
 import Menu, { Divider, MenuItem, MenuItemGroup, SubMenu } from '../src';
 import { isActive, last } from './util';
 
@@ -649,9 +648,7 @@ describe('Menu', () => {
         );
 
         // Open menu
-        await act(async () => {
           jest.runAllTimers();
-        });
 
         // wrapper.container.querySelectorAll('.rc-menu-item').last().simulate('click');
         fireEvent.click(last(container.querySelectorAll('.rc-menu-item')));
@@ -675,9 +672,7 @@ describe('Menu', () => {
       );
 
       // Open menu
-      await act(async () => {
         jest.runAllTimers();
-      });
 
       fireEvent.click(last(container.querySelectorAll('.rc-menu-item')));
       expect(onOpenChange).not.toHaveBeenCalled();
@@ -696,7 +691,7 @@ describe('Menu', () => {
   });
 
   it('should support focus through ref', () => {
-    let menuRef = React.createRef();
+    let menuRef = null;
     const { container } = render(() => 
       <Menu ref={menuRef}>
         <SubMenu key="bamboo" title="Disabled" disabled>
@@ -711,7 +706,7 @@ describe('Menu', () => {
   });
 
   it('should focus active item through ref', () => {
-    let menuRef = React.createRef();
+    let menuRef = null;
     const { container } = render(() => 
       <Menu ref={menuRef} activeKey="cat">
         <MenuItem key="light">Light</MenuItem>
