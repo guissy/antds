@@ -1,21 +1,48 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
-import Menu from './index';
-// import Simple from '../docs/examples/debug.tsx';
-// import InlineCollapsed from '../docs/examples/inlineCollapsed.tsx';
+import Menu, { MenuItem, SubMenu } from './index';
+import Debug from '../docs/examples/debug.tsx';
+import InlineCollapsed from '../docs/examples/inlineCollapsed.tsx';
+import Antd from '../docs/examples/antd';
+import AntdSwitch from '../docs/examples/antd-switch';
+import CustomIcon from '../docs/examples/custom-icon';
+import Items from '../docs/examples/items';
+import KeyPath from '../docs/examples/keyPath';
+import MenuItemGroup from '../docs/examples/menuItemGroup';
+import Multiple from '../docs/examples/multiple';
+import OpenKeys from '../docs/examples/openKeys';
+import RtlAntd from '../docs/examples/rtl-antd';
+import Scrollable from '../docs/examples/scrollable';
+import SelectedKeys from '../docs/examples/selectedKeys';
+import Single from '../docs/examples/single';
 import "../assets/menu.less"
 import "../assets/index.less"
 
 const App = () => {
-    const [active, setAcitve] = createSignal(false);
+    const [active, setActive] = createSignal("inline");
     return <>
-<Menu mode="inline" style={{width: '200px'}}>
-        <Menu.Item key="light">Light</Menu.Item>
-        <Menu.SubMenu key="bamboo" title="Bamboo">
-          <Menu.Item key="little">Little</Menu.Item>
-        </Menu.SubMenu>
-      </Menu>
-        {String(active())}
+    <Single />
+    <SelectedKeys />
+    <Scrollable />
+    <RtlAntd />
+    <OpenKeys />
+    <Multiple />
+    <MenuItemGroup />
+        <KeyPath />
+        <Items />
+        <CustomIcon />
+        <AntdSwitch />
+        <Antd />
+        <Debug />
+        <InlineCollapsed />
+        <button onClick={() => setActive(b => b === 'inline' ? 'vertical' : 'inline')}>{String(active())}</button>
+        <Menu openKeys={['1']} mode={active()} {...{}}>
+            <SubMenu key="1" title="submenu1">
+                <MenuItem key="submenu1">Option 1</MenuItem>
+                <MenuItem key="submenu2">Option 2</MenuItem>
+            </SubMenu>
+            <MenuItem key="2">menu2</MenuItem>
+        </Menu>
     </>
 }
 render(() => App, document.getElementById('root') as HTMLElement);
