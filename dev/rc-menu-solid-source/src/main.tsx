@@ -21,28 +21,28 @@ import "../assets/index.less"
 const App = () => {
     const [active, setActive] = createSignal("inline");
     return <>
-    <Single />
+        {/* <Single />
     <SelectedKeys />
     <Scrollable />
     <RtlAntd />
-    <OpenKeys />
-    <Multiple />
-    <MenuItemGroup />
+    <OpenKeys /> */}
+        <Multiple />
+        {/* <MenuItemGroup />
         <KeyPath />
         <Items />
         <CustomIcon />
         <AntdSwitch />
         <Antd />
-        <Debug />
-        <InlineCollapsed />
-        <button onClick={() => setActive(b => b === 'inline' ? 'vertical' : 'inline')}>{String(active())}</button>
+        <Debug /> */}
+        {/* <InlineCollapsed /> */}
+        {/* <button onClick={() => setActive(b => b === 'inline' ? 'vertical' : 'inline')}>{String(active())}</button>
         <Menu openKeys={['1']} mode={active()} {...{}}>
             <SubMenu key="1" title="submenu1">
                 <MenuItem key="submenu1">Option 1</MenuItem>
                 <MenuItem key="submenu2">Option 2</MenuItem>
             </SubMenu>
             <MenuItem key="2">menu2</MenuItem>
-        </Menu>
+        </Menu> */}
     </>
 }
 render(() => App, document.getElementById('root') as HTMLElement);

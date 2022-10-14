@@ -1,6 +1,6 @@
 /* eslint no-console:0 */
 
-import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children} from "solid-js";
+import { type Component, createSignal, } from "solid-js";
 import Menu, { SubMenu, Item as MenuItem, Divider } from '../../src';
 
 import '../../assets/index.less';
@@ -13,15 +13,15 @@ function handleDeselect(info) {
   console.log('deselect ', info);
 }
 
-const titleRight = <span>sub menu</span>;
-const titleRight1 = <span>sub menu 1</span>;
-const titleRight2 = <span>sub menu 2</span>;
-const titleRight3 = <span>sub menu 3</span>;
+const titleRight = () => <span>sub menu</span>;
+const titleRight1 = () => <span>sub menu 1</span>;
+const titleRight2 = () => <span>sub menu 2</span>;
+const titleRight3 = () => <span>sub menu 3</span>;
 
 function Demo() {
   const [destroy, setDestroy] = createSignal(false);
 
-  const leftMenu = (
+  const leftMenu = () => (
     <Menu
       multiple
       onSelect={handleSelect}
@@ -67,7 +67,7 @@ function Demo() {
           destroy
         </button>
       </p>
-      {!destroy && <div style={{ width: '400px' }}>{leftMenu}</div>}
+      {!destroy() && <div style={{ width: '400px' }}> {leftMenu}</div>}
     </div>
   );
 }
