@@ -532,11 +532,11 @@ export function generateTrigger(
       });
     };
 
-    const handlePortalUpdate = () => {
+    createEffect(() => {
       if (prevPopupVisible() !== popupVisible()) {
         props.afterPopupVisibleChange(popupVisible());
       }
-    };
+    });
 
     const delaySetPopupVisible = (visible: boolean, delayS: number, event?: MouseEvent) => {
       const delay = delayS * 1000;
@@ -730,7 +730,7 @@ export function generateTrigger(
 
       clearOutsideHandler();
     });
-        
+
     onCleanup(() => {
       clearDelayTimer();
       clearOutsideHandler();
@@ -859,34 +859,36 @@ export function generateTrigger(
           return trigger;
         }}
         <Show when={portal()}>
-          <Popup
-            prefixCls={props.prefixCls}
-            destroyPopupOnHide={props.destroyPopupOnHide}
-            visible={popupVisible()}
-            point={props.alignPoint && point()}
-            class={props.popupClassName}
-            align={getPopupAlign()}
-            onAlign={props.onPopupAlign}
-            animation={props.popupAnimation}
-            getClassNameFromAlign={getPopupClassNameFromAlign}
-            {...mouseProps()}
-            stretch={props.stretch}
-            getRootDomNode={getRootDomNode}
-            style={props.popupStyle}
-            mask={props.mask}
-            zIndex={props.zIndex}
-            transitionName={props.popupTransitionName}
-            maskAnimation={props.maskAnimation}
-            maskTransitionName={props.maskTransitionName}
-            maskMotion={props.maskMotion}
-            ref={popupRef}
-            motion={props.popupMotion}
-            mobile={props.mobile}
-            forceRender={props.forceRender}
-            onClick={props.onPopupClick}
-          >
-            {props.popup}
-          </Popup>
+          <Portal getContainer={getContainer}>
+            <Popup
+              prefixCls={props.prefixCls}
+              destroyPopupOnHide={props.destroyPopupOnHide}
+              visible={popupVisible()}
+              point={props.alignPoint && point()}
+              className={props.popupClassName}
+              align={getPopupAlign()}
+              onAlign={props.onPopupAlign}
+              animation={props.popupAnimation}
+              getClassNameFromAlign={getPopupClassNameFromAlign}
+              {...mouseProps()}
+              stretch={props.stretch}
+              getRootDomNode={getRootDomNode}
+              style={props.popupStyle}
+              mask={props.mask}
+              zIndex={props.zIndex}
+              transitionName={props.popupTransitionName}
+              maskAnimation={props.maskAnimation}
+              maskTransitionName={props.maskTransitionName}
+              maskMotion={props.maskMotion}
+              ref={popupRef}
+              motion={props.popupMotion}
+              mobile={props.mobile}
+              forceRender={props.forceRender}
+              onClick={props.onPopupClick}
+            >
+              {props.popup}
+            </Popup>
+          </Portal>
         </Show>
       </TriggerContext.Provider>
     );

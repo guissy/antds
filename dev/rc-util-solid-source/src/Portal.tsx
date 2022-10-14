@@ -1,5 +1,5 @@
 
-import {type ParentComponent, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children} from "solid-js";
+import {type ParentComponent, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, onCleanup, onMount} from "solid-js";
 import { Portal as PortalSolid } from "solid-js/web";
 import canUseDom from './Dom/canUseDom';
 
@@ -32,10 +32,10 @@ const Portal: ParentComponent<PortalProps> = ((props) => {
 
   // [Legacy] Used by `rc-trigger`
   createEffect(() => {
-    props.didUpdate?.(props);
+    props.didUpdate?.({...props});
   }, []);
 
-  createEffect(() => {
+  onMount(() => {
     // Restore container to original place
     // React 18 StrictMode will unmount first and mount back for effect test:
     // https://reactjs.org/blog/2022/03/29/react-v18.html#new-strict-mode-behaviors
@@ -45,12 +45,12 @@ const Portal: ParentComponent<PortalProps> = ((props) => {
     ) {
       parentRef.appendChild(containerRef);
     }
-    return () => {
+    onCleanup(() => {
       // [Legacy] This should not be handle by Portal but parent PortalWrapper instead.
       // Since some component use `Portal` directly, we have to keep the logic here.
       containerRef?.parentNode?.removeChild(containerRef);
-    };
-  }, []);
+    });
+  });
 
   return containerRef
     ? <PortalSolid mount={containerRef}>{props.children}</PortalSolid>
