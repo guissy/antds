@@ -133,7 +133,8 @@ function Overflow<ItemType extends JSX.Element>(
 
   // ================================= Data =================================
   const isResponsive = () => props.maxCount === RESPONSIVE;
-  const shouldResponsive = () => props.data.length && isResponsive();
+  const propsData = createMemo(() => props.data);
+  const shouldResponsive = () => propsData().length && isResponsive();
   const invalidate = () => props.maxCount === INVALIDATE;
 
   /**
@@ -141,9 +142,9 @@ function Overflow<ItemType extends JSX.Element>(
    */
   const showRest = () =>
     shouldResponsive() ||
-    (typeof props.maxCount === 'number' && props.data?.length > props.maxCount);
+    (typeof props.maxCount === 'number' && propsData()?.length > props.maxCount);
 
-  const mergedData = createMemo(on([() => Array.isArray(props.data) ? props.data : [], () => props.itemWidth, containerWidth, () => props.maxCount, shouldResponsive, mergedContainerWidth], 
+  const mergedData = createMemo(on([() => Array.isArray(propsData()) ? propsData() : [], () => props.itemWidth, containerWidth, () => props.maxCount, shouldResponsive, mergedContainerWidth], 
     ([data, itemWidth, containerWidth, maxCount, shouldResponsive, mergedContainerWidth]) => {
     let items = data;
 
@@ -163,12 +164,12 @@ function Overflow<ItemType extends JSX.Element>(
   }));
 
   const omittedItems = createMemo(() => {
-    const data = Array.isArray(props.data) ? props.data : [];
+    const data = Array.isArray(propsData()) ? propsData() : [];
     if (shouldResponsive()) {
       return data.slice(mergedDisplayCount() + 1);
     }
     return data.slice(mergedData().length);
-  }, [props.data, mergedData, shouldResponsive, mergedDisplayCount]);
+  }, [propsData(), mergedData, shouldResponsive, mergedDisplayCount]);
 
   // ================================= Item =================================
   const getKey = (item: ItemType, index: number) => {
@@ -202,7 +203,7 @@ function Overflow<ItemType extends JSX.Element>(
 
     setDisplayCount(count);
     if (!notReady) {
-      setRestReady(count < props.data.length - 1);
+      setRestReady(count < propsData().length - 1);
 
       props.onVisibleChange?.(count);
     }

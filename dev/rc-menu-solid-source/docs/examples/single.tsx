@@ -1,6 +1,5 @@
 /* eslint no-console:0 */
 
-import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children} from "solid-js";
 import Menu, { SubMenu, Item as MenuItem, Divider } from '../../src';
 import '../../assets/index.less';
 
@@ -48,10 +47,10 @@ console.log(menu1Items(menu1List));
 
 export default () => (
   <Menu
-  selectable={false}
-  mode="inline"
-  defaultOpenKeys={"Resources"}
-  style={{ width: "100%" }}
-  items={menu1Items(menu1List)}
-/>
+    selectable={false}
+    mode="inline"
+    defaultOpenKeys={["Resources"]}
+    style={{ width: "100%" }}
+    items={menu1Items(menu1List)}
+  />
 )

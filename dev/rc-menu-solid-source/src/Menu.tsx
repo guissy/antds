@@ -215,7 +215,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
 
   // ========================= Open =========================
   const [mergedOpenKeys, setMergedOpenKeys] = useMergedState(props.defaultOpenKeys, {
-    value: props.openKeys,
+    value: () => props.openKeys,
     postState: keys => keys || EMPTY_LIST,
   });
 
@@ -241,6 +241,8 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
 
   // Restore
   createEffect(() => {
+    console.log("mountRef", mountRef);
+    
     if (!mountRef) {
       return;
     }
@@ -297,7 +299,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
   const [mergedActiveKey, setMergedActiveKey] = useMergedState(
     props.activeKey || ((props.defaultActiveFirst && childList()?.[0]?.key) as string),
     {
-      value: props.activeKey,
+      value: () => props.activeKey,
     },
   );
 
@@ -329,7 +331,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
   const [mergedSelectKeys, setMergedSelectKeys] = useMergedState(
     props.defaultSelectedKeys || [],
     {
-      value: props.selectedKeys,
+      value: () => props.selectedKeys,
 
       // Legacy convert key to array
       postState: keys => {
@@ -395,6 +397,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
   });
 
   const onInternalOpenChange = createMemoCallback((key: string, open: boolean) => {
+    
     let newOpenKeys = mergedOpenKeys().filter(k => k !== key);
 
     if (open) {

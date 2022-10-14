@@ -51,7 +51,7 @@ export default function MenuItemGroup({
   children,
   ...props
 }: MenuItemGroupProps): JSX.Element {
-  const connectedKeyPath = useFullPath(props.eventKey);
+  const connectedKeyPath = useFullPath(() => props.eventKey || props.key);
   const childList: JSX.Element[] = parseChildren(
     children,
     connectedKeyPath(),

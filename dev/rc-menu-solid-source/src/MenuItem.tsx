@@ -117,7 +117,7 @@ const InternalMenuItem = (props: MenuItemProps) => {
   let elementRef = null as (HTMLLIElement | null);
   const mergedDisabled = () => context.disabled || props.disabled;
 
-  const connectedKeys = useFullPath(props.eventKey);
+  const connectedKeys = useFullPath(() => props.eventKey);
 
   // ================================ Warn ================================
   if (process.env.NODE_ENV !== 'production' && props.warnKey) {
@@ -152,7 +152,7 @@ const InternalMenuItem = (props: MenuItemProps) => {
   const selected = createMemo(() => Array.isArray(context.selectedKeys) ? context.selectedKeys.includes(props.eventKey) : false);
 
   // ======================== DirectionStyle ========================
-  const directionStyle = useDirectionStyle(connectedKeys.length);
+  // const directionStyle = useDirectionStyle(connectedKeys.length);
 
   // ============================ Events ============================
   const onInternalClick: JSX.EventHandlerUnion<HTMLLIElement, MouseEvent> = e => {
@@ -208,7 +208,7 @@ const InternalMenuItem = (props: MenuItemProps) => {
       component="li"
       aria-disabled={props.disabled}
       style={{
-        ...directionStyle,
+        ...useDirectionStyle(connectedKeys().length),
         ...props.style,
       }}
       class={classNames(
@@ -248,7 +248,7 @@ function MenuItem(props: MenuItemProps): JSX.Element {
   // ==================== Record KeyPath ====================
   const measure = useMeasure();
   const context = useContext(MenuContext) ?? {} as MenuContextProps;
-  const connectedKeyPath = useFullPath(props.eventKey || context.key);
+  const connectedKeyPath = useFullPath(() => props.eventKey || context.key);
 
   // eslint-disable-next-line consistent-return
   createEffect(on(connectedKeyPath, () => {

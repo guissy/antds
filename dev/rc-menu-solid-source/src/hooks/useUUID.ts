@@ -17,7 +17,8 @@ const genId = () => {
 
 export default function useUUID(id?: string): Accessor<string> {
   const [uuid, setUUID] = useMergedState(id, {
-    value: id || genId(),
+    defaultValue: genId(),
+    value: (() => id),
   });
 
   createEffect(() => {

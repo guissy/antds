@@ -86,10 +86,14 @@ export default function MenuContextProvider(props: InheritableContextProps) {
   const [state, setState] = createStore<MenuContextProps>({} as MenuContextProps);
   createMemo(
     () => {
+      const [_, restProps] = splitProps(props, ['locked', 'children']);
       setState(mergeProps(context, restProps));
-      // console.log(mergeProps(context, restProps))
+      // console.log(restProps.openKeys, JSON.stringify(context.openKeys))
     },
-    () => [context, restProps],
+    () => {
+      const [_, restProps] = splitProps(props, ['locked', 'children']);
+      return [context, restProps]
+    },
     (prev, next) =>
       !props.locked && (prev[0] !== next[0] || !shallowEqual(prev[1], next[1])),
   );
