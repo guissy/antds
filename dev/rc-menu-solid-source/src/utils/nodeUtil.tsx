@@ -10,7 +10,7 @@ export function parseChildren(
 ) {
   
   return toArray(children).map((child, index) => {
-    if (child) {
+    if (child && typeof child === 'object' || typeof child === 'function') {
       // const { key } = child;
       let eventKey = (child as any)?.eventKey ?? child.key;
 

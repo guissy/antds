@@ -25,6 +25,7 @@ import PrivateContext from '../context/PrivateContext';
 
 export interface SubMenuProps
   extends Omit<SubMenuType, 'key' | 'children' | 'label'> {
+    key?: number | string;
   title?: JSX.Element;
 
   children?: JSX.Element;
@@ -355,7 +356,6 @@ export default function SubMenu(props: SubMenuProps) {
 
   // eslint-disable-next-line consistent-return
   createEffect(() => {
-    // console.log("connectedKeyPath()", context.key, props.key)
     const measure = useMeasure();
 
     if (measure) {

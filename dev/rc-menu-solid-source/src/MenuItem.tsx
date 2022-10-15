@@ -18,7 +18,7 @@ export interface MenuItemProps
   extends Omit<MenuItemType, 'label' | 'key'>,
   Omit<
     JSX.HTMLAttributes<HTMLLIElement>,
-    'onClick' | 'onMouseEnter' | 'onMouseLeave' | 'onSelect'
+    'onClick' | 'onMouseEnter' | 'onMouseLeave' | 'onSelect' | 'style'
   > {
   key?: string | number;
   children?: JSX.Element;

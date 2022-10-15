@@ -1,4 +1,4 @@
-import { type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, mergeProps, Accessor, splitProps, Show, onMount, Ref, onCleanup } from "solid-js";
+import { type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, mergeProps, Accessor, splitProps, Show, onMount, Ref, onCleanup, on } from "solid-js";
 import type { CSSMotionProps } from 'rc-motion-solid';
 import classNames from 'classnames';
 import shallowEqual from 'shallowequal';
@@ -221,7 +221,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
 
   const triggerOpenKeys = (keys: string[]) => {
     // console.log("triggerOpenKeys", keys);
-    
+
     setMergedOpenKeys(keys);
     props.onOpenChange?.(keys);
   };
@@ -241,7 +241,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
     }
   }, [mergedOpenKeys]);
 
-  createEffect(() => {
+  onMount(() => {
     mountRef = true;
 
     onCleanup(() => {
@@ -249,8 +249,8 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
     });
   });
   // Restore
-  createEffect(() => {
-    
+  createEffect(on(isInlineMode, () => {
+
     if (!mountRef) {
       return;
     }
@@ -262,7 +262,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
       // Trigger open event in case its in control
       triggerOpenKeys(EMPTY_LIST);
     }
-  }, [isInlineMode()]);
+  }, { defer: true }));
   // ========================= Path =========================
   const {
     registerPath,
@@ -277,7 +277,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
 
   const registerPathContext = createMemo(
     () => ({ registerPath, unregisterPath }),
-    {registerPath, unregisterPath},
+    { registerPath, unregisterPath },
   );
 
   const pathUserContext = createMemo(
@@ -295,9 +295,9 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
     );
   }, [lastVisibleIndex(), allVisible]);
 
-  // ======================== Active ========================
+  // ======================== Active ========================  
   const [mergedActiveKey, setMergedActiveKey] = useMergedState(
-    props.activeKey || ((props.defaultActiveFirst && childList()?.[0]?.key) as string),
+    props.activeKey || ((props.defaultActiveFirst && (childList()?.[0] as HTMLElement)?.getAttribute('key'))),
     {
       value: () => props.activeKey,
     },
@@ -317,8 +317,8 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
       focus: options => {
         const shouldFocusKey =
           mergedActiveKey() ?? Array.from(containerRef.querySelectorAll("li"))
-          .find(node => !node.className.includes('disabled') && node?.getAttribute("key"))?.getAttribute('key');
-          
+            .find(node => !node.className.includes('disabled') && node?.getAttribute("key"))?.getAttribute('key');
+
         if (shouldFocusKey) {
           const elm = containerRef
             ?.querySelector<HTMLLIElement>(
@@ -401,7 +401,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
   });
 
   const onInternalOpenChange = createMemoCallback((key: string, open: boolean) => {
-    
+
     let newOpenKeys = mergedOpenKeys().filter(k => k !== key);
 
     if (open) {
@@ -435,14 +435,14 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
       mergedActiveKey,
       isRtl,
       uuid(),
-  
+
       containerRef,
       getKeys,
       getKeyPath,
-  
+
       setMergedActiveKey,
       triggerAccessibilityOpen,
-  
+
       props.onKeyDown,
     )(e)
   };
@@ -483,7 +483,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
   })
   let childRef = []
   // >>>>> Container
-  const container = () =>(
+  const container = () => (
     <Overflow
       id={props.id}
       ref={containerRef as any}
@@ -513,7 +513,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
             key={child?.key || child?.dataset?.key}
             overflowDisabled={(menuMode().mergedMode !== 'horizontal' || props.disabledOverflow) ? undefined : index > lastVisibleIndex()}
           >
-              {child}
+            {child}
           </MenuContextProvider>
         ))
       )} // wrappedChildList
