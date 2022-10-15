@@ -486,7 +486,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
       prefixCls={`${props.prefixCls}-overflow`}
       component="ul"
       itemComponent={MenuItem}
-      class={classNames(
+      className={classNames(
         props.prefixCls,
         `${props.prefixCls}-root`,
         `${props.prefixCls}-${menuMode().mergedMode}`,
@@ -506,10 +506,10 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
         parseItems(props.children, props.items, EMPTY_LIST).map((child, index) => (
           // Always wrap provider to avoid sub node re-mount
           <MenuContextProvider
-            key={child?.key}
+            key={child?.key || child?.dataset?.key}
             overflowDisabled={(menuMode().mergedMode !== 'horizontal' || props.disabledOverflow) ? undefined : index > lastVisibleIndex()}
           >
-            {child}
+              {child}
           </MenuContextProvider>
         ))
       )} // wrappedChildList
@@ -519,7 +519,6 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
         const len = omitItems.length;
 
         const originOmitItems = len ? childList().slice(-len) : null;
-
         return (
           <SubMenu
             eventKey={OVERFLOW_KEY}

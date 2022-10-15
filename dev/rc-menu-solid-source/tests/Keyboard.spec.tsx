@@ -280,7 +280,6 @@ describe('Menu.Keyboard', () => {
     keyDown(container, KeyCode.DOWN);
     keyDown(container, KeyCode.LEFT);
     keyDown(container, KeyCode.DOWN);
-    screen.debug();
     isActive(container, 0);
   });
 });

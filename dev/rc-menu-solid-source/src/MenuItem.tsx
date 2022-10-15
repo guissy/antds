@@ -308,7 +308,11 @@ function MenuItem(props: MenuItemProps): JSX.Element {
   }
 
   // ======================== Render ========================
-  return <InternalMenuItem {...props} eventKey={props.eventKey || context.key || props.key} />;
+  return <InternalMenuItem
+    {...props}
+    eventKey={props.eventKey || context.key || props.key}
+    warnKey={props.key == undefined && props.eventKey == undefined && context.key == undefined}
+  />;
 }
 
 export default MenuItem;

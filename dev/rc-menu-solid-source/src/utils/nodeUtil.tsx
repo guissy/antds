@@ -2,6 +2,7 @@ import {type Component, type JSX, createEffect, createSignal, createContext, cre
 import toArray from 'rc-util-solid/lib/Children/toArray';
 import type { ItemType } from '../interface';
 import { Divider, MenuItem, MenuItemGroup, SubMenu } from '..';
+import { spread } from "solid-js/web";
 
 export function parseChildren(
   children: JSX.Element | undefined,
@@ -20,21 +21,22 @@ export function parseChildren(
       }
 
       const cloneProps = {
-        key: eventKey,
-        eventKey,
+        // key: eventKey,
+        'data-key': eventKey,
+        // eventKey,
       } as any;
 
       if (process.env.NODE_ENV !== 'production' && emptyKey) {
-        cloneProps.warnKey = true;
+        // cloneProps.warnKey = true;
       }
       // console.log("child=", typeof child);
       // console.log(cloneProps)
-      Object.assign(child, cloneProps);
-      // spread(child as HTMLElement, cloneProps);
+      // Object.assign(child, cloneProps);
+      spread(child as HTMLElement, cloneProps);
       
       // const child = 
       // return React.cloneElement(child, cloneProps);
-      // console.log("➑➑➑", child()?.name)
+      // console.log("➑➑➑", child)
       // spread(child as HTMLElement, cloneProps);
       return child
     }

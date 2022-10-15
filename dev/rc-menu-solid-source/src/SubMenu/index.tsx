@@ -1,4 +1,4 @@
-import { type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, splitProps, Show, onCleanup } from "solid-js";
+import { type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, splitProps, Show, onCleanup, onMount } from "solid-js";
 import classNames from 'classnames';
 import Overflow from 'rc-overflow-solid';
 import warning from 'rc-util-solid/lib/warning';
@@ -118,6 +118,7 @@ const InternalSubMenu = (props: SubMenuProps) => {
   const mergedDisabled = createMemo(() => context.disabled || props.disabled);
   let elementRef = null as (HTMLDivElement | null);
   let popupRef = null as (HTMLUListElement | null);
+  const [domKey, setDomKey] = createSignal('');
 
   // ================================ Warn ================================
   if (process.env.NODE_ENV !== 'production' && props.warnKey) {
@@ -133,7 +134,7 @@ const InternalSubMenu = (props: SubMenuProps) => {
   const open = createMemo(() => !context.overflowDisabled && originOpen());
 
   // =============================== Select ===============================
-  const childrenSelected = pathContext.isSubPathKey?.(context.selectedKeys, props.eventKey);
+  // const childrenSelected = pathContext.isSubPathKey?.(context.selectedKeys, props.eventKey);
 
   // =============================== Active ===============================
   const actived = createMemo(() => useActive(
@@ -214,7 +215,7 @@ const InternalSubMenu = (props: SubMenuProps) => {
   // >>>>> Visible change
   const onPopupVisibleChange = (newVisible: boolean) => {
     if (context.mode !== 'inline') {
-      context.onOpenChange(props.eventKey, newVisible);
+      context.onOpenChange(props.eventKey || domKey(), newVisible);
     }
   };
 
@@ -223,11 +224,17 @@ const InternalSubMenu = (props: SubMenuProps) => {
    * We should manually trigger an active
    */
   const onInternalFocus: JSX.EventHandlerUnion<HTMLDivElement, FocusEvent> = () => {
-    context.onActive(props.eventKey);
+    context.onActive(props.eventKey || domKey());
   };
 
   // =============================== Render ===============================
-  const popupId = createMemo(() => domDataId() && `${domDataId()}-popup`);
+  const popupId = createMemo(() => {
+    return domDataId() && `${domDataId()}-popup`;
+  });
+
+  onMount(() => {
+    setDomKey(popupRef?.id);
+  })
 
   // >>>>> Title
   let titleNode: JSX.Element = (
@@ -291,7 +298,7 @@ const InternalSubMenu = (props: SubMenuProps) => {
           {
             [`${subMenuPrefixCls}-open`]: open(),
             [`${subMenuPrefixCls}-active`]: mergedActive(),
-            [`${subMenuPrefixCls}-selected`]: childrenSelected,
+            [`${subMenuPrefixCls}-selected`]: pathContext.isSubPathKey?.(context.selectedKeys, props.eventKey),
             [`${subMenuPrefixCls}-disabled`]: mergedDisabled(),
           },
         )}
@@ -324,7 +331,7 @@ const InternalSubMenu = (props: SubMenuProps) => {
         </Show>
         {/* Inline mode */}
         {!context.overflowDisabled && (
-          <InlineSubMenuList id={popupId()} open={open()} keyPath={connectedPath()}>
+          <InlineSubMenuList id={popupId()} open={open()} keyPath={connectedPath()} ref={popupRef}>
             {props.children}
           </InlineSubMenuList>
         )}
@@ -348,9 +355,8 @@ export default function SubMenu(props: SubMenuProps) {
 
   // eslint-disable-next-line consistent-return
   createEffect(() => {
-    // console.log("connectedKeyPath()", connectedKeyPath())
+    // console.log("connectedKeyPath()", context.key, props.key)
     const measure = useMeasure();
-    // console.log("measure", measure, connectedKeyPath());
 
     if (measure) {
       measure.registerPath(props.eventKey || context.key || props.key, connectedKeyPath());
@@ -375,7 +381,7 @@ export default function SubMenu(props: SubMenuProps) {
             connectedKeyPath(),
           )
           :
-          <InternalSubMenu {...props} eventKey={props.eventKey || context.key || props.key}>{parseChildren(
+          <InternalSubMenu {...props} eventKey={props.eventKey || context.key || props.key} warnKey={props.key == undefined && props.eventKey == undefined}>{parseChildren(
             props.children,
             connectedKeyPath(),
           )}</InternalSubMenu>

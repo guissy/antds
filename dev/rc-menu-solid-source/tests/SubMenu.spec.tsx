@@ -291,7 +291,7 @@ describe('SubMenu', () => {
       runAllTimer();
 
       expect(container.querySelector('.rc-menu-submenu-open')).toBeTruthy();
-      isActive(container, 0, false);
+      isActive(document.querySelector('body'), 0, false);
     });
 
     it('click to open a submenu should not activate first item', () => {
@@ -302,8 +302,8 @@ describe('SubMenu', () => {
 
       runAllTimer();
 
-      expect(container.querySelector('.rc-menu-submenu-open')).toBeTruthy();
-      isActive(container, 0, false);
+      expect(document.querySelector('.rc-menu-submenu-open')).toBeTruthy();
+      isActive(document.querySelector('body'), 0, false);
     });
 
     it('mouse enter/mouse leave on a subMenu item should trigger hooks', () => {
@@ -321,10 +321,11 @@ describe('SubMenu', () => {
           </SubMenu>
         </Menu>,
       );
-      fireEvent.mouseEnter(container.querySelector('.rc-menu-submenu-title'));
+      // await new Promise(r => setTimeout(r, 1));
+      fireEvent.mouseEnter(document.querySelector('.rc-menu-submenu-title').parentElement);
       expect(onMouseEnter).toHaveBeenCalledTimes(1);
 
-      fireEvent.mouseLeave(container.querySelector('.rc-menu-submenu-title'));
+      fireEvent.mouseLeave(document.querySelector('.rc-menu-submenu-title').parentElement);
       expect(onMouseLeave).toHaveBeenCalledTimes(1);
     });
   });
@@ -336,7 +337,7 @@ describe('SubMenu', () => {
 
     runAllTimer();
 
-    fireEvent.click(container.querySelector('.rc-menu-item'));
+    fireEvent.click(document.querySelector('.rc-menu-item'));
     expect(handleSelect.mock.calls[0][0].key).toBe('s1-1');
   });
 
@@ -345,9 +346,8 @@ describe('SubMenu', () => {
     fireEvent.mouseEnter(container.querySelector('.rc-menu-submenu-title'));
 
     runAllTimer();
-
-    fireEvent.click(container.querySelector('.rc-menu-item'));
-    expect(container.querySelector('.rc-menu-submenu')).toHaveClass(
+    fireEvent.click(document.querySelector('.rc-menu-item'));
+    expect(document.querySelector('.rc-menu-submenu')).toHaveClass(
       'rc-menu-submenu-selected',
     );
   });
@@ -364,14 +364,14 @@ describe('SubMenu', () => {
 
     runAllTimer();
 
-    fireEvent.click(container.querySelector('.rc-menu-item'));
-    fireEvent.click(container.querySelector('.rc-menu-item'));
+    fireEvent.click(document.querySelector('.rc-menu-item'));
+    fireEvent.click(document.querySelector('.rc-menu-item'));
     expect(handleDeselect.mock.calls[0][0].key).toBe('s1-1');
   });
 
   it('should take style prop', () => {
     const App = () => (
-      <Menu style={{ backgroundColor: 'black' }}>
+      <Menu style={{ 'background-color': 'black' }}>
         <SubMenu key="s1" title="submenu1">
           <MenuItem key="s1-1">1</MenuItem>
         </SubMenu>
@@ -380,7 +380,7 @@ describe('SubMenu', () => {
 
     const { container } = render(() => <App show />);
     expect(container.querySelector('.rc-menu')).toHaveStyle({
-      backgroundColor: 'black',
+      'background-color': 'black',
     });
   });
 
@@ -398,7 +398,7 @@ describe('SubMenu', () => {
     });
   });
 
-  it.only('inline click for open', () => {
+  it('inline click for open', () => {
     const onOpenChange = jest.fn();
 
     const { container } = render(() => 
@@ -418,7 +418,6 @@ describe('SubMenu', () => {
 
     // Disabled
     fireEvent.click(last(document.querySelectorAll('.rc-menu-submenu-title')));
-    screen.debug()
     expect(onOpenChange).toHaveBeenCalledWith(['light']);
   });
 

@@ -86,7 +86,7 @@ export default function InlineSubMenuList(props: InlineSubMenuListProps) {
               id={props.id}
               className={motionClassName}
               style={motionStyle}
-              ref={() => 1}
+              ref={props.ref}
             >
               {props.children}
             </SubMenuList>

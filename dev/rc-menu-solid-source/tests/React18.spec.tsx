@@ -48,7 +48,6 @@ describe('React18', () => {
     );
 
     runAllTimer();
-    screen.debug()
     expect(
       container
         .querySelector('.rc-menu-submenu-open')
