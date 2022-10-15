@@ -172,7 +172,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
     "onSelect", "onDeselect", "inlineIndent", "motion", "defaultMotions", "triggerSubMenuAction",
     "builtinPlacements", "itemIcon", "expandIcon", "overflowedIndicator", "overflowedIndicatorPopupClassName",
     "getPopupContainer", "onClick", "onOpenChange", "onKeyDown", "openAnimation", "openTransitionName",
-    "_internalRenderMenuItem", "_internalRenderSubMenuItem"]);
+    "_internalRenderMenuItem", "_internalRenderSubMenuItem", "ref"]);
 
   const [mounted, setMounted] = createSignal(false);
   const childList: Accessor<JSX.Element[]> = createMemo(
@@ -311,20 +311,24 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
     setMergedActiveKey(undefined);
   });
 
-  props.ref?.({
-    list: containerRef,
-    focus: options => {
-      const shouldFocusKey =
-        mergedActiveKey() ?? childList().find(node => !node.disabled)?.key;
-      if (shouldFocusKey) {
-        const elm = containerRef
-          ?.querySelector<HTMLLIElement>(
-            `li[data-menu-id='${getMenuId(uuid(), shouldFocusKey as string)}']`
-          );
-        elm?.focus?.(options);
+  onMount(() => {
+    props.ref?.({
+      list: containerRef,
+      focus: options => {
+        const shouldFocusKey =
+          mergedActiveKey() ?? Array.from(containerRef.querySelectorAll("li"))
+          .find(node => !node.className.includes('disabled') && node?.getAttribute("key"))?.getAttribute('key');
+          
+        if (shouldFocusKey) {
+          const elm = containerRef
+            ?.querySelector<HTMLLIElement>(
+              `li[data-menu-id='${getMenuId(uuid(), shouldFocusKey as string)}']`
+            );
+          elm?.focus?.(options);
+        }
       }
-    }
-  });
+    });
+  })
 
   // ======================== Select ========================
   // >>>>> Select keys

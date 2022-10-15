@@ -1,4 +1,4 @@
-import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children} from "solid-js";
+import {type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, splitProps} from "solid-js";
 import classNames from 'classnames';
 import omit from 'rc-util-solid/lib/omit';
 import { parseChildren } from './utils/nodeUtil';
@@ -19,13 +19,15 @@ export interface MenuItemGroupProps
   warnKey?: boolean;
 }
 
-const InternalMenuItemGroup = ({
-  className,
-  title,
-  eventKey,
-  children,
-  ...restProps
-}: MenuItemGroupProps) => {
+const InternalMenuItemGroup = (props: MenuItemGroupProps) => {
+  // {
+  //   className,
+  //   title,
+  //   eventKey,
+  //   children,
+  //   ...restProps
+  // }
+  const [_, restProps] = splitProps(props, ['className', 'title', 'eventKey', 'children'])
   const context = useContext(MenuContext) ?? {} as MenuContextProps;
 
   const groupPrefixCls = () => `${context.prefixCls}-item-group`;
@@ -34,15 +36,15 @@ const InternalMenuItemGroup = ({
     <li
       {...restProps}
       onClick={e => e.stopPropagation()}
-      class={classNames(groupPrefixCls(), className)}
+      class={classNames(groupPrefixCls(), props.className)}
     >
       <div
         class={`${groupPrefixCls()}-title`}
-        title={typeof title === 'string' ? title : undefined}
+        title={typeof props.title === 'string' ? props.title : undefined}
       >
-        {title}
+        {props.title}
       </div>
-      <ul class={`${groupPrefixCls()}-list`}>{children}</ul>
+      <ul class={`${groupPrefixCls()}-list`}>{props.children}</ul>
     </li>
   );
 };

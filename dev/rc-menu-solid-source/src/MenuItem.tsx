@@ -311,7 +311,7 @@ function MenuItem(props: MenuItemProps): JSX.Element {
   return <InternalMenuItem
     {...props}
     eventKey={props.eventKey || context.key || props.key}
-    warnKey={props.key == undefined && props.eventKey == undefined && context.key == undefined}
+    warnKey={props.eventKey == undefined && context.key == undefined && props.key == undefined}
   />;
 }
 
