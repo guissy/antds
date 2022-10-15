@@ -1,4 +1,4 @@
-import { type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, mergeProps, Accessor, splitProps, Show, onMount, Ref } from "solid-js";
+import { type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, mergeProps, Accessor, splitProps, Show, onMount, Ref, onCleanup } from "solid-js";
 import type { CSSMotionProps } from 'rc-motion-solid';
 import classNames from 'classnames';
 import shallowEqual from 'shallowequal';
@@ -220,6 +220,8 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
   });
 
   const triggerOpenKeys = (keys: string[]) => {
+    // console.log("triggerOpenKeys", keys);
+    
     setMergedOpenKeys(keys);
     props.onOpenChange?.(keys);
   };
@@ -239,30 +241,28 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
     }
   }, [mergedOpenKeys]);
 
+  createEffect(() => {
+    mountRef = true;
+
+    onCleanup(() => {
+      mountRef = false;
+    });
+  });
   // Restore
   createEffect(() => {
-    console.log("mountRef", mountRef);
     
     if (!mountRef) {
       return;
     }
 
     if (isInlineMode()) {
+      // console.log("inlineCacheOpenKeys()", inlineCacheOpenKeys());
       setMergedOpenKeys(inlineCacheOpenKeys());
     } else {
       // Trigger open event in case its in control
       triggerOpenKeys(EMPTY_LIST);
     }
   }, [isInlineMode()]);
-
-  createEffect(() => {
-    mountRef = true;
-
-    return () => {
-      mountRef = false;
-    };
-  }, []);
-
   // ========================= Path =========================
   const {
     registerPath,
@@ -425,7 +425,7 @@ const Menu: Component<MenuProps & JSX.CustomAttributes<HTMLDivElement>> = ((prop
   const onInternalKeyDown = (e) => {
     // let uuid_ = 'no_uuid';
     // untrack(() => uuid_ = uuid())
-    console.log(uuid(), mergedActiveKey());
+    // console.log(uuid(), mergedActiveKey());
     return useAccessibility(
       menuMode().mergedMode,
       mergedActiveKey,

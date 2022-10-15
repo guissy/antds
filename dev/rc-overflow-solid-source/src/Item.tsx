@@ -59,9 +59,6 @@ function InternalItem<ItemType>(props_: ItemProps<ItemType>) {
     props.registerSize(props.itemKey!, width);
   }
 
-  // createEffect(() => {
-
-  // })
   onCleanup(() =>
     internalRegisterSize(null)
   );
@@ -93,6 +90,7 @@ function InternalItem<ItemType>(props_: ItemProps<ItemType>) {
     return overflowProps;
   }
 
+
   let itemNode = () => (
     <Dynamic
       component={props.component as unknown as string}
@@ -103,7 +101,7 @@ function InternalItem<ItemType>(props_: ItemProps<ItemType>) {
       }}
       {...overflowProps()}
       {...restProps}
-    // ref={ref}
+      ref={'ref' in props ?? props?.ref}
     >
       {childNode}
     </Dynamic>

@@ -329,7 +329,6 @@ function Overflow<ItemType extends JSX.Element>(
   const internalRenderItemNode = props.renderRawItem
     ? (item: ItemType, index: number) => {
       const key = getKey(item, index);
-
       return (
         <OverflowContext.Provider
           // key={key}

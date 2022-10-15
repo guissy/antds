@@ -68,7 +68,6 @@ export default function InlineSubMenuList(props: InlineSubMenuListProps) {
   };
 
   if (destroy()) {
-    // TODO: solid
     return null;
   }
 
@@ -85,7 +84,7 @@ export default function InlineSubMenuList(props: InlineSubMenuListProps) {
           return (
             <SubMenuList
               id={props.id}
-              class={motionClassName}
+              className={motionClassName}
               style={motionStyle}
               ref={() => 1}
             >

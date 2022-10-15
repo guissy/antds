@@ -36,7 +36,7 @@ export interface MenuItemProps
 // Since Menu event provide the `info.item` which point to the MenuItem node instance.
 // We have to use class component here.
 // This should be removed from doc & api in future.
-const LegacyMenuItem: ParentComponent<{title: string, attribute: {}, elementRef: Ref<HTMLElement>, eventKey: string }> = (props) => {
+const LegacyMenuItem: ParentComponent<{ title: string, attribute: {}, elementRef: Ref<HTMLElement>, eventKey: string }> = (props) => {
 
   // const { title, attribute, elementRef, ...restProps } = this.props;
   const [_, passedProps] = splitProps(props, ['title', 'attribute', 'elementRef', 'eventKey']);
@@ -89,8 +89,8 @@ const InternalMenuItem = (props: MenuItemProps) => {
   const domDataId = createMemo(() => {
     return useMenuId(props.eventKey);
   });
-  const [_, restProps] = splitProps(props, [ 'style', 'className', 'eventKey', 'warnKey', 'disabled', 'itemIcon', 'children', 'role', 'onMouseEnter',
-  'onMouseLeave','onClick','onKeyDown','onFocus' ]);
+  const [_, restProps] = splitProps(props, ['style', 'className', 'eventKey', 'warnKey', 'disabled', 'itemIcon', 'children', 'role', 'onMouseEnter',
+    'onMouseLeave', 'onClick', 'onKeyDown', 'onFocus']);
   // const {
   //   prefixCls,
   //   onItemClick,
@@ -156,6 +156,8 @@ const InternalMenuItem = (props: MenuItemProps) => {
 
   // ============================ Events ============================
   const onInternalClick: JSX.EventHandlerUnion<HTMLLIElement, MouseEvent> = e => {
+    // console.log("click", e);
+
     if (mergedDisabled()) {
       return;
     }
@@ -194,7 +196,52 @@ const InternalMenuItem = (props: MenuItemProps) => {
   //   optionRoleProps['aria-selected'] = selected;
   // }
 
-  let renderNode = (
+  // let renderNode2 = (
+  //   <LegacyMenuItem
+  //     ref={legacyMenuItemRef}
+  //     elementRef={elementRef}
+  //     role={props.role === null ? 'none' : props.role || 'menuitem'}
+  //     tabIndex={props.disabled ? null : -1}
+  //     data-menu-id={context.overflowDisabled && domDataId() ? null : domDataId()}
+  //     {...restProps}
+  //     onMouseEnter = {actived().onMouseEnter}
+  //     onMouseLeave = {actived().onMouseLeave}
+  //     {...(props.role === 'option' ? {'aria-selected': selected()} : {})}
+  //     component="li"
+  //     aria-disabled={props.disabled}
+  //     style={{
+  //       ...useDirectionStyle(connectedKeys().length),
+  //       ...props.style,
+  //     }}
+  //     class={classNames(
+  //       `${context.prefixCls}-item`,
+  //       {
+  //         [`${context.prefixCls}-item-active`]: actived().active,
+  //         [`${context.prefixCls}-item-selected`]: selected(),
+  //         [`${context.prefixCls}-item-disabled`]: mergedDisabled(),
+  //       },
+  //       props.className,
+  //     )}
+  //     onClick={onInternalClick}
+  //     onKeyDown={onInternalKeyDown}
+  //     onFocus={onInternalFocus}
+  //   >
+  //     {props.children}
+  //     <Icon
+  //       props={{
+  //         ...props,
+  //         isSelected: selected(),
+  //       }}
+  //       icon={props.itemIcon || context.itemIcon}
+  //     />
+  //   </LegacyMenuItem>
+  // );
+
+  // if (_internalRenderMenuItem) {
+  //   renderNode = _internalRenderMenuItem(renderNode, props, { selected: selected() });
+  // }
+
+  return (
     <LegacyMenuItem
       ref={legacyMenuItemRef}
       elementRef={elementRef}
@@ -202,16 +249,16 @@ const InternalMenuItem = (props: MenuItemProps) => {
       tabIndex={props.disabled ? null : -1}
       data-menu-id={context.overflowDisabled && domDataId() ? null : domDataId()}
       {...restProps}
-      onMouseEnter = {actived().onMouseEnter}
-      onMouseLeave = {actived().onMouseLeave}
-      {...(props.role === 'option' ? {'aria-selected': selected()} : {})}
+      onMouseEnter={actived().onMouseEnter}
+      onMouseLeave={actived().onMouseLeave}
+      {...(props.role === 'option' ? { 'aria-selected': selected() } : {})}
       component="li"
       aria-disabled={props.disabled}
       style={{
         ...useDirectionStyle(connectedKeys().length),
         ...props.style,
       }}
-      class={classNames(
+      className={classNames(
         `${context.prefixCls}-item`,
         {
           [`${context.prefixCls}-item-active`]: actived().active,
@@ -234,12 +281,6 @@ const InternalMenuItem = (props: MenuItemProps) => {
       />
     </LegacyMenuItem>
   );
-
-  if (_internalRenderMenuItem) {
-    renderNode = _internalRenderMenuItem(renderNode, props, { selected: selected() });
-  }
-
-  return renderNode;
 };
 
 function MenuItem(props: MenuItemProps): JSX.Element {

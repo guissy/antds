@@ -9,6 +9,9 @@ export default function findDOMNode<T = Element | Text>(
   if (node instanceof HTMLElement) {
     return (node as unknown) as T;
   }
+  if (Array.isArray(node)) {
+    return node[0] as unknown as T
+  }
   const child = Children(() => node);
   return child() as T;
   // return (ReactDOM.findDOMNode(node) as unknown) as T;

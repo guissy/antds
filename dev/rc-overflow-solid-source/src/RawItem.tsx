@@ -1,4 +1,4 @@
-import { type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, splitProps } from "solid-js";
+import { type Component, type JSX, createEffect, createSignal, createContext, createMemo, useContext, children as Children, splitProps, Show, mergeProps } from "solid-js";
 import classNames from 'classnames';
 import Item from './Item';
 import { OverflowContext } from './Overflow';
@@ -15,26 +15,26 @@ const InternalRawItem = (props: RawItemProps) => {
   const context = useContext(OverflowContext);
 
   // Render directly when context not provided
-  if (!context) {
-    const [_, restProps] = splitProps(props, ['component']);
-    return <Dynamic
-      component={props.component as unknown as string}
-      {...restProps}
-      ref={props.ref}
-    />;
-  }
-
-  const { className: contextClassName, ...restContext } = context;
+  // if (!context) {
+  //   const [_, restProps] = splitProps(props, ['component']);
+  //   return <Dynamic
+  //     component={props.component as unknown as string}
+  //     {...restProps}
+  //     ref={props.ref}
+  //   />;
+  // }
+  // const { className: contextClassName, ...restContext } = context;
   // const { className, ...restProps } = props;
-  const [_, restProps] = splitProps(props, ['className']);
+  const [_1, restProps] = splitProps(props, ['className']);
+  const [_2, restContext] = splitProps(context ?? { className: undefined }, ['className']);
   // Do not pass context to sub item to avoid multiple measure
+
   return (
     <OverflowContext.Provider value={null}>
       <Item
         ref={props.ref}
-        class={classNames(contextClassName, props.className)}
-        {...restContext}
-        {...restProps}
+        className={classNames(context?.className, props.className)}
+        {...mergeProps(restContext, restProps)}
       />
     </OverflowContext.Provider>
   );
