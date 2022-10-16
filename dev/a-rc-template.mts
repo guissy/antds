@@ -30,7 +30,6 @@ export const checkPkgInstall = async (rc: string) => {
 
 export const getRepo = async (rc: string) => {
     cd(`${cwd}/packages`);
-    await $`rm -rf ant-design-icons`;
     (await fs.pathExists(`rc-${rc}-solid`)) &&
         (await $`rm -rf rc-${rc}-solid`);
 
