@@ -177,7 +177,7 @@ export default function useStatus(
     const isMounted = mountedRef;
     mountedRef = true;
 
-    if (!supportMotion) {
+    if (!supportMotion()) {
       return;
     }
 
@@ -231,11 +231,12 @@ export default function useStatus(
   // Trigger `onVisibleChanged`
   let firstMountChangeRef = false;
   createEffect(() => {
+    // console.log("asyncVisible", asyncVisible())
     // [visible & motion not end] => [!visible & motion end] still need trigger onVisibleChanged
     if (asyncVisible()) {
       firstMountChangeRef = true;
     }
-
+    
     if (asyncVisible() !== undefined && status() === STATUS_NONE) {
       // Skip first render is invisible since it's nothing changed
       if (firstMountChangeRef || asyncVisible()) {
