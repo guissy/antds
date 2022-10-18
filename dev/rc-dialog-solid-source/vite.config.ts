@@ -15,6 +15,7 @@ export default defineConfig({
       "rc-motion-solid": resolve(__dirname, "../rc-motion-solid/src/index.tsx"),
       "rc-align-solid": resolve(__dirname, "../rc-align-solid/src/index.ts"),
       "dom-align": resolve(__dirname, "./node_modules/dom-align"),
+      "@rc-component-solid/portal": resolve(__dirname, "../rc-portal-solid/src/index.tsx"),
     }
   }
 });
