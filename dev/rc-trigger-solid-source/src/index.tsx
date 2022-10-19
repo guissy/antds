@@ -1,4 +1,4 @@
-import { type Component, type JSX, mergeProps, createEffect, createSignal, createContext, createMemo, useContext, children as Children, onCleanup, Show, on, } from "solid-js";
+import { type Component, type JSX, mergeProps, createEffect, createSignal, createContext, createMemo, useContext, children as Children, onCleanup, Show, on, onMount, } from "solid-js";
 import raf from 'rc-util-solid/lib/raf';
 import contains from 'rc-util-solid/lib/Dom/contains';
 import findDOMNode from 'rc-util-solid/lib/Dom/findDOMNode';
@@ -505,11 +505,11 @@ export function generateTrigger(
       setPopupVisibleRaw((prevPopupVisible) => {
         let visible = prevPopupVisible;
         if (prevPopupVisible !== popupVisible) {
-          // if (props.popupVisible === undefined) {
+          if (props.popupVisible === undefined) {
             // setState({ popupVisible, prevPopupVisible });
             setPrevPopupVisible(prevPopupVisible);
             visible = popupVisible;
-          // }
+          }
           props.onPopupVisibleChange(popupVisible);
         }
 
@@ -739,12 +739,18 @@ export function generateTrigger(
     })
 
     const triggerContextValue = { onPopupMouseDown };
-    props.ref?.({
-      getPopupDomNode,
-      getRootDomNode,
-      onDocumentClick,
-      props // TODO: solid jest
-    });
+    onMount(() => {
+      console.log('popupRef', popupRef);
+      
+      props.ref?.({
+        getPopupDomNode,
+        getRootDomNode,
+        onDocumentClick,
+        popupRef,
+        triggerRef,
+        props // TODO: solid jest
+      });
+    })    
     // ======================== Render ========================
 
     // const { popupVisible } = state;
