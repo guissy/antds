@@ -209,15 +209,15 @@ const PopupInner: Component<PopupInnerProps> = (props) => {
 
   // ======================== Render ========================
   const mergedStyle: Accessor<JSX.CSSProperties> = createMemo(() => {    
-    // console.log("mergedStyle:", status(), props.visible)
+    // console.log("mergedStyle:", status(), props.visible, "opacity = ",  (status() === 'motion' || status() === 'stable' || !props.visible) ? undefined : 0)
     return ({
-      ...stretchStyle,
+      ...stretchStyle(),
       'z-index': props.zIndex,
       opacity:
         (status() === 'motion' || status() === 'stable' || !props.visible) ? undefined : 0,
       // Cannot interact with disappearing elements
       // https://github.com/ant-design/ant-design/issues/35051#issuecomment-1101340714
-      'pointer-events': !props.visible && status() !== 'stable' ? 'none' : undefined,
+      'pointer-events': (!props.visible && status() !== 'stable' ? 'none' : undefined as JSX.CSSProperties['pointer-events']),
       ...props.style,
     })
   });

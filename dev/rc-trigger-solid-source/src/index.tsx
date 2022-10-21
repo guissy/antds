@@ -1,4 +1,4 @@
-import { type Component, type JSX, mergeProps, createEffect, createSignal, createContext, createMemo, useContext, children as Children, onCleanup, Show, on, onMount, } from "solid-js";
+import { type Component, type JSX, mergeProps, createEffect, createSignal, createContext, createMemo, useContext, children as Children, onCleanup, Show, on, onMount, untrack, batch, } from "solid-js";
 import raf from 'rc-util-solid/lib/raf';
 import contains from 'rc-util-solid/lib/Dom/contains';
 import findDOMNode from 'rc-util-solid/lib/Dom/findDOMNode';
@@ -371,6 +371,7 @@ export function generateTrigger(
         if (shouldUpdate) {
           setPrevPopupVisible(popupVisiblePrev);
         }
+        // console.log("setPopupVisibleRaw1", shouldUpdate ? props.popupVisible! : popupVisiblePrev)
         return shouldUpdate ? props.popupVisible! : popupVisiblePrev
       });
     }))
@@ -494,7 +495,7 @@ export function generateTrigger(
      * @param event           SyntheticEvent, used for `pointAlign`
      */
     const setPopupVisible = (
-      popupVisible: boolean,
+      popupVisibleNow: boolean,
       event?: { pageX: number; pageY: number },
     ) => {
       // const { alignPoint } = props;
@@ -502,22 +503,25 @@ export function generateTrigger(
 
       clearDelayTimer();
 
-      setPopupVisibleRaw((prevPopupVisible) => {
-        let visible = prevPopupVisible;
-        if (prevPopupVisible !== popupVisible) {
+      // setPopupVisibleRaw((prevPopupVisible) => {
+        // let visible = prevPopupVisible;
+        let prevPopupVisible = popupVisible();
+        if (prevPopupVisible !== popupVisibleNow) {
           if (props.popupVisible === undefined) {
+            batch(() => {
+              setPrevPopupVisible(prevPopupVisible);
+              setPopupVisibleRaw(popupVisibleNow);
+            })
             // setState({ popupVisible, prevPopupVisible });
-            setPrevPopupVisible(prevPopupVisible);
-            visible = popupVisible;
           }
-          props.onPopupVisibleChange(popupVisible);
+          props.onPopupVisibleChange(popupVisibleNow);
         }
-
-        return visible;
-      })
+        // console.log("setPopupVisibleRaw2", visible)
+        // return visible;
+      // })
 
       // Always record the point position since mouseEnterDelay will delay the show
-      if (props.alignPoint && event && popupVisible) {
+      if (props.alignPoint && event && popupVisibleNow) {
         setPoint(event);
       }
     }
@@ -739,16 +743,23 @@ export function generateTrigger(
     })
 
     const triggerContextValue = { onPopupMouseDown };
+    const ref = {
+      getPopupDomNode,
+      getRootDomNode,
+      onDocumentClick,
+      popupRef,
+      triggerRef,
+      props // TODO: solid jest
+    }
+    props.ref?.(ref);
     onMount(() => {
-      console.log('popupRef', popupRef);
-      
-      props.ref?.({
+      Object.assign(ref, {
         getPopupDomNode,
         getRootDomNode,
         onDocumentClick,
         popupRef,
         triggerRef,
-        props // TODO: solid jest
+        props: {...props} // TODO: solid jest
       });
     })    
     // ======================== Render ========================
@@ -886,7 +897,10 @@ export function generateTrigger(
               maskAnimation={props.maskAnimation}
               maskTransitionName={props.maskTransitionName}
               maskMotion={props.maskMotion}
-              ref={popupRef}
+              ref={(ref_) => {
+                popupRef = ref_;
+                ref.popupRef = ref_;
+              }}
               motion={props.popupMotion}
               mobile={props.mobile}
               forceRender={props.forceRender}

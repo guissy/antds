@@ -3,11 +3,13 @@ import { spread } from 'solid-js/web'
 import { fillRef } from 'rc-util-solid/lib/ref';
 import classNames from 'classnames';
 import { getTransitionName, supportTransition } from './util/motion';
-import type {
+import {
   MotionStatus,
   MotionEventHandler,
   MotionEndEventHandler,
   MotionPrepareEventHandler,
+  STATUS_APPEAR,
+  STATUS_LEAVE,
 } from './interface';
 import { STATUS_NONE, STEP_PREPARE, STEP_START } from './interface';
 import useStatus from './hooks/useStatus';
@@ -148,7 +150,6 @@ export function genCSSMotion(
     let nodeRef = null as (any | null);
     // Ref to the dom wrapper in case ref can not pass to HTMLElement
     // let wrapperNodeRef = useRef();
-
     function getDomElement() {
       try {
         // Here we're avoiding call for findDOMNode since it's deprecated
@@ -195,16 +196,18 @@ export function genCSSMotion(
         : null
     )() as HTMLElement;
     setNodeRef(motionChildren)
-    const classNameInit = motionChildren?.className;
+    let classNameInit = motionChildren?.className;
     const styleInit = toStyleObject(motionChildren?.style?.cssText);
     // const styleInit = motionChildren?.style;
     const [removed, setRemoved] = createSignal(false);
     createEffect(({child, styleKeys}) => {
       setRemoved(false);      
       const styleInitForce = Object.fromEntries(Object.keys(toStyleObject(child?.style?.cssText)).filter(k => styleKeys.includes(k)).map(k => [k, styleInit[k] ?? '']));
+      if (child?.className && (status() === STATUS_APPEAR) && statusStep() === STEP_START) {
+        classNameInit = child?.className        
+      }
       const mergedProps = mergeProps(props.eventProps, { 'class': classNames(classNameInit, props.className), visible: visible() });
       const removeOnLeave = props.removeOnLeave ?? true;
-
       // TODO: solid notification works, but tooltip not work (it has no key) 
       if (props.key) {
         const childNew = Children(() => props.children({ ...mergedProps }))() as HTMLElement;
