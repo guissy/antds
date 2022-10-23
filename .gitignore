@@ -62,3 +62,5 @@ ci.*
 
 /__mock__
 /packages/*
+
+# /a.mts
