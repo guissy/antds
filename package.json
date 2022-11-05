@@ -52,6 +52,6 @@
     "zx": "^7.0.8"
   },
   "dependencies": {
-    "solid-js": "^1.5.1"
+    "solid-js": "^1.6.0"
   }
 }

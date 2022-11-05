@@ -77,7 +77,7 @@ const resolvePkg = async () => {
   );
   pkg.dependencies.typescript = "^4.8.2"
   pkg.peerDependencies = {
-    "solid-js": ">=1.5.0",
+    "solid-js": ">=1.6.0",
   };
   await nodeFs.writeFile(
     "rc-util-solid/package.json",

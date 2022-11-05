@@ -74,7 +74,7 @@ const resolvePkg = async () => {
     Object.entries(pkg.devDependencies).sort((a, b) => (a[0] < b[0] ? -1 : 1))
   );
   pkg.peerDependencies = {
-    "solid-js": ">=1.5.0",
+    "solid-js": ">=1.6.0",
   };
   await nodeFs.writeFile(
     "antd-icons-solid/package.json",
